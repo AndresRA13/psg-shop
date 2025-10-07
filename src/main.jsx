@@ -6,8 +6,8 @@ import { HashRouter } from 'react-router-dom'
 import { PayPalScriptProvider } from '@paypal/react-paypal-js'
 
 const paypalOptions = {
-  'client-id': 'ECmX0zT4f25SE12Wz3vY6RNnLLG1iK_uOE1UvckTz5o2Pn9DhFtVpeKOBvJSLGu1MpPYduxBNjUWPKwP',
-  currency: 'COP',
+  'client-id': 'AdgxAW2HZC5B-yzBWZKimJnJH8W5r-PwL5_lppQOw1w43p_mlpg5FzCDl2trocXC23YuwZhhjyiJIOEf',
+  currency: 'USD',
   intent: 'capture'
 };
 

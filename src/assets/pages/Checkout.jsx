@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PayPalButtons } from '@paypal/react-paypal-js';
-import Navbar from '../../components/navbar';
 import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../App';
+import { useAuth } from '../../context/AuthContext';
 import { db } from '../../firebase';
 import { doc, getDoc, setDoc, collection, addDoc, updateDoc } from 'firebase/firestore';
 import Swal from 'sweetalert2';
@@ -13,6 +12,38 @@ const Checkout = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   
+  // Exchange rate for COP to USD (you might want to fetch this dynamically)
+  const EXCHANGE_RATE = 0.00028; // 1 USD = 3570 COP (approximate)
+  
+  // Convert COP to USD
+  const convertToUSD = (copAmount) => {
+    return copAmount * EXCHANGE_RATE;
+  };
+
+  // Get the primary image URL for a product
+  const getPrimaryImageUrl = (product) => {
+    if (product.imageUrls && product.imageUrls.length > 0) {
+      // Filter out empty images
+      const validImages = product.imageUrls.filter(image => 
+        image && (typeof image === 'string' || (image.data && typeof image.data === 'string'))
+      );
+      if (validImages.length > 0) {
+        const primaryIndex = product.primaryImageIndex || 0;
+        // Ensure primaryIndex is within bounds
+        const safeIndex = Math.min(primaryIndex, validImages.length - 1);
+        const primaryImage = validImages[safeIndex];
+        
+        // Handle both string URLs and base64 data objects
+        if (typeof primaryImage === 'string') {
+          return primaryImage;
+        } else if (primaryImage && primaryImage.data) {
+          return primaryImage.data;
+        }
+      }
+    }
+    return product.imageUrl || 'https://via.placeholder.com/100x100.png?text=Moño';
+  };
+
   // State for addresses and checkout
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -146,6 +177,9 @@ const Checkout = () => {
   // Create order in Firestore
   const createOrder = async (paymentMethod, paymentStatus) => {
     try {
+      // Convert total to USD for PayPal payments
+      const totalInUSD = convertToUSD(total);
+      
       const orderData = {
         userId: currentUser.uid,
         userEmail: currentUser.email,
@@ -153,6 +187,7 @@ const Checkout = () => {
         subtotal: parseFloat(subtotal),
         discount: parseFloat(discount),
         totalAmount: parseFloat(total),
+        totalAmountUSD: parseFloat(totalInUSD.toFixed(2)), // Store USD amount for PayPal payments
         address: selectedAddress,
         paymentMethod: paymentMethod,
         paymentStatus: paymentStatus,
@@ -267,7 +302,6 @@ const Checkout = () => {
   if (cartLoading || loading) {
     return (
       <div>
-        <Navbar />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
@@ -285,7 +319,6 @@ const Checkout = () => {
   
   return (
     <div>
-      <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
         
@@ -489,7 +522,7 @@ const Checkout = () => {
                       <li key={item.id} className="py-6 flex">
                         <div className="flex-shrink-0 w-24 h-24 border border-gray-200 rounded-md overflow-hidden">
                           <img
-                            src={item.imageUrl || 'https://via.placeholder.com/100x100.png?text=Moño'}
+                            src={getPrimaryImageUrl(item)}
                             alt={item.name}
                             className="w-full h-full object-center object-cover"
                             onError={(e) => {
@@ -572,12 +605,14 @@ const Checkout = () => {
                       <PayPalButtons
                         style={{ layout: 'vertical' }}
                         createOrder={(data, actions) => {
+                          // Convert total from COP to USD for PayPal
+                          const totalInUSD = convertToUSD(total);
                           return actions.order.create({
                             purchase_units: [
                               {
                                 amount: {
-                                  value: parseFloat(total).toFixed(2),
-                                  currency_code: 'COP'
+                                  value: totalInUSD.toFixed(2),
+                                  currency_code: 'USD'
                                 }
                               }
                             ]
@@ -594,8 +629,8 @@ const Checkout = () => {
                         <svg className="mr-2 h-5 w-5" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg">
                           <path fill="#253b80" d="M35.71 15.39c.27-.4.4-.87.36-1.35-.04-.48-.24-.93-.57-1.28-.33-.35-.76-.55-1.22-.56-.46 0-.89.19-1.22.53-.33.34-.52.8-.54 1.28-.02.48.12.94.4 1.33.28.39.68.67 1.14.8.46.13.95.1 1.4-.08.45-.18.84-.49 1.12-.89z"/>
                           <path fill="#179bd7" d="M13.34 15.96c.34-.46.52-1.02.51-1.59-.01-.57-.22-1.12-.59-1.54-.37-.42-.87-.67-1.41-.71-.54-.04-1.08.13-1.51.46-.43.33-.73.81-.85 1.35-.12.54-.07 1.11.14 1.62.21.51.57.94 1.03 1.23.46.29.99.42 1.53.37.54-.05 1.05-.27 1.47-.63z"/>
-                          <path fill="#253b80" d="M22.72 16.11c.41-.36.67-.87.72-1.41.05-.54-.09-1.08-.39-1.51-.3-.43-.75-.73-1.26-.84-.51-.11-1.04-.06-1.52.14-.5.2-.88.54-1.15.97-.27.43-.41.94-.4 1.47.01.53.18 1.04.48 1.47.3.43.74.75 1.24.91.5.16 1.03.17 1.54.03.51-.14.96-.43 1.3-.83z"/>
-                          <path fill="#179bd7" d="M30.21 16.26c.45-.31.75-.8.83-1.34.08-.54-.03-1.09-.31-1.55-.28-.46-.72-.81-1.23-.96-.51-.15-1.05-.13-1.55.05-.5.18-.92.51-1.19.94-.27.43-.4.93-.37 1.44.03.51.21.99.51 1.4.3.41.74.72 1.23.88.49.16 1.01.18 1.51.06.5-.12.94-.4 1.26-.78z"/>
+                          <path fill="#253b80" d="M22.72 16.11c.41-.36.67-.87.72-1.41.05-.54-.09-1.08-.31-1.55-.28-.42-.72-.81-1.23-.96-.51-.15-1-.08-1.46.09-.46.17-.85.49-1.11.89-.27.4-.37.93-.32 1.44.03.51.21.99.51 1.4.3.41.74.72 1.23.88.49.16 1.01.17 1.51.06.5-.12.94-.4 1.26-.78z"/>
+                          <path fill="#179bd7" d="M30.21 16.26c.45-.31.75-.8.83-1.34.08-.54-.03-1.09-.31-1.55-.28-.42-.72-.81-1.23-.96-.51-.15-1-.08-1.46.09-.46.17-.85.49-1.11.89-.26.4-.37.88-.32 1.37.05.49.27.95.61 1.31.34.36.79.6 1.28.68.49.08 1-.01 1.44-.24z"/>
                           <path fill="#253b80" d="M5.39 16.39c.47-.23.81-.66.93-1.16.12-.5.03-1.03-.25-1.45-.28-.42-.71-.71-1.2-.82-.49-.11-1-.08-1.46.09-.46.17-.85.49-1.11.89-.26.4-.37.88-.32 1.37.05.49.27.95.61 1.31.34.36.79.6 1.28.68.49.08 1-.01 1.44-.24z"/>
                         </svg>
                         Pagar con PayPal

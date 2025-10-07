@@ -5,6 +5,7 @@ import { auth, db } from './firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { AuthContext, useAuth } from './context/AuthContext';
 import Shop from './assets/pages/Shop';
 import ProductDetail from './assets/pages/ProductDetail';
 import Cart from './assets/pages/Cart';
@@ -20,13 +21,6 @@ import Wishlist from './assets/pages/Wishlist';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
 import createSampleCoupon from './utils/createSampleCoupon';
-
-// Create AuthContext
-export const AuthContext = React.createContext();
-
-export const useAuth = () => {
-  return React.useContext(AuthContext);
-};
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -161,7 +155,7 @@ function App() {
                     <ResetPassword />
                   </RedirectIfAuthenticated>
                 } />
-                <Route path="/admin" element={
+                <Route path="/admin/*" element={
                   <ProtectedRoute adminOnly>
                     <ModernAdminDashboard />
                   </ProtectedRoute>
@@ -173,7 +167,11 @@ function App() {
                 } />
               </Routes>
             </main>
-            <Footer />
+            {/* Only show footer for non-admin routes */}
+            <Routes>
+              <Route path="/admin/*" element={null} />
+              <Route path="*" element={<Footer />} />
+            </Routes>
           </div>
         </WishlistProvider>
       </CartProvider>

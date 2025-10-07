@@ -4,7 +4,7 @@ import { getProducts } from '../../services/productService';
 import StarRating from '../../components/StarRating';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { useAuth } from '../../App';
+import { useAuth } from '../../context/AuthContext';
 import Swal from 'sweetalert2';
 
 const Shop = () => {
@@ -113,8 +113,12 @@ const Shop = () => {
       return;
     }
     
+    // Get the primary product image as selected in the admin panel
+    const mainImage = getPrimaryImageUrl(product);
+    
     addToCart({
       ...product,
+      imageUrl: mainImage, // Ensure we use the primary image selected in admin panel
       quantity: 1
     });
     
@@ -146,7 +150,14 @@ const Shop = () => {
       return;
     }
 
-    addToWishlist(product);
+    // Get the primary product image as selected in the admin panel
+    const mainImage = getPrimaryImageUrl(product);
+    
+    addToWishlist({
+      ...product,
+      imageUrl: mainImage // Ensure we use the primary image selected in admin panel
+    });
+    
     Swal.fire({
       title: 'Producto agregado',
       text: 'Producto agregado correctamente a tu lista de deseos',
@@ -270,7 +281,7 @@ const Shop = () => {
                         }}
                       >
                         <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4 4 0 000 6.364L12 20.364l7.682-7.682a4 4 0 00-6.364-6.364L12 7.636l-1.318-1.318a4 4 0 00-6.364 0z" />
                         </svg>
                       </button>
                     </div>

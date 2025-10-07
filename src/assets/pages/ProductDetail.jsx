@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getProductById } from '../../services/productService';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { useAuth } from '../../App';
+import { useAuth } from '../../context/AuthContext';
 import StarRating from '../../components/StarRating';
 import Swal from 'sweetalert2';
 import { createReview, getReviewsByProductId } from '../../services/reviewService';
@@ -70,6 +70,30 @@ const ProductDetail = () => {
     fetchReviews();
   }, [id]);
 
+  // Get the primary image URL for a product
+  const getPrimaryImageUrl = (product) => {
+    if (product.imageUrls && product.imageUrls.length > 0) {
+      // Filter out empty images
+      const validImages = product.imageUrls.filter(image => 
+        image && (typeof image === 'string' || (image.data && typeof image.data === 'string'))
+      );
+      if (validImages.length > 0) {
+        const primaryIndex = product.primaryImageIndex || 0;
+        // Ensure primaryIndex is within bounds
+        const safeIndex = Math.min(primaryIndex, validImages.length - 1);
+        const primaryImage = validImages[safeIndex];
+        
+        // Handle both string URLs and base64 data objects
+        if (typeof primaryImage === 'string') {
+          return primaryImage;
+        } else if (primaryImage && primaryImage.data) {
+          return primaryImage.data;
+        }
+      }
+    }
+    return product.imageUrl || 'https://via.placeholder.com/600x600.png?text=Moño';
+  };
+
   const handleAddToCart = () => {
     // Check if user is logged in
     if (!currentUser) {
@@ -102,8 +126,12 @@ const ProductDetail = () => {
         return;
       }
       
+      // Get the primary product image as selected in the admin panel
+      const mainImage = getPrimaryImageUrl(product);
+      
       addToCart({
         ...product,
+        imageUrl: mainImage, // Ensure we use the primary image selected in admin panel
         quantity: 1
       });
       
@@ -140,7 +168,14 @@ const ProductDetail = () => {
     }
 
     if (product) {
-      addToWishlist(product);
+      // Get the primary product image as selected in the admin panel
+      const mainImage = getPrimaryImageUrl(product);
+      
+      addToWishlist({
+        ...product,
+        imageUrl: mainImage // Ensure we use the primary image selected in admin panel
+      });
+      
       Swal.fire({
         title: 'Producto agregado',
         text: 'Producto agregado correctamente a tu lista de deseos',
@@ -356,7 +391,7 @@ const ProductDetail = () => {
           <div className="flex flex-col-reverse">
             {/* Image selector */}
             {images.length > 1 && (
-              <div className="hidden w-full max-w-2xl mx-auto mt-6 sm:block lg:max-w-none">
+              <div className="w-full max-w-2xl mx-auto mt-6 lg:max-w-none">
                 <div className="grid grid-cols-4 gap-6" aria-orientation="horizontal">
                   {images.map((image, index) => (
                     <button

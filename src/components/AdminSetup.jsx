@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { useAuth } from '../App';
+import { useAuth } from '../../context/AuthContext';
 
 const AdminSetup = () => {
   const [email, setEmail] = useState('');

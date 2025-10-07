@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useState, useRef, useCallback } from 'react';
 import { db } from '../firebase';
 import { doc, setDoc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
-import { useAuth } from '../App';
+import { useAuth } from '../context/AuthContext';
 
 const CartContext = createContext();
 
@@ -112,7 +112,29 @@ export const CartProvider = ({ children }) => {
   const { currentUser } = useAuth();
   const initialCartLoad = useRef(true);
   
-  console.log('CartProvider initialized with currentUser:', currentUser);
+  // Get the primary image URL for a product
+  const getPrimaryImageUrl = (product) => {
+    if (product.imageUrls && product.imageUrls.length > 0) {
+      // Filter out empty images
+      const validImages = product.imageUrls.filter(image => 
+        image && (typeof image === 'string' || (image.data && typeof image.data === 'string'))
+      );
+      if (validImages.length > 0) {
+        const primaryIndex = product.primaryImageIndex || 0;
+        // Ensure primaryIndex is within bounds
+        const safeIndex = Math.min(primaryIndex, validImages.length - 1);
+        const primaryImage = validImages[safeIndex];
+        
+        // Handle both string URLs and base64 data objects
+        if (typeof primaryImage === 'string') {
+          return primaryImage;
+        } else if (primaryImage && primaryImage.data) {
+          return primaryImage.data;
+        }
+      }
+    }
+    return product.imageUrl || 'https://via.placeholder.com/600x600.png?text=Moño';
+  };
 
   // Load cart from Firestore when user logs in
   const loadCartFromFirestore = useCallback(async () => {
@@ -216,7 +238,12 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product) => {
     console.log('Adding to cart:', product);
-    dispatch({ type: 'ADD_TO_CART', payload: product });
+    // Ensure we use the primary image selected in the admin panel
+    const productWithPrimaryImage = {
+      ...product,
+      imageUrl: getPrimaryImageUrl(product)
+    };
+    dispatch({ type: 'ADD_TO_CART', payload: productWithPrimaryImage });
   };
 
   const removeFromCart = async (productId) => {

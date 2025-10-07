@@ -5,6 +5,30 @@ import { useWishlist } from '../../context/WishlistContext';
 const Wishlist = () => {
   const { items, removeFromWishlist, loading } = useWishlist();
 
+  // Get the primary image URL for a product
+  const getPrimaryImageUrl = (product) => {
+    if (product.imageUrls && product.imageUrls.length > 0) {
+      // Filter out empty images
+      const validImages = product.imageUrls.filter(image => 
+        image && (typeof image === 'string' || (image.data && typeof image.data === 'string'))
+      );
+      if (validImages.length > 0) {
+        const primaryIndex = product.primaryImageIndex || 0;
+        // Ensure primaryIndex is within bounds
+        const safeIndex = Math.min(primaryIndex, validImages.length - 1);
+        const primaryImage = validImages[safeIndex];
+        
+        // Handle both string URLs and base64 data objects
+        if (typeof primaryImage === 'string') {
+          return primaryImage;
+        } else if (primaryImage && primaryImage.data) {
+          return primaryImage.data;
+        }
+      }
+    }
+    return product.imageUrl || 'https://via.placeholder.com/300x300.png?text=Moño';
+  };
+
   // Show loading state
   if (loading) {
     return (
@@ -47,9 +71,7 @@ const Wishlist = () => {
                 <Link to={`/product/${item.id}`}>
                   <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden">
                     <img
-                      src={item.imageUrls && item.imageUrls.length > 0 ? 
-                        (typeof item.imageUrls[0] === 'string' ? item.imageUrls[0] : item.imageUrls[0].data) : 
-                        item.imageUrl || 'https://via.placeholder.com/300x300.png?text=Moño'}
+                      src={getPrimaryImageUrl(item)}
                       alt={item.name}
                       className="w-full h-64 object-cover"
                       onError={(e) => {

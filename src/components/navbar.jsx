@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaShoppingCart, FaHeart, FaBars, FaTimes, FaYoutube, FaLinkedin, FaFacebook, FaTwitter, FaUser, FaCog, FaSignOutAlt, FaList } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../App';
+import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { signOut } from 'firebase/auth';

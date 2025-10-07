@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../App';
+import { useAuth } from '../../context/AuthContext';
 import { getReviewsByProductId } from '../services/reviewService';
 import StarRating from './StarRating';
 import Swal from 'sweetalert2';
