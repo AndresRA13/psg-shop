@@ -23,7 +23,7 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Contacto</h4>
             <address className="text-gray-300 not-italic">
-              <p>Email: info@tiendademosnos.com</p>
+              <p>Email: psgmoños@gmail.com</p>
               <p>Teléfono: (123) 456-7890</p>
             </address>
           </div>

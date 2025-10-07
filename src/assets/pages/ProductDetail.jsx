@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import Navbar from '../../components/navbar';
+// Removed duplicate Navbar import since it's already rendered in App.jsx
 import { getProductById } from '../../services/productService';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
@@ -302,8 +302,8 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
+      // Removed duplicate Navbar since it's already rendered in App.jsx
       <div>
-        <Navbar />
         <div className="flex items-center justify-center h-64">
           <div className="w-12 h-12 border-b-2 border-gray-900 rounded-full animate-spin"></div>
         </div>
@@ -313,8 +313,8 @@ const ProductDetail = () => {
 
   if (error || !product) {
     return (
+      // Removed duplicate Navbar since it's already rendered in App.jsx
       <div>
-        <Navbar />
         <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="relative px-4 py-3 text-red-700 bg-red-100 border border-red-400 rounded" role="alert">
             <strong className="font-bold">Error! </strong>
@@ -328,8 +328,8 @@ const ProductDetail = () => {
   const images = getProductImages();
 
   return (
+    // Removed duplicate Navbar since it's already rendered in App.jsx
     <div>
-      <Navbar />
       <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
