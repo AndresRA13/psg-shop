@@ -880,10 +880,10 @@ const ModernAdminDashboard = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imagen</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                     </tr>
                   </thead>
@@ -891,43 +891,35 @@ const ModernAdminDashboard = () => {
                     {products.map((product) => (
                       <tr key={product.id}>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10">
-                              {product.imageUrls && product.imageUrls.length > 0 ? (
-                                <img 
-                                  className="h-10 w-10 rounded-md object-cover" 
-                                  src={typeof product.imageUrls[product.primaryImageIndex] === 'string' ? 
-                                    product.imageUrls[product.primaryImageIndex] : 
-                                    product.imageUrls[product.primaryImageIndex]?.data || 
-                                    product.imageUrls[0]} 
-                                  alt={product.name} 
-                                  onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = 'https://via.placeholder.com/40x40.png?text=Moño';
-                                  }}
-                                />
-                              ) : (
-                                <div className="h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center">
-                                  <FiShoppingBag className="text-gray-500" />
-                                </div>
-                              )}
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                              <div className="text-sm text-gray-500 line-clamp-1">{product.description}</div>
-                            </div>
+                          <div className="flex-shrink-0 h-10 w-10">
+                            {product.imageUrls && product.imageUrls.length > 0 ? (
+                              <img 
+                                className="h-10 w-10 rounded-md object-cover" 
+                                src={typeof product.imageUrls[product.primaryImageIndex] === 'string' ? 
+                                  product.imageUrls[product.primaryImageIndex] : 
+                                  product.imageUrls[product.primaryImageIndex]?.data || 
+                                  product.imageUrls[0]} 
+                                alt={product.name} 
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.src = 'https://via.placeholder.com/40x40.png?text=Moño';
+                                }}
+                              />
+                            ) : (
+                              <div className="h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center">
+                                <FiShoppingBag className="text-gray-500" />
+                              </div>
+                            )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {formatCurrency(product.price)}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{product.name}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {product.stock}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                            {product.category || 'Sin categoría'}
-                          </span>
+                          {formatCurrency(product.price)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button 
@@ -956,9 +948,7 @@ const ModernAdminDashboard = () => {
       case 'users':
         return (
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Gestión de Usuarios</h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Gestión de Usuarios</h2>
             
             {usersLoading ? (
               <div className="flex justify-center py-8">
@@ -969,7 +959,6 @@ const ModernAdminDashboard = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -978,8 +967,9 @@ const ModernAdminDashboard = () => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {users.map((user) => (
                       <tr key={user.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name || user.email}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {user.email}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             user.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
@@ -988,11 +978,18 @@ const ModernAdminDashboard = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button 
-                            onClick={() => updateUserRole(user.id, user.role === 'admin' ? 'user' : 'admin')}
-                            className="text-blue-600 hover:text-blue-900"
+                          <button
+                            onClick={() => {
+                              const newRole = user.role === 'admin' ? 'customer' : 'admin';
+                              updateUserRole(user.id, newRole);
+                            }}
+                            className={`px-3 py-1 text-xs rounded-md ${
+                              user.role === 'admin' 
+                                ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                            }`}
                           >
-                            {user.role === 'admin' ? 'Cambiar a Cliente' : 'Hacer Administrador'}
+                            {user.role === 'admin' ? 'Hacer Cliente' : 'Hacer Administrador'}
                           </button>
                         </td>
                       </tr>
