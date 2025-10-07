@@ -6,6 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { AuthContext, useAuth } from './context/AuthContext';
+import Home from './assets/pages/Home';
 import Shop from './assets/pages/Shop';
 import ProductDetail from './assets/pages/ProductDetail';
 import Cart from './assets/pages/Cart';
@@ -71,7 +72,7 @@ function App() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <div className="w-12 h-12 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -119,8 +120,8 @@ function App() {
             
             <main className="flex-grow">
               <Routes>
-                <Route path="/" element={<Shop />} />
-                <Route path="/home" element={<Shop />} />
+                <Route path="/" element={<Home />} />
+                <Route path="/home" element={<Home />} />
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
