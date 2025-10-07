@@ -38,7 +38,7 @@ const ModernAdminDashboard = () => {
     recentOrders: [],
     recentUsers: []
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   
   // Products state
   const [products, setProducts] = useState([]);
@@ -297,20 +297,31 @@ const ModernAdminDashboard = () => {
   // Initialize data based on active section
   useEffect(() => {
     if (isAdmin) {
+      // Reset loading states when switching sections
+      setLoading(false); // Only used for analytics
+      setProductsLoading(false);
+      setUsersLoading(false);
+      setReviewsLoading(false);
+      setOrdersLoading(false);
+      
       switch (activeSection) {
         case 'analytics':
           fetchDashboardStats();
           break;
         case 'products':
+          setProductsLoading(true);
           fetchProducts();
           break;
         case 'users':
+          setUsersLoading(true);
           fetchUsers();
           break;
         case 'reviews':
+          setReviewsLoading(true);
           fetchReviews();
           break;
         case 'orders':
+          setOrdersLoading(true);
           fetchOrders();
           break;
         default:
@@ -730,7 +741,7 @@ const ModernAdminDashboard = () => {
         return (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {/* Stats Cards */}
-            <div className="p-6 bg-white rounded-xl shadow-sm">
+            <div className="p-6 bg-white shadow-sm rounded-xl">
               <div className="flex items-center">
                 <div className="p-3 bg-blue-100 rounded-lg">
                   <FiShoppingBag className="text-blue-600" size={24} />
@@ -742,7 +753,7 @@ const ModernAdminDashboard = () => {
               </div>
             </div>
 
-            <div className="p-6 bg-white rounded-xl shadow-sm">
+            <div className="p-6 bg-white shadow-sm rounded-xl">
               <div className="flex items-center">
                 <div className="p-3 bg-green-100 rounded-lg">
                   <FiPackage className="text-green-600" size={24} />
@@ -754,7 +765,7 @@ const ModernAdminDashboard = () => {
               </div>
             </div>
 
-            <div className="p-6 bg-white rounded-xl shadow-sm">
+            <div className="p-6 bg-white shadow-sm rounded-xl">
               <div className="flex items-center">
                 <div className="p-3 bg-purple-100 rounded-lg">
                   <FiUsers className="text-purple-600" size={24} />
@@ -766,7 +777,7 @@ const ModernAdminDashboard = () => {
               </div>
             </div>
 
-            <div className="p-6 bg-white rounded-xl shadow-sm">
+            <div className="p-6 bg-white shadow-sm rounded-xl">
               <div className="flex items-center">
                 <div className="p-3 bg-yellow-100 rounded-lg">
                   <FiMessageSquare className="text-yellow-600" size={24} />
@@ -778,7 +789,7 @@ const ModernAdminDashboard = () => {
               </div>
             </div>
 
-            <div className="p-6 bg-white rounded-xl shadow-sm">
+            <div className="p-6 bg-white shadow-sm rounded-xl">
               <div className="flex items-center">
                 <div className="p-3 bg-indigo-100 rounded-lg">
                   <FiBarChart2 className="text-indigo-600" size={24} />
@@ -791,26 +802,26 @@ const ModernAdminDashboard = () => {
             </div>
 
             {/* Recent Orders */}
-            <div className="p-6 bg-white rounded-xl shadow-sm md:col-span-2 lg:col-span-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Pedidos Recientes</h3>
+            <div className="p-6 bg-white shadow-sm rounded-xl md:col-span-2 lg:col-span-3">
+              <h3 className="mb-4 text-lg font-medium text-gray-900">Pedidos Recientes</h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">ID</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cliente</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Total</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {stats.recentOrders.map((order) => (
                       <tr key={order.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.id.substring(0, 8)}...</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.userEmail || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(order.createdAt)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(order.totalAmount || 0)}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{order.id.substring(0, 8)}...</td>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{order.userEmail || 'N/A'}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{formatDate(order.createdAt)}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{formatCurrency(order.totalAmount || 0)}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending')}`}>
                             {getOrderStatusText(order.orderStatus || 'pending')}
@@ -824,23 +835,23 @@ const ModernAdminDashboard = () => {
             </div>
 
             {/* Recent Users */}
-            <div className="p-6 bg-white rounded-xl shadow-sm md:col-span-2 lg:col-span-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Usuarios Recientes</h3>
+            <div className="p-6 bg-white shadow-sm rounded-xl md:col-span-2 lg:col-span-3">
+              <h3 className="mb-4 text-lg font-medium text-gray-900">Usuarios Recientes</h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Registro</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Nombre</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Email</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Rol</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha de Registro</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {stats.recentUsers.map((user) => (
                       <tr key={user.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name || user.email}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{user.name || user.email}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{user.email}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             user.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
@@ -848,7 +859,7 @@ const ModernAdminDashboard = () => {
                             {user.role === 'admin' ? 'Administrador' : 'Cliente'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(user.createdAt)}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{formatDate(user.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -859,12 +870,12 @@ const ModernAdminDashboard = () => {
         );
       case 'products':
         return (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
+          <div className="p-6 bg-white shadow-sm rounded-xl">
+            <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">Gestión de Productos</h2>
               <button 
                 onClick={openAddProductModal}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center px-4 py-2 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
               >
                 <FiPlus className="mr-2" />
                 Añadir Producto
@@ -880,21 +891,21 @@ const ModernAdminDashboard = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imagen</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Imagen</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Nombre</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Stock</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Precio</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {products.map((product) => (
                       <tr key={product.id}>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex-shrink-0 h-10 w-10">
+                          <div className="flex-shrink-0 w-10 h-10">
                             {product.imageUrls && product.imageUrls.length > 0 ? (
                               <img 
-                                className="h-10 w-10 rounded-md object-cover" 
+                                className="object-cover w-10 h-10 rounded-md" 
                                 src={typeof product.imageUrls[product.primaryImageIndex] === 'string' ? 
                                   product.imageUrls[product.primaryImageIndex] : 
                                   product.imageUrls[product.primaryImageIndex]?.data || 
@@ -906,7 +917,7 @@ const ModernAdminDashboard = () => {
                                 }}
                               />
                             ) : (
-                              <div className="h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center">
+                              <div className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-md">
                                 <FiShoppingBag className="text-gray-500" />
                               </div>
                             )}
@@ -915,16 +926,16 @@ const ModernAdminDashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{product.name}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                           {product.stock}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                           {formatCurrency(product.price)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
                           <button 
                             onClick={() => openEditProductModal(product)}
-                            className="text-blue-600 hover:text-blue-900 mr-3"
+                            className="mr-3 text-blue-600 hover:text-blue-900"
                             title="Editar producto"
                           >
                             <FiEdit />
@@ -947,8 +958,8 @@ const ModernAdminDashboard = () => {
         );
       case 'users':
         return (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Gestión de Usuarios</h2>
+          <div className="p-6 bg-white shadow-sm rounded-xl">
+            <h2 className="mb-6 text-xl font-semibold text-gray-900">Gestión de Usuarios</h2>
             
             {usersLoading ? (
               <div className="flex justify-center py-8">
@@ -959,15 +970,15 @@ const ModernAdminDashboard = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Email</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Rol</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {users.map((user) => (
                       <tr key={user.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                           {user.email}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -977,7 +988,7 @@ const ModernAdminDashboard = () => {
                             {user.role === 'admin' ? 'Administrador' : 'Cliente'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
                           <button
                             onClick={() => {
                               const newRole = user.role === 'admin' ? 'customer' : 'admin';
@@ -1002,10 +1013,8 @@ const ModernAdminDashboard = () => {
         );
       case 'reviews':
         return (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Gestión de Reseñas</h2>
-            </div>
+          <div className="p-6 bg-white shadow-sm rounded-xl">
+            <h2 className="mb-6 text-xl font-semibold text-gray-900">Gestión de Reseñas</h2>
             
             {reviewsLoading ? (
               <div className="flex justify-center py-8">
@@ -1016,214 +1025,17 @@ const ModernAdminDashboard = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comentario</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Calificación</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Producto</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Usuario</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Calificación</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {reviews.map((review) => (
                       <tr key={review.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{review.productName}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{review.userEmail}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 line-clamp-1">{review.comment}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <StarRating rating={review.rating} />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button 
-                            onClick={() => openEditReviewModal(review)}
-                            className="text-blue-600 hover:text-blue-900 mr-3"
-                            title="Editar reseña"
-                          >
-                            <FiEdit />
-                          </button>
-                          <button 
-                            onClick={() => deleteReviewHandler(review.id)}
-                            className="text-red-600 hover:text-red-900"
-                            title="Eliminar reseña"
-                          >
-                            <FiTrash2 />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        );
-      case 'coupons':
-        return (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Gestión de Códigos Promocionales</h2>
-            </div>
-            <CouponManager />
-          </div>
-        );
-      case 'orders':
-        return (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Gestión de Pedidos</h2>
-            </div>
-            
-            {ordersLoading ? (
-              <div className="flex justify-center py-8">
-                <div className="w-8 h-8 border-b-2 border-blue-600 rounded-full animate-spin"></div>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {orders.map((order) => (
-                      <tr key={order.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.id.substring(0, 8)}...</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.userEmail || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(order.createdAt)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(order.totalAmount || 0)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending')}`}>
-                            {getOrderStatusText(order.orderStatus || 'pending')}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button 
-                            onClick={() => openOrderDetails(order)}
-                            className="text-blue-600 hover:text-blue-900 mr-3"
-                            title="Ver detalles del pedido"
-                          >
-                            <FiShoppingCart />
-                          </button>
-                          <button 
-                            onClick={() => updateOrderStatusHandler(order.id, order.orderStatus === 'delivered' ? 'pending' : 'delivered')}
-                            className={order.orderStatus === 'delivered' ? 'text-green-600 hover:text-green-900' : 'text-gray-600 hover:text-gray-900'}
-                            title="Actualizar estado del pedido"
-                          >
-                            {order.orderStatus === 'delivered' ? 'Marcar como Pendiente' : 'Marcar como Entregado'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        );
-      case 'users':
-        return (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Gestión de Usuarios</h2>
-            
-            {usersLoading ? (
-              <div className="flex justify-center py-8">
-                <div className="w-8 h-8 border-b-2 border-blue-600 rounded-full animate-spin"></div>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Registro</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {users.map((user) => (
-                      <tr key={user.id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10">
-                              <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                                {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
-                              </div>
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">{user.name || 'N/A'}</div>
-                              <div className="text-sm text-gray-500">{user.email}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {user.email}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            user.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {user.role === 'admin' ? 'Administrador' : 'Cliente'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {formatDate(user.createdAt)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => {
-                              const newRole = user.role === 'admin' ? 'customer' : 'admin';
-                              updateUserRole(user.id, newRole);
-                            }}
-                            className={`px-3 py-1 text-xs rounded-md ${
-                              user.role === 'admin' 
-                                ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-                                : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                            }`}
-                          >
-                            {user.role === 'admin' ? 'Hacer Cliente' : 'Hacer Administrador'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        );
-      case 'reviews':
-        return (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Gestión de Reseñas</h2>
-            
-            {reviewsLoading ? (
-              <div className="flex justify-center py-8">
-                <div className="w-8 h-8 border-b-2 border-blue-600 rounded-full animate-spin"></div>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Calificación</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comentario</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {reviews.map((review) => (
-                      <tr key={review.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                           {review.productId || 'N/A'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -1233,16 +1045,13 @@ const ModernAdminDashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <StarRating rating={review.rating} />
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-500 max-w-xs">
-                          <div className="line-clamp-2">{review.comment || 'N/A'}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                           {formatDate(review.createdAt)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
                           <button 
                             onClick={() => openEditReviewModal(review)}
-                            className="text-blue-600 hover:text-blue-900 mr-3"
+                            className="mr-3 text-blue-600 hover:text-blue-900"
                             title="Editar reseña"
                           >
                             <FiEdit />
@@ -1265,15 +1074,15 @@ const ModernAdminDashboard = () => {
         );
       case 'coupons':
         return (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Gestión de Códigos Promocionales</h2>
+          <div className="p-6 bg-white shadow-sm rounded-xl">
+            <h2 className="mb-6 text-xl font-semibold text-gray-900">Gestión de Códigos Promocionales</h2>
             <CouponManager />
           </div>
         );
       case 'orders':
         return (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Gestión de Pedidos</h2>
+          <div className="p-6 bg-white shadow-sm rounded-xl">
+            <h2 className="mb-6 text-xl font-semibold text-gray-900">Gestión de Pedidos</h2>
             
             {ordersLoading ? (
               <div className="flex justify-center py-8">
@@ -1284,47 +1093,33 @@ const ModernAdminDashboard = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">ID</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cliente</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Total</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado</th>
+                      <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {orders.map((order) => (
                       <tr key={order.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.id.substring(0, 8)}...</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.userEmail || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(order.createdAt)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(order.totalAmount || 0)}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{order.id.substring(0, 8)}...</td>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{order.userEmail || 'N/A'}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{formatDate(order.createdAt)}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{formatCurrency(order.totalAmount || 0)}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending')}`}>
                             {getOrderStatusText(order.orderStatus || 'pending')}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex items-center space-x-2">
-                            <select
-                              value={order.orderStatus || 'pending'}
-                              onChange={(e) => updateOrderStatusHandler(order.id, e.target.value)}
-                              className="text-xs border rounded px-2 py-1"
-                              disabled={orderStatusUpdating[order.id]}
-                            >
-                              <option value="pending">Pendiente</option>
-                              <option value="processing">Procesando</option>
-                              <option value="shipped">Enviado</option>
-                              <option value="delivered">Entregado</option>
-                              <option value="cancelled">Cancelado</option>
-                            </select>
-                            <button 
-                              onClick={() => openOrderDetails(order)}
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              Ver Detalles
-                            </button>
-                          </div>
+                        <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                          <button
+                            onClick={() => openOrderDetails(order)}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            Ver Detalles
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1336,8 +1131,8 @@ const ModernAdminDashboard = () => {
         );
       default:
         return (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Dashboard</h2>
+          <div className="p-6 bg-white shadow-sm rounded-xl">
+            <h2 className="mb-4 text-xl font-semibold text-gray-900">Dashboard</h2>
             <p className="text-gray-600">Bienvenido al panel de administración moderno.</p>
           </div>
         );
@@ -1433,7 +1228,7 @@ const ModernAdminDashboard = () => {
                 className="flex items-center px-3 py-1 text-sm bg-gray-100 rounded-full cursor-pointer"
                 onClick={toggleProfileMenu}
               >
-                <div className="w-8 h-8 mr-2 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                <div className="flex items-center justify-center w-8 h-8 mr-2 font-semibold text-white bg-blue-500 rounded-full">
                   {currentUser?.email?.charAt(0).toUpperCase() || 'A'}
                 </div>
                 <span className="font-medium text-gray-700">Administrador</span>
@@ -1472,7 +1267,7 @@ const ModernAdminDashboard = () => {
 
         {/* Success/Error messages */}
         {successMessage && (
-          <div className="bg-green-50 border-l-4 border-green-500 p-4 mx-4 mt-4 lg:mx-6">
+          <div className="p-4 mx-4 mt-4 border-l-4 border-green-500 bg-green-50 lg:mx-6">
             <div className="flex">
               <div className="flex-shrink-0">
                 <span className="text-green-500">✓</span>
@@ -1485,7 +1280,7 @@ const ModernAdminDashboard = () => {
         )}
         
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mx-4 mt-4 lg:mx-6">
+          <div className="p-4 mx-4 mt-4 border-l-4 border-red-500 bg-red-50 lg:mx-6">
             <div className="flex">
               <div className="flex-shrink-0">
                 <span className="text-red-500">✕</span>
@@ -1498,8 +1293,8 @@ const ModernAdminDashboard = () => {
         )}
 
         {/* Main content area */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6 bg-gray-50">
-          {loading ? (
+        <main className="flex-1 p-4 overflow-y-auto lg:p-6 bg-gray-50">
+          {activeSection === 'analytics' && loading ? (
             <div className="flex items-center justify-center h-64">
               <div className="w-8 h-8 border-b-2 border-blue-600 rounded-full animate-spin"></div>
             </div>
@@ -1512,9 +1307,9 @@ const ModernAdminDashboard = () => {
       {/* Product Modal */}
       {productModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div 
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-40" 
+              className="fixed inset-0 z-40 transition-opacity bg-gray-500 bg-opacity-75" 
               aria-hidden="true"
               onClick={() => setProductModalOpen(false)}
             ></div>
@@ -1522,13 +1317,13 @@ const ModernAdminDashboard = () => {
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             
             {/* Modern Modal Design */}
-            <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full z-50" style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.1)', width: '650px' }}>
+            <div className="z-50 inline-block overflow-hidden text-left align-bottom transition-all transform bg-white shadow-xl rounded-2xl sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full" style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.1)', width: '650px' }}>
               <div className="px-8 py-8">
-                <div className="text-center mb-8">
+                <div className="mb-8 text-center">
                   <h3 className="text-2xl font-semibold text-gray-900">
                     {modalMode === 'add' ? 'Añadir Producto' : 'Editar Producto'}
                   </h3>
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="mt-2 text-sm text-gray-500">
                     {modalMode === 'add' ? 'Ingresa los detalles del nuevo producto' : 'Modifica la información del producto'}
                   </p>
                 </div>
@@ -1536,33 +1331,33 @@ const ModernAdminDashboard = () => {
                 <div className="mt-2">
                   <form onSubmit={modalMode === 'add' ? createProduct : updateProduct} className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Nombre del Producto</label>
+                      <label className="block mb-3 text-sm font-medium text-gray-700">Nombre del Producto</label>
                       <input
                         type="text"
                         name="name"
                         value={modalMode === 'add' ? newProduct.name : editingProduct?.name}
                         onChange={modalMode === 'add' ? handleProductChange : handleEditProductChange}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all text-gray-900 placeholder-gray-400"
+                        className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                         placeholder="Nombre del producto"
                         required
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Descripción</label>
+                      <label className="block mb-3 text-sm font-medium text-gray-700">Descripción</label>
                       <textarea
                         name="description"
                         value={modalMode === 'add' ? newProduct.description : editingProduct?.description}
                         onChange={modalMode === 'add' ? handleProductChange : handleEditProductChange}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all text-gray-900 placeholder-gray-400"
+                        className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                         rows="4"
                         placeholder="Descripción del producto"
                       />
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Precio (COP)</label>
+                        <label className="block mb-3 text-sm font-medium text-gray-700">Precio (COP)</label>
                         <input
                           type="number"
                           name="price"
@@ -1570,29 +1365,29 @@ const ModernAdminDashboard = () => {
                           min="0"
                           value={modalMode === 'add' ? newProduct.price : editingProduct?.price}
                           onChange={modalMode === 'add' ? handleProductChange : handleEditProductChange}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all text-gray-900 placeholder-gray-400"
+                          className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                           placeholder="0.00"
                           required
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Stock</label>
+                        <label className="block mb-3 text-sm font-medium text-gray-700">Stock</label>
                         <input
                           type="number"
                           name="stock"
                           min="0"
                           value={modalMode === 'add' ? newProduct.stock : editingProduct?.stock}
                           onChange={modalMode === 'add' ? handleProductChange : handleEditProductChange}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all text-gray-900 placeholder-gray-400"
+                          className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                           placeholder="Cantidad disponible"
                         />
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Calificación</label>
+                        <label className="block mb-3 text-sm font-medium text-gray-700">Calificación</label>
                         <input
                           type="number"
                           name="rating"
@@ -1601,69 +1396,69 @@ const ModernAdminDashboard = () => {
                           max="5"
                           value={modalMode === 'add' ? newProduct.rating : editingProduct?.rating}
                           onChange={modalMode === 'add' ? handleProductChange : handleEditProductChange}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all text-gray-900 placeholder-gray-400"
+                          className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                           placeholder="0.0 - 5.0"
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Material</label>
+                        <label className="block mb-3 text-sm font-medium text-gray-700">Material</label>
                         <input
                           type="text"
                           name="material"
                           value={modalMode === 'add' ? newProduct.material : editingProduct?.material}
                           onChange={modalMode === 'add' ? handleProductChange : handleEditProductChange}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all text-gray-900 placeholder-gray-400"
+                          className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                           placeholder="Material del producto"
                         />
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Color</label>
+                        <label className="block mb-3 text-sm font-medium text-gray-700">Color</label>
                         <input
                           type="text"
                           name="color"
                           value={modalMode === 'add' ? newProduct.color : editingProduct?.color}
                           onChange={modalMode === 'add' ? handleProductChange : handleEditProductChange}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all text-gray-900 placeholder-gray-400"
+                          className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                           placeholder="Color del producto"
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Tamaño</label>
+                        <label className="block mb-3 text-sm font-medium text-gray-700">Tamaño</label>
                         <input
                           type="text"
                           name="size"
                           value={modalMode === 'add' ? newProduct.size : editingProduct?.size}
                           onChange={modalMode === 'add' ? handleProductChange : handleEditProductChange}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all text-gray-900 placeholder-gray-400"
+                          className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                           placeholder="Tamaño del producto"
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Estilo</label>
+                        <label className="block mb-3 text-sm font-medium text-gray-700">Estilo</label>
                         <input
                           type="text"
                           name="style"
                           value={modalMode === 'add' ? newProduct.style : editingProduct?.style}
                           onChange={modalMode === 'add' ? handleProductChange : handleEditProductChange}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all text-gray-900 placeholder-gray-400"
+                          className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                           placeholder="Estilo del producto"
                         />
                       </div>
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Categoría</label>
+                      <label className="block mb-3 text-sm font-medium text-gray-700">Categoría</label>
                       <select
                         name="category"
                         value={modalMode === 'add' ? newProduct.category : editingProduct?.category}
                         onChange={modalMode === 'add' ? handleProductChange : handleEditProductChange}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all text-gray-900"
+                        className="w-full px-4 py-3 text-gray-900 transition-all border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                       >
                         <option value="">Seleccionar categoría</option>
                         <option value="Moños Elegantes">Moños Elegantes</option>
@@ -1676,7 +1471,7 @@ const ModernAdminDashboard = () => {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Imágenes</label>
+                      <label className="block mb-3 text-sm font-medium text-gray-700">Imágenes</label>
                       <div className="mt-3">
                         <button
                           type="button"
@@ -1688,7 +1483,7 @@ const ModernAdminDashboard = () => {
                         </button>
                         
                         {(modalMode === 'add' ? newProduct.imageUrls.length >= 4 : editingProduct?.imageUrls.length >= 4) && (
-                          <p className="text-sm text-gray-500 mt-2">Has alcanzado el límite máximo de 4 imágenes.</p>
+                          <p className="mt-2 text-sm text-gray-500">Has alcanzado el límite máximo de 4 imágenes.</p>
                         )}
                         
                         {uploading && (
@@ -1699,13 +1494,13 @@ const ModernAdminDashboard = () => {
                         
                         {modalMode === 'add' ? (
                           newProduct.imageUrls.length > 0 && (
-                            <div className="mt-5 grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4 mt-5">
                               {newProduct.imageUrls.map((imageData, index) => (
                                 <div key={index} className="relative">
                                   <img 
                                     src={typeof imageData === 'string' ? imageData : imageData.data} 
                                     alt={`Preview ${index}`} 
-                                    className="h-32 w-full object-cover rounded-lg"
+                                    className="object-cover w-full h-32 rounded-lg"
                                     onError={(e) => {
                                       e.target.onerror = null;
                                       e.target.src = 'https://via.placeholder.com/150x150.png?text=Imagen';
@@ -1735,13 +1530,13 @@ const ModernAdminDashboard = () => {
                           )
                         ) : (
                           editingProduct?.imageUrls.length > 0 && (
-                            <div className="mt-5 grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4 mt-5">
                               {editingProduct.imageUrls.map((imageData, index) => (
                                 <div key={index} className="relative">
                                   <img 
                                     src={typeof imageData === 'string' ? imageData : imageData.data} 
                                     alt={`Preview ${index}`} 
-                                    className="h-32 w-full object-cover rounded-lg"
+                                    className="object-cover w-full h-32 rounded-lg"
                                     onError={(e) => {
                                       e.target.onerror = null;
                                       e.target.src = 'https://via.placeholder.com/150x150.png?text=Imagen';
@@ -1778,7 +1573,7 @@ const ModernAdminDashboard = () => {
               </div>
               
               {/* Action Bar */}
-              <div className="bg-white px-8 py-5 border-t border-gray-200 flex justify-between">
+              <div className="flex justify-between px-8 py-5 bg-white border-t border-gray-200">
                 <button
                   type="button"
                   onClick={() => setProductModalOpen(false)}
@@ -1802,9 +1597,9 @@ const ModernAdminDashboard = () => {
       {/* Review Edit Modal */}
       {reviewModalOpen && editingReview && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div 
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-40" 
+              className="fixed inset-0 z-40 transition-opacity bg-gray-500 bg-opacity-75" 
               aria-hidden="true"
               onClick={() => setReviewModalOpen(false)}
             ></div>
@@ -1812,13 +1607,13 @@ const ModernAdminDashboard = () => {
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             
             {/* Modern Modal Design */}
-            <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full z-50" style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.1)', width: '650px' }}>
+            <div className="z-50 inline-block overflow-hidden text-left align-bottom transition-all transform bg-white shadow-xl rounded-2xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full" style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.1)', width: '650px' }}>
               <div className="px-8 py-8">
-                <div className="text-center mb-8">
+                <div className="mb-8 text-center">
                   <h3 className="text-2xl font-semibold text-gray-900">
                     Editar Reseña
                   </h3>
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="mt-2 text-sm text-gray-500">
                     Modifica la calificación y el comentario de la reseña
                   </p>
                 </div>
@@ -1826,14 +1621,14 @@ const ModernAdminDashboard = () => {
                 <div className="mt-2">
                   <form onSubmit={saveEditedReview} className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-4">Calificación</label>
+                      <label className="block mb-4 text-sm font-medium text-gray-700">Calificación</label>
                       <div className="flex items-center justify-center space-x-2">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             key={star}
                             type="button"
                             onClick={() => handleEditRatingClick(star)}
-                            className="text-4xl focus:outline-none transition-transform hover:scale-110"
+                            className="text-4xl transition-transform focus:outline-none hover:scale-110"
                           >
                             {star <= editingReview.rating ? (
                               <span className="text-yellow-400">★</span>
@@ -1843,7 +1638,7 @@ const ModernAdminDashboard = () => {
                           </button>
                         ))}
                       </div>
-                      <div className="text-center mt-3">
+                      <div className="mt-3 text-center">
                         <span className="text-sm text-gray-500">
                           {editingReview.rating} de 5 estrellas
                         </span>
@@ -1851,7 +1646,7 @@ const ModernAdminDashboard = () => {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                      <label className="block mb-3 text-sm font-medium text-gray-700">
                         Comentario
                       </label>
                       <textarea
@@ -1859,7 +1654,7 @@ const ModernAdminDashboard = () => {
                         rows={6}
                         value={editingReview.comment}
                         onChange={handleReviewEditChange}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all text-gray-900 placeholder-gray-400"
+                        className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                         placeholder="Escribe tu reseña aquí..."
                       />
                     </div>
@@ -1868,7 +1663,7 @@ const ModernAdminDashboard = () => {
               </div>
               
               {/* Action Bar */}
-              <div className="bg-white px-8 py-5 border-t border-gray-200 flex justify-between">
+              <div className="flex justify-between px-8 py-5 bg-white border-t border-gray-200">
                 <button
                   type="button"
                   onClick={() => setReviewModalOpen(false)}
