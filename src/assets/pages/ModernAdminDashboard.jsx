@@ -1109,9 +1109,18 @@ const ModernAdminDashboard = () => {
                         <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{formatDate(order.createdAt)}</td>
                         <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{formatCurrency(order.totalAmount || 0)}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending')}`}>
-                            {getOrderStatusText(order.orderStatus || 'pending')}
-                          </span>
+                          <select
+                            value={order.orderStatus || 'pending'}
+                            onChange={(e) => updateOrderStatusHandler(order.id, e.target.value)}
+                            className="px-2 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled={orderStatusUpdating[order.id]}
+                          >
+                            <option value="pending">Pendiente</option>
+                            <option value="processing">Procesando</option>
+                            <option value="shipped">Enviado</option>
+                            <option value="delivered">Entregado</option>
+                            <option value="cancelled">Cancelado</option>
+                          </select>
                         </td>
                         <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
                           <button
@@ -1214,13 +1223,7 @@ const ModernAdminDashboard = () => {
           </div>
           <div className="flex items-center space-x-4">
             {/* Go to Shop Button */}
-            <button 
-              onClick={() => navigate('/shop')}
-              className="flex items-center px-3 py-2 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-            >
-              <FiShoppingCart className="mr-2" />
-              Ir a la tienda
-            </button>
+            
             
             {/* Admin Profile Menu */}
             <div className="relative" ref={profileMenuRef}>
@@ -1309,7 +1312,7 @@ const ModernAdminDashboard = () => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div 
-              className="fixed inset-0 z-40 transition-opacity bg-gray-500 bg-opacity-75" 
+              className="fixed transition-opacity bg-opacity-75 bg-white-500" 
               aria-hidden="true"
               onClick={() => setProductModalOpen(false)}
             ></div>
@@ -1599,7 +1602,7 @@ const ModernAdminDashboard = () => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div 
-              className="fixed inset-0 z-40 transition-opacity bg-gray-500 bg-opacity-75" 
+              className="fixed transition-opacity bg-gray-500 bg-opacity-75" 
               aria-hidden="true"
               onClick={() => setReviewModalOpen(false)}
             ></div>
