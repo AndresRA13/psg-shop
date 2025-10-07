@@ -13,7 +13,7 @@ import Profile from './assets/pages/Profile';
 import Login from './components/login';
 import Register from './components/Register';
 import ResetPassword from './components/ResetPassword';
-import AdminDashboard from './assets/pages/AdminDashboard';
+import ModernAdminDashboard from './assets/pages/ModernAdminDashboard';
 import Orders from './assets/pages/Orders';
 import CouponTest from './assets/pages/CouponTest';
 import Wishlist from './assets/pages/Wishlist';
@@ -117,7 +117,11 @@ function App() {
       <CartProvider>
         <WishlistProvider>
           <div className="flex flex-col min-h-screen">
-            <Navbar />
+            {/* Only show navbar for non-admin routes */}
+            <Routes>
+              <Route path="/admin/*" element={null} />
+              <Route path="*" element={<Navbar />} />
+            </Routes>
             
             <main className="flex-grow">
               <Routes>
@@ -159,7 +163,7 @@ function App() {
                 } />
                 <Route path="/admin" element={
                   <ProtectedRoute adminOnly>
-                    <AdminDashboard />
+                    <ModernAdminDashboard />
                   </ProtectedRoute>
                 } />
                 <Route path="/coupon-test" element={

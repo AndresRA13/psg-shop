@@ -4,7 +4,7 @@ import Home from '../pages/home';
 import Login from '../../components/login';
 import Register from '../../components/Register';
 import ResetPassword from '../../components/ResetPassword';
-import AdminPanel from '../pages/AdminDashboard';
+import ModernAdminDashboard from '../pages/ModernAdminDashboard';
 import ProductDetail from '../pages/ProductDetail';
 import Cart from '../pages/Cart';
 import Checkout from '../pages/Checkout';
@@ -12,10 +12,9 @@ import CheckoutSuccess from '../pages/CheckoutSuccess';
 import CheckoutCancel from '../pages/CheckoutCancel';
 import Shop from '../pages/Shop';
 import Wishlist from '../pages/Wishlist';
-import Profile from '../pages/Profile'; // Added import
+import Profile from '../pages/Profile';
 import StarRatingTest from '../pages/StarRatingTest';
-import Orders from '../pages/Orders'; // Added import for Orders page
-import Navbar from '../../components/navbar';
+import Orders from '../pages/Orders';
 import Footer from '../../components/footer';
 import AdminRoute from './AdminRoute';
 import ProtectedRoute from './protectedRoute';
@@ -34,12 +33,9 @@ const AppRoutes = () => {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} /> {/* Added profile route */}
-          <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} /> {/* Added orders route */}
-          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-          <Route path="/checkout/success" element={<ProtectedRoute><CheckoutSuccess /></ProtectedRoute>} />
-          <Route path="/checkout/cancel" element={<ProtectedRoute><CheckoutCancel /></ProtectedRoute>} />
-          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+          <Route path="/admin/*" element={<AdminRoute><ModernAdminDashboard /></AdminRoute>} />
           <Route path="/star-rating-test" element={<StarRatingTest />} />
         </Routes>
       </main>
