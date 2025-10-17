@@ -94,8 +94,8 @@ const Shop = () => {
         cancelButtonText: 'Cancelar'
       }).then((result) => {
         if (result.isConfirmed) {
-          // Redirect to login page
-          window.location.href = '/login';
+          // Redirect to login page with hash routing
+          window.location.href = '/psg-shop/#/login';
         }
       });
       return;
@@ -143,8 +143,8 @@ const Shop = () => {
         cancelButtonText: 'Cancelar'
       }).then((result) => {
         if (result.isConfirmed) {
-          // Redirect to login page
-          window.location.href = '/login';
+          // Redirect to login page with hash routing
+          window.location.href = '/psg-shop/#/login';
         }
       });
       return;
@@ -168,20 +168,20 @@ const Shop = () => {
 
   return (
     <div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div className="flex flex-col mb-8 md:flex-row md:items-center md:justify-between">
           <h1 className="text-3xl font-bold text-gray-900">Nuestra Colección</h1>
-          <div className="mt-4 md:mt-0 flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-4 mt-4 md:mt-0 sm:flex-row">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Buscar productos..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 w-full sm:w-64"
+                className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:w-64"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -192,7 +192,7 @@ const Shop = () => {
               </label>
               <select
                 id="category-filter"
-                className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className="border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
               >
@@ -207,11 +207,11 @@ const Shop = () => {
         </div>
 
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+          <div className="flex items-center justify-center h-64">
+            <div className="w-12 h-12 border-b-2 border-gray-900 rounded-full animate-spin"></div>
           </div>
         ) : error ? (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <div className="relative px-4 py-3 text-red-700 bg-red-100 border border-red-400 rounded" role="alert">
             <strong className="font-bold">Error! </strong>
             <span className="block sm:inline">{error}</span>
           </div>
@@ -222,15 +222,15 @@ const Shop = () => {
                 {filteredProducts.length} producto(s) encontrado(s) para "{searchTerm}"
               </div>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredProducts.map((product) => (
-                <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div key={product.id} className="overflow-hidden transition-shadow duration-300 bg-white rounded-lg shadow-md hover:shadow-lg">
                   <Link to={`/product/${product.id}`}>
-                    <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden">
+                    <div className="w-full overflow-hidden aspect-w-1 aspect-h-1">
                       <img
                         src={getPrimaryImageUrl(product)}
                         alt={product.name}
-                        className="w-full h-64 object-cover"
+                        className="object-cover w-full h-64"
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = 'https://via.placeholder.com/300x300.png?text=Moño';
@@ -262,9 +262,9 @@ const Shop = () => {
                       <span className="text-lg font-semibold text-indigo-600">${parseFloat(product.price).toLocaleString('es-CO')}</span>
                     </div>
                     
-                    <div className="mt-4 flex gap-2">
+                    <div className="flex gap-2 mt-4">
                       <button 
-                        className="flex-1 bg-indigo-600 border border-transparent rounded-md py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         onClick={(e) => {
                           e.preventDefault();
                           handleAddToCart(product);
@@ -273,14 +273,14 @@ const Shop = () => {
                         Agregar al Carrito
                       </button>
                       <button 
-                        className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                           handleAddToWishlist(product);
                         }}
                       >
-                        <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4 4 0 000 6.364L12 20.364l7.682-7.682a4 4 0 00-6.364-6.364L12 7.636l-1.318-1.318a4 4 0 00-6.364 0z" />
                         </svg>
                       </button>
@@ -293,8 +293,8 @@ const Shop = () => {
         )}
 
         {!loading && !error && filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="py-12 text-center">
+            <svg className="w-12 h-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <h3 className="mt-2 text-lg font-medium text-gray-900">No se encontraron productos</h3>
@@ -310,7 +310,7 @@ const Shop = () => {
                     setSearchTerm('');
                     setFilter('all');
                   }}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   Ver todos los productos
                 </button>

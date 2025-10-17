@@ -127,8 +127,8 @@ const Home = () => {
         cancelButtonText: 'Cancelar'
       }).then((result) => {
         if (result.isConfirmed) {
-          // Redirect to login page
-          window.location.href = '/login';
+          // Redirect to login page with hash routing
+          window.location.href = '/psg-shop/#/login';
         }
       });
       return;
@@ -176,8 +176,8 @@ const Home = () => {
         cancelButtonText: 'Cancelar'
       }).then((result) => {
         if (result.isConfirmed) {
-          // Redirect to login page
-          window.location.href = '/login';
+          // Redirect to login page with hash routing
+          window.location.href = '/psg-shop/#/login';
         }
       });
       return;
@@ -237,7 +237,7 @@ const Home = () => {
       description: "Protegemos tus datos de pago",
       icon: (
         <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 01-8 0v4h8z"></path>
         </svg>
       )
     }
@@ -254,29 +254,29 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section - Enhanced with gradient and better typography */}
-      <div className="relative bg-gradient-to-r from-indigo-700 to-purple-800 overflow-hidden">
+      <div className="relative overflow-hidden bg-gradient-to-r from-indigo-700 to-purple-800">
         <div className="absolute inset-0 bg-black opacity-20"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-            <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
+            <main className="px-4 mx-auto mt-10 max-w-7xl sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
               <div className="sm:text-center lg:text-left">
-                <h1 className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
+                <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
                   <span className="block">Elegancia en cada</span>
                   <span className="block text-indigo-200">detalle perfecto</span>
                 </h1>
                 <p className="mt-3 text-base text-indigo-100 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
                   Colección exclusiva de moños artesanales para todas las ocasiones. Calidad premium, diseño único y entrega rápida.
                 </p>
-                <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row sm:justify-center lg:justify-start gap-4">
+                <div className="flex flex-col gap-4 mt-8 sm:mt-10 sm:flex-row sm:justify-center lg:justify-start">
                   <Link
                     to="/shop"
-                    className="px-8 py-4 border border-transparent text-base font-medium rounded-lg text-indigo-700 bg-white hover:bg-indigo-50 md:py-4 md:text-lg md:px-10 transition-all duration-300 hover:shadow-lg shadow-md text-center"
+                    className="px-8 py-4 text-base font-medium text-center text-indigo-700 transition-all duration-300 bg-white border border-transparent rounded-lg shadow-md hover:bg-indigo-50 md:py-4 md:text-lg md:px-10 hover:shadow-lg"
                   >
                     Comprar Ahora
                   </Link>
                   <Link
                     to="/shop"
-                    className="px-8 py-4 border-2 border-white text-base font-medium rounded-lg text-white bg-transparent hover:bg-white hover:bg-opacity-10 md:py-4 md:text-lg md:px-10 transition-all duration-300 text-center"
+                    className="px-8 py-4 text-base font-medium text-center text-white transition-all duration-300 bg-transparent border-2 border-white rounded-lg hover:bg-white hover:bg-opacity-10 md:py-4 md:text-lg md:px-10"
                   >
                     Ver Catálogo
                   </Link>
@@ -286,9 +286,9 @@ const Home = () => {
           </div>
         </div>
         <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-          <div className="h-56 w-full sm:h-72 md:h-96 lg:w-full lg:h-full">
+          <div className="w-full h-56 sm:h-72 md:h-96 lg:w-full lg:h-full">
             <img
-              className="w-full h-full object-cover"
+              className="object-cover w-full h-full"
               src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
               alt="Elegante colección de moños"
               onError={(e) => {
@@ -301,24 +301,24 @@ const Home = () => {
       </div>
 
       {/* Stats Section - Added to match blog style */}
-      <div className="bg-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div className="py-12 bg-white">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
             <div className="p-4">
               <div className="text-3xl font-bold text-indigo-700">500+</div>
-              <div className="text-gray-600 mt-2">Clientes Satisfechos</div>
+              <div className="mt-2 text-gray-600">Clientes Satisfechos</div>
             </div>
             <div className="p-4">
               <div className="text-3xl font-bold text-indigo-700">100+</div>
-              <div className="text-gray-600 mt-2">Diseños Únicos</div>
+              <div className="mt-2 text-gray-600">Diseños Únicos</div>
             </div>
             <div className="p-4">
               <div className="text-3xl font-bold text-indigo-700">24/7</div>
-              <div className="text-gray-600 mt-2">Soporte</div>
+              <div className="mt-2 text-gray-600">Soporte</div>
             </div>
             <div className="p-4">
               <div className="text-3xl font-bold text-indigo-700">5.0</div>
-              <div className="text-gray-600 mt-2">Calificación Promedio</div>
+              <div className="mt-2 text-gray-600">Calificación Promedio</div>
             </div>
           </div>
         </div>
@@ -326,13 +326,13 @@ const Home = () => {
 
       {/* Features Section - Enhanced with better spacing and design */}
       <div className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-16">
-            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Nuestros Beneficios</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-16 lg:text-center">
+            <h2 className="text-base font-semibold tracking-wide text-indigo-600 uppercase">Nuestros Beneficios</h2>
+            <p className="mt-2 text-3xl font-extrabold leading-8 tracking-tight text-gray-900 sm:text-4xl">
               Por qué elegirnos
             </p>
-            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+            <p className="max-w-2xl mt-4 text-xl text-gray-500 lg:mx-auto">
               Comprometidos con la calidad y la satisfacción del cliente
             </p>
           </div>
@@ -341,7 +341,7 @@ const Home = () => {
             <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
               {features.map((feature) => (
                 <div key={feature.id} className="text-center group">
-                  <div className="flex items-center justify-center mx-auto bg-indigo-50 rounded-full w-16 h-16 transition-all duration-300 group-hover:bg-indigo-100">
+                  <div className="flex items-center justify-center w-16 h-16 mx-auto transition-all duration-300 rounded-full bg-indigo-50 group-hover:bg-indigo-100">
                     {feature.icon}
                   </div>
                   <h3 className="mt-6 text-lg font-medium text-gray-900">{feature.title}</h3>
@@ -356,23 +356,23 @@ const Home = () => {
       </div>
 
       {/* Categories Section - Enhanced with gradient overlays and better design */}
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-16">
-            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Categorías</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+      <div className="py-16 bg-gradient-to-r from-indigo-50 to-purple-50">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-16 lg:text-center">
+            <h2 className="text-base font-semibold tracking-wide text-indigo-600 uppercase">Categorías</h2>
+            <p className="mt-2 text-3xl font-extrabold leading-8 tracking-tight text-gray-900 sm:text-4xl">
               Nuestra colección
             </p>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-8 mt-10 sm:grid-cols-2 lg:grid-cols-4">
             {categories.map((category) => (
-              <div key={category.id} className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div key={category.id} className="relative overflow-hidden transition-all duration-300 transform shadow-lg group rounded-2xl hover:shadow-xl hover:-translate-y-1">
                 <div className="relative w-full h-80">
                   <img
                     src={category.image}
                     alt={category.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = 'https://via.placeholder.com/500x500.png?text=' + encodeURIComponent(category.name);
@@ -381,10 +381,10 @@ const Home = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-70"></div>
                 </div>
                 <div className="absolute inset-0 flex flex-col justify-end p-6">
-                  <h3 className="text-xl font-bold text-white mb-2">{category.name}</h3>
+                  <h3 className="mb-2 text-xl font-bold text-white">{category.name}</h3>
                   <Link 
                     to="/shop" 
-                    className="inline-flex items-center text-indigo-200 hover:text-white font-medium transition-colors duration-300"
+                    className="inline-flex items-center font-medium text-indigo-200 transition-colors duration-300 hover:text-white"
                   >
                     Explorar
                     <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,73 +399,81 @@ const Home = () => {
       </div>
 
       {/* Featured Products Section - Enhanced with better card design */}
-      <div className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-16">
-            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Productos Destacados</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+      <div className="py-16 bg-white">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-16 lg:text-center">
+            <h2 className="text-base font-semibold tracking-wide text-indigo-600 uppercase">Productos Destacados</h2>
+            <p className="mt-2 text-3xl font-extrabold leading-8 tracking-tight text-gray-900 sm:text-4xl">
               Lo más vendido
             </p>
           </div>
 
           {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            <div className="flex items-center justify-center h-64">
+              <div className="w-12 h-12 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
             </div>
           ) : error ? (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <div className="relative px-4 py-3 text-red-700 bg-red-100 border border-red-400 rounded" role="alert">
               <strong className="font-bold">Error! </strong>
               <span className="block sm:inline">{error}</span>
             </div>
           ) : (
-            <div className="mt-10 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+            <div className="grid grid-cols-1 mt-10 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
               {featuredProducts.map((product) => (
-                <div key={product.id} className="group relative bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300">
-                  <Link to={`/product/${product.id}`}>
-                    <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-t-2xl overflow-hidden group-hover:opacity-90">
-                      <img
-                        src={getPrimaryImageUrl(product)}
-                        alt={product.name}
-                        className="w-full h-full object-center object-cover lg:w-full lg:h-full transition-transform duration-500 group-hover:scale-105"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'https://via.placeholder.com/300x300.png?text=Moño';
-                        }}
-                      />
-                    </div>
-                  </Link>
-                  <div className="p-6">
-                    <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                        {product.category}
-                      </span>
-                      {product.stock !== undefined && product.stock <= 5 && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                <div key={product.id} className="overflow-hidden transition-all duration-300 transform bg-white border border-gray-100 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-2">
+                  <div className="relative">
+                    <Link to={`/product/${product.id}`}>
+                      <div className="w-full overflow-hidden aspect-w-1 aspect-h-1">
+                        <img
+                          src={getPrimaryImageUrl(product)}
+                          alt={product.name}
+                          className="object-cover w-full h-64"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://via.placeholder.com/300x300.png?text=Moño';
+                          }}
+                        />
+                      </div>
+                    </Link>
+                    {product.stock !== undefined && product.stock <= 5 && (
+                      <div className="absolute z-20 top-4 right-4">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          product.stock > 0 
+                            ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-sm' 
+                            : 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm'
+                        }`}>
                           {product.stock > 0 ? `Solo ${product.stock} disponibles` : 'Agotado'}
                         </span>
-                      )}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800">
+                        {product.category}
+                      </span>
                     </div>
                     
-                    <h3 className="mt-4 text-lg font-bold text-gray-900">
-                      <Link to={`/product/${product.id}`}>
-                        <span aria-hidden="true" className="absolute inset-0" />
+                    <h3 className="mt-2 text-lg font-medium text-gray-900 transition-colors duration-300 group-hover:text-indigo-700">
+                      <Link to={`/product/${product.id}`} className="block">
                         {product.name}
                       </Link>
                     </h3>
                     
                     {product.rating > 0 && (
-                      <div className="mt-3">
+                      <div className="mt-2">
                         <StarRating rating={product.rating} size="sm" />
                       </div>
                     )}
                     
-                    <div className="mt-4">
-                      <span className="text-2xl font-bold text-indigo-700">${parseFloat(product.price).toLocaleString('es-CO')}</span>
+                    <div className="mt-2">
+                      <span className="text-lg font-semibold text-indigo-700">${parseFloat(product.price).toLocaleString('es-CO')}</span>
                     </div>
                     
-                    <div className="mt-6 flex gap-3">
+                    <div className="flex gap-2 mt-4">
                       <button 
-                        className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-700 border border-transparent rounded-lg py-3 px-4 text-sm font-medium text-white hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 shadow-md hover:shadow-lg"
+                        className="flex-1 px-4 py-2 text-sm font-medium text-white transition-all duration-300 border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         onClick={(e) => {
                           e.preventDefault();
                           handleAddToCart(product);
@@ -474,14 +482,14 @@ const Home = () => {
                         Agregar al Carrito
                       </button>
                       <button 
-                        className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300"
+                        className="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-300 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                           handleAddToWishlist(product);
                         }}
                       >
-                        <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-5 h-5 text-gray-500 transition-colors duration-300 hover:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4 4 0 000 6.364L12 20.364l7.682-7.682a4 4 0 00-6.364-6.364L12 7.636l-1.318-1.318a4 4 0 00-6.364 0z" />
                         </svg>
                       </button>
@@ -495,7 +503,7 @@ const Home = () => {
           <div className="mt-16 text-center">
             <Link
               to="/shop"
-              className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-lg shadow-lg text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 transition-all duration-300 hover:shadow-xl"
+              className="inline-flex items-center px-8 py-4 text-base font-medium text-white transition-all duration-300 border border-transparent rounded-lg shadow-lg bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 hover:shadow-xl"
             >
               Ver todos los productos
             </Link>
@@ -504,17 +512,17 @@ const Home = () => {
       </div>
 
       {/* Testimonials Section - Simplified slider design */}
-      <div className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-16">
-            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Testimonios</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+      <div className="py-16 bg-white">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-16 lg:text-center">
+            <h2 className="text-base font-semibold tracking-wide text-indigo-600 uppercase">Testimonios</h2>
+            <p className="mt-2 text-3xl font-extrabold leading-8 tracking-tight text-gray-900 sm:text-4xl">
               Lo que dicen nuestros clientes
             </p>
           </div>
 
-          <div className="mt-10 max-w-4xl mx-auto">
-            <div className="relative bg-gray-50 rounded-2xl p-8 shadow-sm">
+          <div className="max-w-4xl mx-auto mt-10">
+            <div className="relative p-8 shadow-sm bg-gray-50 rounded-2xl">
               <div className="text-center">
                 <div className="flex justify-center mb-4">
                   {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
@@ -523,7 +531,7 @@ const Home = () => {
                     </svg>
                   ))}
                 </div>
-                <blockquote className="text-xl text-gray-600 italic">
+                <blockquote className="text-xl italic text-gray-600">
                   "{testimonials[currentTestimonial].text}"
                 </blockquote>
                 <figcaption className="mt-6">
@@ -550,39 +558,39 @@ const Home = () => {
       </div>
 
       {/* Blog Preview Section - Replaces newsletter for logged-in users */}
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-16">
-            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Últimas Entradas</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+      <div className="py-16 bg-gradient-to-r from-indigo-50 to-purple-50">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-16 lg:text-center">
+            <h2 className="text-base font-semibold tracking-wide text-indigo-600 uppercase">Últimas Entradas</h2>
+            <p className="mt-2 text-3xl font-extrabold leading-8 tracking-tight text-gray-900 sm:text-4xl">
               Descubre consejos y tendencias
             </p>
-            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+            <p className="max-w-2xl mt-4 text-xl text-gray-500 lg:mx-auto">
               Explora nuestros artículos sobre estilo, cuidado y novedades en el mundo de los moños
             </p>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300">
+          <div className="grid grid-cols-1 gap-8 mt-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl">
               <div className="h-48 overflow-hidden">
                 <img 
                   src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
                   alt="Cómo elegir el moño perfecto" 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
                 />
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                  <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-indigo-800 bg-indigo-100 rounded-full">
                     Guía de Estilo
                   </span>
                   <span className="text-sm text-gray-500">15 Oct 2025</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Cómo elegir el moño perfecto para tu ocasión especial</h3>
-                <p className="text-gray-600 mb-4">Descubre los factores clave para seleccionar el moño ideal que complemente tu estilo y la ocasión.</p>
+                <h3 className="mb-3 text-xl font-bold text-gray-900">Cómo elegir el moño perfecto para tu ocasión especial</h3>
+                <p className="mb-4 text-gray-600">Descubre los factores clave para seleccionar el moño ideal que complemente tu estilo y la ocasión.</p>
                 <Link 
                   to="/blog" 
-                  className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800 transition-colors duration-300"
+                  className="inline-flex items-center font-medium text-indigo-600 transition-colors duration-300 hover:text-indigo-800"
                 >
                   Leer más
                   <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -592,26 +600,26 @@ const Home = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300">
+            <div className="overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl">
               <div className="h-48 overflow-hidden">
                 <img 
                   src="https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
                   alt="Tendencias de moda en moños" 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
                 />
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                  <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-indigo-800 bg-indigo-100 rounded-full">
                     Tendencias
                   </span>
                   <span className="text-sm text-gray-500">10 Oct 2025</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Tendencias de moda en moños para esta temporada</h3>
-                <p className="text-gray-600 mb-4">Explora las últimas tendencias en moños y cómo incorporarlas a tu guardarropa diario.</p>
+                <h3 className="mb-3 text-xl font-bold text-gray-900">Tendencias de moda en moños para esta temporada</h3>
+                <p className="mb-4 text-gray-600">Explora las últimas tendencias en moños y cómo incorporarlas a tu guardarropa diario.</p>
                 <Link 
                   to="/blog" 
-                  className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800 transition-colors duration-300"
+                  className="inline-flex items-center font-medium text-indigo-600 transition-colors duration-300 hover:text-indigo-800"
                 >
                   Leer más
                   <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -621,26 +629,26 @@ const Home = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300">
+            <div className="overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl">
               <div className="h-48 overflow-hidden">
                 <img 
                   src="https://images.unsplash.com/photo-1595173425119-1c5134b706b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
                   alt="Cuidado y mantenimiento" 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
                 />
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                  <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-indigo-800 bg-indigo-100 rounded-full">
                     Cuidado
                   </span>
                   <span className="text-sm text-gray-500">5 Oct 2025</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Cuidado y mantenimiento de tus moños favoritos</h3>
-                <p className="text-gray-600 mb-4">Consejos profesionales para mantener tus moños en perfecto estado durante más tiempo.</p>
+                <h3 className="mb-3 text-xl font-bold text-gray-900">Cuidado y mantenimiento de tus moños favoritos</h3>
+                <p className="mb-4 text-gray-600">Consejos profesionales para mantener tus moños en perfecto estado durante más tiempo.</p>
                 <Link 
                   to="/blog" 
-                  className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800 transition-colors duration-300"
+                  className="inline-flex items-center font-medium text-indigo-600 transition-colors duration-300 hover:text-indigo-800"
                 >
                   Leer más
                   <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -654,7 +662,7 @@ const Home = () => {
           <div className="mt-12 text-center">
             <Link
               to="/blog"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 transition-all duration-300 shadow-md"
+              className="inline-flex items-center px-6 py-3 text-base font-medium text-white transition-all duration-300 border border-transparent rounded-lg shadow-md bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800"
             >
               Ver todos los artículos
             </Link>
@@ -663,25 +671,25 @@ const Home = () => {
       </div>
 
       {/* Contact Section - Added below blog preview */}
-      <div className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-16">
-            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Contáctanos</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+      <div className="py-16 bg-white">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-16 lg:text-center">
+            <h2 className="text-base font-semibold tracking-wide text-indigo-600 uppercase">Contáctanos</h2>
+            <p className="mt-2 text-3xl font-extrabold leading-8 tracking-tight text-gray-900 sm:text-4xl">
               ¿Tienes preguntas?
             </p>
-            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+            <p className="max-w-2xl mt-4 text-xl text-gray-500 lg:mx-auto">
               Envíanos un mensaje y nos pondremos en contacto contigo pronto
             </p>
           </div>
 
-          <div className="mt-10 max-w-4xl mx-auto">
-            <div className="bg-gray-50 rounded-2xl shadow-sm p-8">
+          <div className="max-w-4xl mx-auto mt-10">
+            <div className="p-8 shadow-sm bg-gray-50 rounded-2xl">
               {state.succeeded ? (
-                <div className="rounded-md bg-green-50 p-4 mb-8">
+                <div className="p-4 mb-8 rounded-md bg-green-50">
                   <div className="flex">
                     <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                      <svg className="w-5 h-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                     </div>
@@ -699,9 +707,9 @@ const Home = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-700">
                         Nombre
                       </label>
                       <input
@@ -711,12 +719,12 @@ const Home = () => {
                         required
                         value={formData.name}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300"
+                        className="w-full px-4 py-3 transition-colors duration-300 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         placeholder="Tu nombre completo"
                       />
                     </div>
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">
                         Email
                       </label>
                       <input
@@ -726,7 +734,7 @@ const Home = () => {
                         required
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300"
+                        className="w-full px-4 py-3 transition-colors duration-300 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         placeholder="tu@email.com"
                       />
                       <ValidationError 
@@ -737,7 +745,7 @@ const Home = () => {
                     </div>
                   </div>
                   <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="subject" className="block mb-2 text-sm font-medium text-gray-700">
                       Asunto
                     </label>
                     <input
@@ -747,12 +755,12 @@ const Home = () => {
                       required
                       value={formData.subject}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300"
+                      className="w-full px-4 py-3 transition-colors duration-300 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                       placeholder="¿Sobre qué te gustaría hablar?"
                     />
                   </div>
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-700">
                       Mensaje
                     </label>
                     <textarea
@@ -762,7 +770,7 @@ const Home = () => {
                       required
                       value={formData.message}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300"
+                      className="w-full px-4 py-3 transition-colors duration-300 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                       placeholder="Escribe tu mensaje aquí..."
                     />
                     <ValidationError 
@@ -781,7 +789,7 @@ const Home = () => {
                     >
                       {state.submitting ? (
                         <>
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 mr-3 -ml-1 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
