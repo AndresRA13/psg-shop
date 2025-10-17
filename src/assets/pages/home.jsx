@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useForm, ValidationError } from '@formspree/react';
 import { Link } from 'react-router-dom';
 import { getProducts } from '../../services/productService';
 import StarRating from '../../components/StarRating';
@@ -14,6 +15,20 @@ const Home = () => {
   const { addToCart } = useCart();
   const { addToWishlist } = useWishlist();
   const { currentUser } = useAuth();
+
+  // State for testimonials slider
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  // Formspree form setup
+  const [state, handleSubmit] = useForm("mpwybkly");
+  
+  // State for contact form
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
 
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
@@ -35,6 +50,45 @@ const Home = () => {
 
     fetchFeaturedProducts();
   }, []);
+
+  // Testimonials data
+  const testimonials = [
+    {
+      id: 1,
+      name: "María González",
+      text: "Los moños son de excelente calidad y el envío fue rápido. ¡Definitivamente volveré a comprar!",
+      rating: 5
+    },
+    {
+      id: 2,
+      name: "Carlos Rodríguez",
+      text: "Excelente atención al cliente y productos de alta calidad. Muy recomendado para eventos especiales.",
+      rating: 5
+    },
+    {
+      id: 3,
+      name: "Ana Martínez",
+      text: "Compré varios moños para una boda y todos quedaron hermosos. La calidad superó mis expectativas.",
+      rating: 5
+    }
+  ];
+
+  // Auto-rotate testimonials
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [testimonials.length]);
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   // Get the primary image URL for a product
   const getPrimaryImageUrl = (product) => {
@@ -145,24 +199,6 @@ const Home = () => {
     });
   };
 
-  // Hero section data
-  const heroSlides = [
-    {
-      id: 1,
-      title: "Colección de Verano",
-      subtitle: "Descubre nuestra nueva colección de moños elegantes",
-      image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea",
-      cta: "Explorar Colección"
-    },
-    {
-      id: 2,
-      title: "Ofertas Especiales",
-      subtitle: "Hasta 30% de descuento en moños seleccionados",
-      image: "https://images.unsplash.com/photo-1591370874773-6702e8f12fd8",
-      cta: "Ver Ofertas"
-    }
-  ];
-
   // Features data
   const features = [
     {
@@ -209,44 +245,41 @@ const Home = () => {
 
   // Categories data
   const categories = [
-    { id: 1, name: "Moños Clásicos", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea" },
-    { id: 2, name: "Moños Modernos", image: "https://images.unsplash.com/photo-1611849785508-1f152a6489d4" },
-    { id: 3, name: "Moños Infantiles", image: "https://images.unsplash.com/photo-1595173425119-1c5134b706b3" },
-    { id: 4, name: "Moños para Damas", image: "https://images.unsplash.com/photo-1611849785508-1f152a6489d4" }
+    { id: 1, name: "Moños Clásicos", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" },
+    { id: 2, name: "Moños Modernos", image: "https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" },
+    { id: 3, name: "Moños Infantiles", image: "https://images.unsplash.com/photo-1595173425119-1c5134b706b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" },
+    { id: 4, name: "Moños para Damas", image: "https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" }
   ];
 
   return (
-    <div className="bg-gray-50">
-      {/* Hero Section */}
-      <div className="relative bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="relative z-10 pb-8 bg-gray-50 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section - Enhanced with gradient and better typography */}
+      <div className="relative bg-gradient-to-r from-indigo-700 to-purple-800 overflow-hidden">
+        <div className="absolute inset-0 bg-black opacity-20"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
             <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
               <div className="sm:text-center lg:text-left">
-                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block xl:inline">Descubre la elegancia</span>{' '}
-                  <span className="block text-indigo-600 xl:inline">en cada moño</span>
+                <h1 className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
+                  <span className="block">Elegancia en cada</span>
+                  <span className="block text-indigo-200">detalle perfecto</span>
                 </h1>
-                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  Colección exclusiva de moños para todas las ocasiones. Calidad premium, diseño único y entrega rápida.
+                <p className="mt-3 text-base text-indigo-100 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                  Colección exclusiva de moños artesanales para todas las ocasiones. Calidad premium, diseño único y entrega rápida.
                 </p>
-                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                  <div className="rounded-md shadow">
-                    <Link
-                      to="/shop"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10"
-                    >
-                      Comprar Ahora
-                    </Link>
-                  </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
-                    <Link
-                      to="/shop"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10"
-                    >
-                      Ver Catálogo
-                    </Link>
-                  </div>
+                <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row sm:justify-center lg:justify-start gap-4">
+                  <Link
+                    to="/shop"
+                    className="px-8 py-4 border border-transparent text-base font-medium rounded-lg text-indigo-700 bg-white hover:bg-indigo-50 md:py-4 md:text-lg md:px-10 transition-all duration-300 hover:shadow-lg shadow-md text-center"
+                  >
+                    Comprar Ahora
+                  </Link>
+                  <Link
+                    to="/shop"
+                    className="px-8 py-4 border-2 border-white text-base font-medium rounded-lg text-white bg-transparent hover:bg-white hover:bg-opacity-10 md:py-4 md:text-lg md:px-10 transition-all duration-300 text-center"
+                  >
+                    Ver Catálogo
+                  </Link>
                 </div>
               </div>
             </main>
@@ -256,7 +289,7 @@ const Home = () => {
           <div className="h-56 w-full sm:h-72 md:h-96 lg:w-full lg:h-full">
             <img
               className="w-full h-full object-cover"
-              src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea"
+              src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
               alt="Elegante colección de moños"
               onError={(e) => {
                 e.target.onerror = null;
@@ -267,11 +300,35 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Features Section */}
-      <div className="py-12 bg-white">
+      {/* Stats Section - Added to match blog style */}
+      <div className="bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Características</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="p-4">
+              <div className="text-3xl font-bold text-indigo-700">500+</div>
+              <div className="text-gray-600 mt-2">Clientes Satisfechos</div>
+            </div>
+            <div className="p-4">
+              <div className="text-3xl font-bold text-indigo-700">100+</div>
+              <div className="text-gray-600 mt-2">Diseños Únicos</div>
+            </div>
+            <div className="p-4">
+              <div className="text-3xl font-bold text-indigo-700">24/7</div>
+              <div className="text-gray-600 mt-2">Soporte</div>
+            </div>
+            <div className="p-4">
+              <div className="text-3xl font-bold text-indigo-700">5.0</div>
+              <div className="text-gray-600 mt-2">Calificación Promedio</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section - Enhanced with better spacing and design */}
+      <div className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:text-center mb-16">
+            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Nuestros Beneficios</h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
               Por qué elegirnos
             </p>
@@ -281,13 +338,13 @@ const Home = () => {
           </div>
 
           <div className="mt-10">
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
               {features.map((feature) => (
-                <div key={feature.id} className="text-center">
-                  <div className="flex items-center justify-center mx-auto">
+                <div key={feature.id} className="text-center group">
+                  <div className="flex items-center justify-center mx-auto bg-indigo-50 rounded-full w-16 h-16 transition-all duration-300 group-hover:bg-indigo-100">
                     {feature.icon}
                   </div>
-                  <h3 className="mt-4 text-lg font-medium text-gray-900">{feature.title}</h3>
+                  <h3 className="mt-6 text-lg font-medium text-gray-900">{feature.title}</h3>
                   <p className="mt-2 text-base text-gray-500">
                     {feature.description}
                   </p>
@@ -298,46 +355,53 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Categories Section */}
-      <div className="bg-gray-50 py-12">
+      {/* Categories Section - Enhanced with gradient overlays and better design */}
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
+          <div className="lg:text-center mb-16">
             <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Categorías</h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
               Nuestra colección
             </p>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {categories.map((category) => (
-              <div key={category.id} className="group relative">
-                <div className="relative w-full h-80 bg-white rounded-lg overflow-hidden group-hover:opacity-75 sm:aspect-w-2 sm:aspect-h-1 sm:h-64 lg:aspect-w-1 lg:aspect-h-1">
+              <div key={category.id} className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div className="relative w-full h-80">
                   <img
                     src={category.image}
                     alt={category.name}
-                    className="w-full h-full object-center object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = 'https://via.placeholder.com/500x500.png?text=' + encodeURIComponent(category.name);
                     }}
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-70"></div>
                 </div>
-                <h3 className="mt-6 text-sm text-gray-500">
-                  <Link to="/shop">
-                    <span className="absolute inset-0" />
-                    {category.name}
+                <div className="absolute inset-0 flex flex-col justify-end p-6">
+                  <h3 className="text-xl font-bold text-white mb-2">{category.name}</h3>
+                  <Link 
+                    to="/shop" 
+                    className="inline-flex items-center text-indigo-200 hover:text-white font-medium transition-colors duration-300"
+                  >
+                    Explorar
+                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
                   </Link>
-                </h3>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Featured Products Section */}
-      <div className="bg-white py-12">
+      {/* Featured Products Section - Enhanced with better card design */}
+      <div className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
+          <div className="lg:text-center mb-16">
             <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Productos Destacados</h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
               Lo más vendido
@@ -346,7 +410,7 @@ const Home = () => {
 
           {loading ? (
             <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
             </div>
           ) : error ? (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
@@ -356,13 +420,13 @@ const Home = () => {
           ) : (
             <div className="mt-10 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
               {featuredProducts.map((product) => (
-                <div key={product.id} className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div key={product.id} className="group relative bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300">
                   <Link to={`/product/${product.id}`}>
-                    <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
+                    <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-t-2xl overflow-hidden group-hover:opacity-90">
                       <img
                         src={getPrimaryImageUrl(product)}
                         alt={product.name}
-                        className="w-full h-full object-center object-cover lg:w-full lg:h-full"
+                        className="w-full h-full object-center object-cover lg:w-full lg:h-full transition-transform duration-500 group-hover:scale-105"
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = 'https://via.placeholder.com/300x300.png?text=Moño';
@@ -370,9 +434,9 @@ const Home = () => {
                       />
                     </div>
                   </Link>
-                  <div className="p-4">
+                  <div className="p-6">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                         {product.category}
                       </span>
                       {product.stock !== undefined && product.stock <= 5 && (
@@ -382,7 +446,7 @@ const Home = () => {
                       )}
                     </div>
                     
-                    <h3 className="mt-2 text-lg font-medium text-gray-900">
+                    <h3 className="mt-4 text-lg font-bold text-gray-900">
                       <Link to={`/product/${product.id}`}>
                         <span aria-hidden="true" className="absolute inset-0" />
                         {product.name}
@@ -390,18 +454,18 @@ const Home = () => {
                     </h3>
                     
                     {product.rating > 0 && (
-                      <div className="mt-2">
+                      <div className="mt-3">
                         <StarRating rating={product.rating} size="sm" />
                       </div>
                     )}
                     
-                    <div className="mt-2">
-                      <span className="text-lg font-semibold text-indigo-600">${parseFloat(product.price).toLocaleString('es-CO')}</span>
+                    <div className="mt-4">
+                      <span className="text-2xl font-bold text-indigo-700">${parseFloat(product.price).toLocaleString('es-CO')}</span>
                     </div>
                     
-                    <div className="mt-4 flex gap-2">
+                    <div className="mt-6 flex gap-3">
                       <button 
-                        className="flex-1 bg-indigo-600 border border-transparent rounded-md py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-700 border border-transparent rounded-lg py-3 px-4 text-sm font-medium text-white hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 shadow-md hover:shadow-lg"
                         onClick={(e) => {
                           e.preventDefault();
                           handleAddToCart(product);
@@ -410,7 +474,7 @@ const Home = () => {
                         Agregar al Carrito
                       </button>
                       <button 
-                        className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -428,10 +492,10 @@ const Home = () => {
             </div>
           )}
 
-          <div className="mt-12 text-center">
+          <div className="mt-16 text-center">
             <Link
               to="/shop"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-lg shadow-lg text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 transition-all duration-300 hover:shadow-xl"
             >
               Ver todos los productos
             </Link>
@@ -439,121 +503,297 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Testimonials Section */}
-      <div className="bg-indigo-700 py-12">
+      {/* Testimonials Section - Simplified slider design */}
+      <div className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-indigo-200 font-semibold tracking-wide uppercase">Testimonios</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
+          <div className="lg:text-center mb-16">
+            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Testimonios</h2>
+            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
               Lo que dicen nuestros clientes
             </p>
           </div>
 
-          <div className="mt-10">
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
-                  </div>
-                  <div className="ml-4">
-                    <h4 className="text-lg font-bold text-gray-900">María González</h4>
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                  </div>
+          <div className="mt-10 max-w-4xl mx-auto">
+            <div className="relative bg-gray-50 rounded-2xl p-8 shadow-sm">
+              <div className="text-center">
+                <div className="flex justify-center mb-4">
+                  {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
+                    <svg key={i} className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
                 </div>
-                <p className="mt-4 text-gray-600">
-                  "Los moños son de excelente calidad y el envío fue rápido. ¡Definitivamente volveré a comprar!"
-                </p>
+                <blockquote className="text-xl text-gray-600 italic">
+                  "{testimonials[currentTestimonial].text}"
+                </blockquote>
+                <figcaption className="mt-6">
+                  <div className="font-bold text-gray-900">{testimonials[currentTestimonial].name}</div>
+                </figcaption>
               </div>
+            </div>
 
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
-                  </div>
-                  <div className="ml-4">
-                    <h4 className="text-lg font-bold text-gray-900">Carlos Rodríguez</h4>
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <p className="mt-4 text-gray-600">
-                  "Excelente atención al cliente y productos de alta calidad. Muy recomendado para eventos especiales."
-                </p>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
-                  </div>
-                  <div className="ml-4">
-                    <h4 className="text-lg font-bold text-gray-900">Ana Martínez</h4>
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <p className="mt-4 text-gray-600">
-                  "Compré varios moños para una boda y todos quedaron hermosos. La calidad superó mis expectativas."
-                </p>
-              </div>
+            {/* Slider controls */}
+            <div className="flex justify-center mt-8 space-x-2">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentTestimonial(index)}
+                  className={`w-3 h-3 rounded-full ${
+                    index === currentTestimonial ? 'bg-indigo-600' : 'bg-gray-300'
+                  }`}
+                  aria-label={`Ver testimonio ${index + 1}`}
+                />
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Newsletter Section */}
-      <div className="bg-white py-12">
+      {/* Blog Preview Section - Replaces newsletter for logged-in users */}
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="px-6 py-12 bg-indigo-700 rounded-3xl md:px-12 lg:flex lg:items-center">
-            <div className="lg:w-0 lg:flex-1">
-              <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                Mantente al día
-              </h2>
-              <p className="max-w-3xl mt-3 text-lg text-indigo-200">
-                Suscríbete a nuestro boletín para recibir ofertas especiales y novedades.
-              </p>
-            </div>
-            <div className="mt-8 lg:mt-0 lg:ml-8">
-              <form className="sm:flex">
-                <label htmlFor="email-address" className="sr-only">
-                  Correo electrónico
-                </label>
-                <input
-                  id="email-address"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="w-full px-5 py-3 placeholder-gray-500 focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white focus:outline-none rounded-md"
-                  placeholder="Ingresa tu correo"
+          <div className="lg:text-center mb-16">
+            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Últimas Entradas</h2>
+            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+              Descubre consejos y tendencias
+            </p>
+            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+              Explora nuestros artículos sobre estilo, cuidado y novedades en el mundo de los moños
+            </p>
+          </div>
+
+          <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+                  alt="Cómo elegir el moño perfecto" 
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                 />
-                <button
-                  type="submit"
-                  className="flex items-center justify-center w-full mt-3 px-5 py-3 border border-transparent text-base font-medium text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white rounded-md sm:w-auto sm:ml-3 sm:flex-shrink-0"
+              </div>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                    Guía de Estilo
+                  </span>
+                  <span className="text-sm text-gray-500">15 Oct 2025</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Cómo elegir el moño perfecto para tu ocasión especial</h3>
+                <p className="text-gray-600 mb-4">Descubre los factores clave para seleccionar el moño ideal que complemente tu estilo y la ocasión.</p>
+                <Link 
+                  to="/blog" 
+                  className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800 transition-colors duration-300"
                 >
-                  Suscribirse
-                </button>
-              </form>
-              <p className="mt-3 text-sm text-indigo-200">
-                Prometemos no enviar spam. Puedes cancelar la suscripción en cualquier momento.
-              </p>
+                  Leer más
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+                  alt="Tendencias de moda en moños" 
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                    Tendencias
+                  </span>
+                  <span className="text-sm text-gray-500">10 Oct 2025</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Tendencias de moda en moños para esta temporada</h3>
+                <p className="text-gray-600 mb-4">Explora las últimas tendencias en moños y cómo incorporarlas a tu guardarropa diario.</p>
+                <Link 
+                  to="/blog" 
+                  className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800 transition-colors duration-300"
+                >
+                  Leer más
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1595173425119-1c5134b706b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+                  alt="Cuidado y mantenimiento" 
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                    Cuidado
+                  </span>
+                  <span className="text-sm text-gray-500">5 Oct 2025</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Cuidado y mantenimiento de tus moños favoritos</h3>
+                <p className="text-gray-600 mb-4">Consejos profesionales para mantener tus moños en perfecto estado durante más tiempo.</p>
+                <Link 
+                  to="/blog" 
+                  className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800 transition-colors duration-300"
+                >
+                  Leer más
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              to="/blog"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 transition-all duration-300 shadow-md"
+            >
+              Ver todos los artículos
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Contact Section - Added below blog preview */}
+      <div className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:text-center mb-16">
+            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Contáctanos</h2>
+            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+              ¿Tienes preguntas?
+            </p>
+            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+              Envíanos un mensaje y nos pondremos en contacto contigo pronto
+            </p>
+          </div>
+
+          <div className="mt-10 max-w-4xl mx-auto">
+            <div className="bg-gray-50 rounded-2xl shadow-sm p-8">
+              {state.succeeded ? (
+                <div className="rounded-md bg-green-50 p-4 mb-8">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-green-800">
+                        ¡Gracias por tu mensaje!
+                      </h3>
+                      <div className="mt-2 text-sm text-green-700">
+                        <p>
+                          Hemos recibido tu mensaje y nos pondremos en contacto contigo pronto.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                        Nombre
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        required
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300"
+                        placeholder="Tu nombre completo"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        required
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300"
+                        placeholder="tu@email.com"
+                      />
+                      <ValidationError 
+                        prefix="Email" 
+                        field="email"
+                        errors={state.errors}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                      Asunto
+                    </label>
+                    <input
+                      type="text"
+                      name="subject"
+                      id="subject"
+                      required
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300"
+                      placeholder="¿Sobre qué te gustaría hablar?"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                      Mensaje
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows={6}
+                      required
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300"
+                      placeholder="Escribe tu mensaje aquí..."
+                    />
+                    <ValidationError 
+                      prefix="Message" 
+                      field="message"
+                      errors={state.errors}
+                    />
+                  </div>
+                  <div>
+                    <button
+                      type="submit"
+                      disabled={state.submitting}
+                      className={`w-full flex justify-center py-3 px-6 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 ${
+                        state.submitting ? 'opacity-75 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      {state.submitting ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Enviando...
+                        </>
+                      ) : (
+                        'Enviar Mensaje'
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>

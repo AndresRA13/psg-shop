@@ -19,15 +19,22 @@ import ModernAdminDashboard from './assets/pages/ModernAdminDashboard';
 import Orders from './assets/pages/Orders';
 import CouponTest from './assets/pages/CouponTest';
 import Wishlist from './assets/pages/Wishlist';
+import Blog from './assets/pages/Blog';
+import BlogPost from './assets/pages/BlogPost';
+import Contact from './assets/pages/Contact';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
 import createSampleCoupon from './utils/createSampleCoupon';
+import useScrollToTop from './hooks/useScrollToTop';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+
+  // Add scroll to top functionality
+  useScrollToTop();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -126,6 +133,9 @@ function App() {
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:id" element={<BlogPost />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/checkout" element={
                   <ProtectedRoute>
                     <Checkout />

@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@formspree/react": "^3.0.0",
     "@paypal/react-paypal-js": "^8.9.2",
     "@tailwindcss/vite": "^4.1.13",
     "firebase": "^12.3.0",
