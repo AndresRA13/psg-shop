@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaShoppingCart, FaHeart, FaBars, FaTimes, FaYoutube, FaLinkedin, FaFacebook, FaTwitter, FaUser, FaCog, FaSignOutAlt, FaList } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -15,6 +15,7 @@ const Navbar = () => {
   const { items } = useCart();
   const { items: wishlistItems } = useWishlist();
   const navigate = useNavigate();
+  const location = useLocation();
   const profileMenuRef = useRef(null);
 
   // Debug log to see if isAdmin is updating
@@ -67,22 +68,62 @@ const Navbar = () => {
   const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
   const wishlistItemCount = wishlistItems.length;
 
+  // Function to determine if a link is active
+  const isActiveLink = (path) => {
+    return location.pathname === path;
+  };
+
   return (
     <>
       <header className="sticky top-0 z-50 font-sans bg-white shadow-sm">
         <nav className="flex items-center justify-between p-4 mx-auto max-w-7xl">
           {/* Logo */}
-          <div className="text-2xl font-bold text-slate-800">
+          <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">
             <Link to="/home">PSGSHOP</Link>
           </div>
 
           {/* Desktop Navigation Menu */}
           <ul className="items-center hidden space-x-8 md:flex">
-            <li><Link to="/home" className={navLinkClasses}>Inicio</Link></li>
-            <li><Link to="/shop" className={navLinkClasses}>Productos</Link></li>
-            <li><Link to="/blog" className={navLinkClasses}>Blog</Link></li>
-            <li><Link to="/contact" className={navLinkClasses}>Contacto</Link></li>
-            
+            <li>
+              <Link 
+                to="/home" 
+                className={isActiveLink('/home') 
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium" 
+                  : navLinkClasses}
+              >
+                Inicio
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/shop" 
+                className={isActiveLink('/shop') 
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium" 
+                  : navLinkClasses}
+              >
+                Productos
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/blog" 
+                className={isActiveLink('/blog') 
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium" 
+                  : navLinkClasses}
+              >
+                Blog
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/contact" 
+                className={isActiveLink('/contact') 
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium" 
+                  : navLinkClasses}
+              >
+                Contacto
+              </Link>
+            </li>
           </ul>
 
           {/* Right-aligned Icons */}
@@ -95,7 +136,7 @@ const Navbar = () => {
             <Link to="/wishlist" className={`${iconClasses} text-xl flex items-center justify-center relative`}>
               <FaHeart />
               {wishlistItemCount > 0 && (
-                <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-green-500 rounded-full -top-2 -right-3">
+                <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full -top-2 -right-3">
                   {wishlistItemCount}
                 </span>
               )}
@@ -105,7 +146,7 @@ const Navbar = () => {
             <Link to="/cart" className={`${iconClasses} text-xl flex items-center justify-center relative`}>
               <FaShoppingCart />
               {cartItemCount > 0 && (
-                <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-green-500 rounded-full -top-2 -right-3">
+                <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full -top-2 -right-3">
                   {cartItemCount}
                 </span>
               )}
@@ -167,7 +208,7 @@ const Navbar = () => {
                     {isAdmin && (
                       <Link 
                         to="/admin" 
-                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-700"
+                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
                         onClick={closeProfileMenu}
                       >
                         <FaCog className="mr-3 text-gray-400" />
@@ -177,7 +218,7 @@ const Navbar = () => {
                     
                     <Link 
                       to="/profile" 
-                      className="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-700"
+                      className="flex items-center px-4 py-2 text-sm text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
                       onClick={closeProfileMenu}
                     >
                       <FaUser className="mr-3 text-gray-400" />
@@ -188,7 +229,7 @@ const Navbar = () => {
                     <div className="border-t border-gray-700">
                       <Link 
                         to="/orders" 
-                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-700"
+                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
                         onClick={closeProfileMenu}
                       >
                         <FaList className="mr-3 text-gray-400" />
@@ -198,7 +239,7 @@ const Navbar = () => {
                     
                     <button 
                       onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-sm text-left text-white hover:bg-gray-700"
+                      className="flex items-center w-full px-4 py-2 text-sm text-left text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
                     >
                       <FaSignOutAlt className="mr-3 text-gray-400" />
                       <span>Cerrar sesión</span>
@@ -212,7 +253,7 @@ const Navbar = () => {
             <div className="ml-3 text-2xl cursor-pointer md:hidden text-slate-800" onClick={toggleMenu}>
               <FaBars />
               {/* Menu badge (example with 11 items) */}
-              <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-green-500 rounded-full -top-1 -right-1">
+              <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full -top-1 -right-1">
                 11
               </span>
             </div>
@@ -231,16 +272,68 @@ const Navbar = () => {
             </button>
           </div>
           <ul className="flex-grow space-y-4">
-            <li><Link to="/home" className={`text-lg ${navLinkClasses}`} onClick={toggleMenu}>Inicio</Link></li>
-            <li><Link to="/shop" className={`text-lg ${navLinkClasses}`} onClick={toggleMenu}>Productos</Link></li>
-            <li><Link to="/blog" className={`text-lg ${navLinkClasses}`} onClick={toggleMenu}>Blog</Link></li>
-            <li><Link to="/contact" className={`text-lg ${navLinkClasses}`} onClick={toggleMenu}>Contacto</Link></li>
-            <li><Link to="/cart" className={`text-lg ${navLinkClasses}`} onClick={toggleMenu}>Carrito</Link></li>
-            <li><Link to="/wishlist" className={`text-lg ${navLinkClasses}`} onClick={toggleMenu}>Favoritos</Link></li>
+            <li>
+              <Link 
+                to="/home" 
+                className={`text-lg ${isActiveLink('/home') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                onClick={toggleMenu}
+              >
+                Inicio
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/shop" 
+                className={`text-lg ${isActiveLink('/shop') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                onClick={toggleMenu}
+              >
+                Productos
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/blog" 
+                className={`text-lg ${isActiveLink('/blog') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                onClick={toggleMenu}
+              >
+                Blog
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/contact" 
+                className={`text-lg ${isActiveLink('/contact') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                onClick={toggleMenu}
+              >
+                Contacto
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/cart" 
+                className={`text-lg ${isActiveLink('/cart') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                onClick={toggleMenu}
+              >
+                Carrito
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/wishlist" 
+                className={`text-lg ${isActiveLink('/wishlist') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                onClick={toggleMenu}
+              >
+                Favoritos
+              </Link>
+            </li>
             {/* Admin Panel button in mobile menu - only visible to admin users */}
             {currentUser && isAdmin && (
               <li>
-                <Link to="/admin" className="text-lg font-medium text-blue-600" onClick={toggleMenu}>
+                <Link 
+                  to="/admin" 
+                  className={`text-lg ${isActiveLink('/admin') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : 'text-blue-600'}`} 
+                  onClick={toggleMenu}
+                >
                   Panel administrativo 
                 </Link>
               </li>
@@ -250,14 +343,14 @@ const Navbar = () => {
             {currentUser ? (
               <button 
                 onClick={() => { handleLogout(); toggleMenu(); }}
-                className="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 border border-transparent rounded-md shadow-sm hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Cerrar Sesión
               </button>
             ) : (
               <Link 
                 to="/login" 
-                className="block w-full px-4 py-2 text-sm font-medium text-center text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="block w-full px-4 py-2 text-sm font-medium text-center text-white bg-gradient-to-r from-indigo-500 to-purple-600 border border-transparent rounded-md shadow-sm hover:from-indigo-500 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 onClick={toggleMenu}
               >
                 Iniciar Sesión
@@ -265,10 +358,18 @@ const Navbar = () => {
             )}
           </div>
           <div className="flex justify-center p-5 mt-auto space-x-6">
-            <a href="#" className={`text-2xl ${iconClasses}`}><FaYoutube /></a>
-            <a href="#" className={`text-2xl ${iconClasses}`}><FaLinkedin /></a>
-            <a href="#" className={`text-2xl ${iconClasses}`}><FaFacebook /></a>
-            <a href="#" className={`text-2xl ${iconClasses}`}><FaTwitter /></a>
+            <a href="#" className="text-2xl text-slate-600 hover:text-indigo-600 transition-colors duration-300">
+              <FaYoutube />
+            </a>
+            <a href="#" className="text-2xl text-slate-600 hover:text-indigo-600 transition-colors duration-300">
+              <FaLinkedin />
+            </a>
+            <a href="#" className="text-2xl text-slate-600 hover:text-indigo-600 transition-colors duration-300">
+              <FaFacebook />
+            </a>
+            <a href="#" className="text-2xl text-slate-600 hover:text-indigo-600 transition-colors duration-300">
+              <FaTwitter />
+            </a>
           </div>
         </aside>
       </>

@@ -1247,6 +1247,211 @@ const ModernAdminDashboard = () => {
                   {orders.map((order) => (
                     <tr key={order.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.id.substring(0, 8)}...</td>
+                      <td className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.userEmail || 'N/A'}</td>
+                      <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(order.createdAt)}</td>
+                      <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatCurrency(order.totalAmount || 0)}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap`}>
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending', theme)}`}>
+                          {getOrderStatusText(order.orderStatus || 'pending')}
+                        </span>
+                      </td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                        <button 
+                          onClick={() => openOrderDetails(order)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                          }`}
+                        >
+                          <FiShoppingCart />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      case 'coupons':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los códigos promocionales</h2>
+            </div>
+            <div className="w-full overflow-x-auto">
+              <CouponManager />
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            </div>
+            <div className="w-full overflow-x-auto">
+              <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                <thead>
+                  <tr>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Producto</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Calificación</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Comentario</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                  {reviews.map((review) => (
+                    <tr key={review.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{review.productName}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.userEmail}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>
+                        <StarRating rating={review.rating} />
+                      </td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.comment}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                        <button 
+                          onClick={() => openEditReviewModal(review)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                          }`}
+                        >
+                          <FiEdit />
+                        </button>
+                        <button 
+                          onClick={() => deleteReviewHandler(review.id)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                          }`}
+                        >
+                          <FiTrash2 />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      case 'orders':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los pedidos</h2>
+            </div>
+            <div className="w-full overflow-x-auto">
+              <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                <thead>
+                  <tr>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                  {orders.map((order) => (
+                    <tr key={order.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{order.id.substring(0, 8)}...</td>
+                      <td className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.userEmail || 'N/A'}</td>
+                      <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(order.createdAt)}</td>
+                      <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatCurrency(order.totalAmount || 0)}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap`}>
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending', theme)}`}>
+                          {getOrderStatusText(order.orderStatus || 'pending')}
+                        </span>
+                      </td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                        <button 
+                          onClick={() => openOrderDetails(order)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                          }`}
+                        >
+                          <FiPackage />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      case 'reviews':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todas las reseñas</h2>
+            </div>
+            <div className="w-full overflow-x-auto">
+              <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                <thead>
+                  <tr>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Producto</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Usuario</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Calificación</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Comentario</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                  {reviews.map((review) => (
+                    <tr key={review.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{review.productName}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.userEmail || 'N/A'}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>
+                        <StarRating rating={review.rating} />
+                      </td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.comment}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                        <button 
+                          onClick={() => openEditReviewModal(review)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                          }`}
+                        >
+                          <FiEdit />
+                        </button>
+                        <button 
+                          onClick={() => deleteReviewHandler(review.id)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                          }`}
+                        >
+                          <FiTrash2 />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      case 'orders':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los pedidos</h2>
+            </div>
+            <div className="w-full overflow-x-auto">
+              <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                <thead>
+                  <tr>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                  {orders.map((order) => (
+                    <tr key={order.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.id.substring(0, 8)}...</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{order.userEmail || 'N/A'}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(order.createdAt)}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatCurrency(order.totalAmount || 0)}</td>
@@ -1298,12 +1503,19 @@ const ModernAdminDashboard = () => {
       case 'coupons':
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los códigos promocionales</h2>
-            </div>
-            <div className="w-full overflow-x-auto">
-              <CouponManager theme={theme} />
-            </div>
+            <h2 className={`mb-6 text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Gestión de Cupones</h2>
+const Dashboard = ({ theme, activeTab }) => {
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'coupons':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+  const renderContent = () => {
+    switch (currentTab) {
+      case 'coupons':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-8800' : 'bg-white'} w-full`}>
+            <CouponManager theme={theme} />
           </div>
         );
       default:
@@ -1314,6 +1526,8 @@ const ModernAdminDashboard = () => {
           </div>
         );
     }
+  };
+  };
   };
 
   return (

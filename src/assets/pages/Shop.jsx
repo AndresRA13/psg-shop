@@ -208,7 +208,7 @@ const Shop = () => {
 
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="w-12 h-12 border-b-2 border-gray-900 rounded-full animate-spin"></div>
+            <div className="w-12 h-12 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
           </div>
         ) : error ? (
           <div className="relative px-4 py-3 text-red-700 bg-red-100 border border-red-400 rounded" role="alert">
@@ -224,7 +224,7 @@ const Shop = () => {
             )}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredProducts.map((product) => (
-                <div key={product.id} className="overflow-hidden transition-shadow duration-300 bg-white rounded-lg shadow-md hover:shadow-lg">
+                <div key={product.id} className="overflow-hidden transition-all duration-300 bg-white rounded-lg shadow-md hover:shadow-lg border border-gray-100">
                   <Link to={`/product/${product.id}`}>
                     <div className="w-full overflow-hidden aspect-w-1 aspect-h-1">
                       <img
@@ -240,11 +240,15 @@ const Shop = () => {
                   </Link>
                   <div className="p-4">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800">
                         {product.category}
                       </span>
                       {product.stock !== undefined && product.stock <= 5 && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium shadow-sm ${
+                          product.stock > 0 
+                            ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white' 
+                            : 'bg-gradient-to-r from-red-500 to-red-600 text-white'
+                        }`}>
                           {product.stock > 0 ? `Solo ${product.stock} disponibles` : 'Agotado'}
                         </span>
                       )}
@@ -259,12 +263,12 @@ const Shop = () => {
                     )}
                     
                     <div className="mt-2">
-                      <span className="text-lg font-semibold text-indigo-600">${parseFloat(product.price).toLocaleString('es-CO')}</span>
+                      <span className="text-lg font-semibold text-indigo-700">${parseFloat(product.price).toLocaleString('es-CO')}</span>
                     </div>
                     
                     <div className="flex gap-2 mt-4">
                       <button 
-                        className="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="flex-1 px-4 py-2 text-sm font-medium text-white transition-all duration-300 border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         onClick={(e) => {
                           e.preventDefault();
                           handleAddToCart(product);
@@ -273,14 +277,14 @@ const Shop = () => {
                         Agregar al Carrito
                       </button>
                       <button 
-                        className="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-300 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                           handleAddToWishlist(product);
                         }}
                       >
-                        <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-5 h-5 text-gray-500 hover:text-red-500 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4 4 0 000 6.364L12 20.364l7.682-7.682a4 4 0 00-6.364-6.364L12 7.636l-1.318-1.318a4 4 0 00-6.364 0z" />
                         </svg>
                       </button>
@@ -310,7 +314,7 @@ const Shop = () => {
                     setSearchTerm('');
                     setFilter('all');
                   }}
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-all duration-300 border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   Ver todos los productos
                 </button>

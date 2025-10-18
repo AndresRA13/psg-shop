@@ -346,7 +346,7 @@ const Blog = () => {
               </p>
               <Link 
                 to="/shop" 
-                className="inline-block bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-300"
+                className="inline-block bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-purple-800 transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 Explorar Colección
               </Link>

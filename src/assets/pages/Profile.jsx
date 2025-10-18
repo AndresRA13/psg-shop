@@ -782,7 +782,7 @@ const Profile = () => {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                     >
                       {saving ? 'Guardando...' : 'Guardar Cambios'}
                     </button>
@@ -851,7 +851,7 @@ const Profile = () => {
                     <button
                       type="submit"
                       disabled={securitySaving}
-                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                     >
                       {securitySaving ? 'Guardando...' : 'Cambiar Contraseña'}
                     </button>
@@ -1010,7 +1010,7 @@ const Profile = () => {
                       <button
                         type="submit"
                         disabled={addressSaving}
-                        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                       >
                         {addressSaving ? 'Guardando...' : (editingAddress ? 'Guardar Cambios' : 'Agregar Dirección')}
                       </button>
@@ -1066,7 +1066,7 @@ const Profile = () => {
                               <button
                                 onClick={() => handleSetDefaultAddress(address.id)}
                                 disabled={address.isDefault}
-                                className={`inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 ${address.isDefault ? 'bg-gray-100' : 'bg-indigo-100 hover:bg-indigo-200'}`}
+                                className={`inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 ${address.isDefault ? 'bg-gray-100' : 'bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200'}`}
                               >
                                 {address.isDefault ? 'Predeterminada' : 'Hacer Predeterminada'}
                               </button>

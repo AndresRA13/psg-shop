@@ -41,20 +41,37 @@ export const getOrderStatusText = (status) => {
 };
 
 // Get status badge class
-export const getStatusBadgeClass = (status) => {
-    switch (status) {
-        case 'pending':
-            return 'bg-yellow-100 text-yellow-800';
-        case 'processing':
-            return 'bg-blue-100 text-blue-800';
-        case 'shipped':
-            return 'bg-indigo-100 text-indigo-800';
-        case 'delivered':
-            return 'bg-green-100 text-green-800';
-        case 'cancelled':
-            return 'bg-red-100 text-red-800';
-        default:
-            return 'bg-gray-100 text-gray-800';
+export const getStatusBadgeClass = (status, theme = 'light') => {
+    if (theme === 'dark') {
+        switch (status) {
+            case 'pending':
+                return 'bg-yellow-900 text-yellow-200';
+            case 'processing':
+                return 'bg-blue-900 text-blue-200';
+            case 'shipped':
+                return 'bg-indigo-900 text-indigo-200';
+            case 'delivered':
+                return 'bg-green-900 text-green-200';
+            case 'cancelled':
+                return 'bg-red-900 text-red-200';
+            default:
+                return 'bg-gray-700 text-gray-200';
+        }
+    } else {
+        switch (status) {
+            case 'pending':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'processing':
+                return 'bg-blue-100 text-blue-800';
+            case 'shipped':
+                return 'bg-indigo-100 text-indigo-800';
+            case 'delivered':
+                return 'bg-green-100 text-green-800';
+            case 'cancelled':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
     }
 };
 

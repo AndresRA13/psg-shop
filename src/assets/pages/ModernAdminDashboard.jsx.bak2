@@ -1318,6 +1318,23 @@ const ModernAdminDashboard = () => {
 
   return (
     <div className={`min-h-screen flex w-full ${theme === 'dark' ? 'dark:bg-gray-900 bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-8800' : 'bg-white'} w-full`}>
+            <CouponManager theme={theme} />
+          </div>
+        );
+      default:
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <h2 className={`mb-6 text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Dashboard</h2>
+            <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Bienvenido al panel de administración moderno.</p>
+          </div>
+        );
+    }
+  };
+  };
+
+  return (
+    <div className={`min-h-screen flex w-full ${theme === 'dark' ? 'dark:bg-gray-900 bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
       {/* Success/Error Messages */}
       {successMessage && (
         <div className="fixed z-50 px-6 py-4 text-white bg-green-600 rounded-lg shadow-lg top-4 right-4">

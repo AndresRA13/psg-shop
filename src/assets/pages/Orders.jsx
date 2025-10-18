@@ -42,7 +42,7 @@ const Orders = () => {
       case 'processing':
         return 'bg-blue-100 text-blue-800';
       case 'shipped':
-        return 'bg-indigo-100 text-indigo-800';
+        return 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800';
       case 'delivered':
         return 'bg-green-100 text-green-800';
       case 'cancelled':
@@ -230,7 +230,7 @@ const Orders = () => {
             <div className="mt-6">
               <Link
                 to="/shop"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Comprar ahora
               </Link>
@@ -256,7 +256,7 @@ const Orders = () => {
                       </span>
                       <button
                         onClick={() => openOrderDetails(order)}
-                        className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                       >
                         Ver detalles
                       </button>
@@ -306,7 +306,7 @@ const Orders = () => {
                           </div>
                           <button
                             onClick={() => openReviewForm(item)}
-                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                           >
                             Dejar reseña
                           </button>
@@ -387,7 +387,7 @@ const Orders = () => {
                   </button>
                   <button
                     onClick={submitReview}
-                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-700 border border-transparent rounded-md shadow-sm hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Enviar Reseña
                   </button>

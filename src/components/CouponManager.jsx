@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy } from "firebase/firestore";
 
-const CouponManager = () => {
+const CouponManager = ({ theme = 'light' }) => {
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -182,11 +182,39 @@ const CouponManager = () => {
     }).format(amount || 0);
   };
 
+  // Theme-based classes
+  const getThemeClasses = () => {
+    return {
+      container: theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900',
+      header: theme === 'dark' ? 'border-gray-700 text-white' : 'border-gray-200 text-gray-900',
+      input: theme === 'dark' 
+        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500' 
+        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500',
+      buttonPrimary: theme === 'dark' 
+        ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 text-white' 
+        : 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 text-white',
+      buttonSecondary: theme === 'dark' 
+        ? 'bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600 focus:ring-blue-500' 
+        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-indigo-500',
+      tableHeader: theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-50 text-gray-500',
+      tableRow: theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700 divide-gray-700' : 'bg-white hover:bg-gray-50 divide-gray-200',
+      badge: {
+        percentage: theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800',
+        active: theme === 'dark' ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800',
+        inactive: theme === 'dark' ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800'
+      },
+      successMessage: theme === 'dark' ? 'bg-green-900 border-green-700 text-green-200' : 'bg-green-100 border-green-400 text-green-700',
+      errorMessage: theme === 'dark' ? 'bg-red-900 border-red-700 text-red-200' : 'bg-red-100 border-red-400 text-red-700'
+    };
+  };
+
+  const themeClasses = getThemeClasses();
+
   return (
     <div className="mt-8">
       {/* Success Message */}
       {successMessage && (
-        <div className="relative px-4 py-3 mb-4 text-green-700 bg-green-100 border border-green-400 rounded" role="alert">
+        <div className={`relative px-4 py-3 mb-4 rounded ${themeClasses.successMessage}`} role="alert">
           <strong className="font-bold">Éxito! </strong>
           <span className="block sm:inline">{successMessage}</span>
         </div>
@@ -194,16 +222,16 @@ const CouponManager = () => {
       
       {/* Error Message */}
       {error && (
-        <div className="relative px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded" role="alert">
+        <div className={`relative px-4 py-3 mb-4 rounded ${themeClasses.errorMessage}`} role="alert">
           <strong className="font-bold">Error! </strong>
           <span className="block sm:inline">{error}</span>
         </div>
       )}
 
       {/* Add Coupon Form */}
-      <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
-        <div className="px-4 py-5 border-b border-gray-200 sm:px-6">
-          <h3 className="text-lg font-medium leading-6 text-gray-900">
+      <div className={`rounded-lg shadow overflow-hidden mb-8 ${themeClasses.container}`}>
+        <div className={`px-4 py-5 border-b sm:px-6 ${themeClasses.header}`}>
+          <h3 className="text-lg font-medium leading-6">
             {editingCoupon ? 'Editar Cupón' : 'Agregar Nuevo Cupón'}
           </h3>
         </div>
@@ -211,7 +239,7 @@ const CouponManager = () => {
           <form onSubmit={editingCoupon ? saveEdit : createCoupon}>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <label htmlFor="code" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="code" className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Código del Cupón *
                 </label>
                 <input
@@ -221,13 +249,13 @@ const CouponManager = () => {
                   required
                   value={editingCoupon ? editingCoupon.code : newCoupon.code}
                   onChange={editingCoupon ? handleEditCouponChange : handleNewCouponChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm ${themeClasses.input}`}
                   placeholder="Ej: DESCUENTO10"
                 />
               </div>
               
               <div>
-                <label htmlFor="discountType" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="discountType" className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Tipo de Descuento *
                 </label>
                 <select
@@ -236,15 +264,15 @@ const CouponManager = () => {
                   required
                   value={editingCoupon ? editingCoupon.discountType : newCoupon.discountType}
                   onChange={editingCoupon ? handleEditCouponChange : handleNewCouponChange}
-                  className="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className={`mt-1 block w-full rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm ${themeClasses.input}`}
                 >
-                  <option value="percentage">Porcentaje</option>
-                  <option value="fixed">Monto Fijo</option>
+                  <option value="percentage" className={theme === 'dark' ? 'bg-gray-700' : 'bg-white'}>Porcentaje</option>
+                  <option value="fixed" className={theme === 'dark' ? 'bg-gray-700' : 'bg-white'}>Monto Fijo</option>
                 </select>
               </div>
               
               <div>
-                <label htmlFor="discountValue" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="discountValue" className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Valor del Descuento *
                 </label>
                 <input
@@ -256,12 +284,12 @@ const CouponManager = () => {
                   step="0.01"
                   value={editingCoupon ? editingCoupon.discountValue : newCoupon.discountValue}
                   onChange={editingCoupon ? handleEditCouponChange : handleNewCouponChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm ${themeClasses.input}`}
                   placeholder={editingCoupon ? 
                     (editingCoupon.discountType === 'percentage' ? 'Ej: 15' : 'Ej: 5000') : 
                     (newCoupon.discountType === 'percentage' ? 'Ej: 15' : 'Ej: 5000')}
                 />
-                <p className="mt-1 text-sm text-gray-500">
+                <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                   {editingCoupon ? 
                     (editingCoupon.discountType === 'percentage' ? 'Porcentaje de descuento (1-100%)' : 'Monto fijo en COP') : 
                     (newCoupon.discountType === 'percentage' ? 'Porcentaje de descuento (1-100%)' : 'Monto fijo en COP')}
@@ -269,7 +297,7 @@ const CouponManager = () => {
               </div>
               
               <div>
-                <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="expiryDate" className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Fecha de Expiración
                 </label>
                 <input
@@ -278,7 +306,7 @@ const CouponManager = () => {
                   id="expiryDate"
                   value={editingCoupon ? editingCoupon.expiryDate : newCoupon.expiryDate}
                   onChange={editingCoupon ? handleEditCouponChange : handleNewCouponChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm ${themeClasses.input}`}
                 />
               </div>
               
@@ -290,9 +318,13 @@ const CouponManager = () => {
                     type="checkbox"
                     checked={editingCoupon ? editingCoupon.isActive : newCoupon.isActive}
                     onChange={editingCoupon ? handleEditCouponChange : handleNewCouponChange}
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    className={`h-4 w-4 focus:ring-2 focus:ring-offset-2 ${
+                      theme === 'dark' 
+                        ? 'text-blue-500 bg-gray-700 border-gray-600 focus:ring-blue-500 focus:ring-offset-gray-800' 
+                        : 'text-indigo-600 border-gray-300 focus:ring-indigo-500 focus:ring-offset-white'
+                    } rounded`}
                   />
-                  <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
+                  <label htmlFor="isActive" className={`ml-2 block text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}`}>
                     Cupón Activo
                   </label>
                 </div>
@@ -304,14 +336,14 @@ const CouponManager = () => {
                 <>
                   <button
                     type="submit"
-                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${themeClasses.buttonPrimary}`}
                   >
                     Guardar Cambios
                   </button>
                   <button
                     type="button"
                     onClick={() => setEditingCoupon(null)}
-                    className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className={`inline-flex justify-center py-2 px-4 border shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${themeClasses.buttonSecondary}`}
                   >
                     Cancelar
                   </button>
@@ -319,7 +351,7 @@ const CouponManager = () => {
               ) : (
                 <button
                   type="submit"
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${themeClasses.buttonPrimary}`}
                 >
                   Crear Cupón
                 </button>
@@ -330,80 +362,84 @@ const CouponManager = () => {
       </div>
 
       {/* Coupons List */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="px-4 py-5 border-b border-gray-200 sm:px-6">
-          <h3 className="text-lg font-medium leading-6 text-gray-900">Cupones Existentes</h3>
+      <div className={`rounded-lg shadow overflow-hidden ${themeClasses.container}`}>
+        <div className={`px-4 py-5 border-b sm:px-6 ${themeClasses.header}`}>
+          <h3 className="text-lg font-medium leading-6">
+            Cupones Existentes
+          </h3>
         </div>
         <div className="px-4 py-5 sm:px-6">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y">
+              <thead className={themeClasses.tableHeader}>
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Código</th>
-                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tipo</th>
-                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Valor</th>
-                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado</th>
-                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Expiración</th>
-                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Acciones</th>
+                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase">Código</th>
+                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase">Tipo</th>
+                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase">Valor</th>
+                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase">Estado</th>
+                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-left uppercase">Expiración</th>
+                  <th scope="col" className="px-6 py-3 text-xs font-medium tracking-wider text-right uppercase">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className={`divide-y ${themeClasses.tableRow}`}>
                 {loading ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan="6" className="px-6 py-4 text-center">
                       <div className="flex justify-center">
-                        <div className="w-6 h-6 border-b-2 border-gray-900 rounded-full animate-spin"></div>
+                        <div className={`w-6 h-6 border-b-2 rounded-full animate-spin ${
+                          theme === 'dark' ? 'border-gray-400' : 'border-gray-900'
+                        }`}></div>
                       </div>
                     </td>
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-4 text-center text-red-500">{error}</td>
+                    <td colSpan="6" className={`px-6 py-4 text-center ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`}>{error}</td>
                   </tr>
                 ) : coupons.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-4 text-center text-gray-500">No hay cupones disponibles</td>
+                    <td colSpan="6" className={`px-6 py-4 text-center ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>No hay cupones disponibles</td>
                   </tr>
                 ) : (
                   coupons.map((coupon) => (
-                    <tr key={coupon.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{coupon.code}</div>
+                    <tr key={coupon.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {coupon.code}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${themeClasses.badge.percentage}`}>
                           {coupon.discountType === 'percentage' ? 'Porcentaje' : 'Monto Fijo'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>
                         {coupon.discountType === 'percentage' 
                           ? `${coupon.discountValue}%` 
                           : formatCurrency(coupon.discountValue)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {coupon.isActive ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${themeClasses.badge.active}`}>
                             Activo
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${themeClasses.badge.inactive}`}>
                             Inactivo
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>
                         {coupon.expiryDate ? formatDate(coupon.expiryDate) : 'Nunca'}
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
                         <button
                           onClick={() => setEditingCoupon(coupon)}
-                          className="mr-3 text-indigo-600 hover:text-indigo-900"
+                          className={`mr-3 ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'}`}
                         >
                           Editar
                         </button>
                         <button
                           onClick={() => deleteCoupon(coupon.id, coupon.code)}
-                          className="text-red-600 hover:text-red-900"
+                          className={theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}
                         >
                           Eliminar
                         </button>

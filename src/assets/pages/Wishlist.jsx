@@ -58,7 +58,7 @@ const Wishlist = () => {
             <div className="mt-6">
               <Link
                 to="/shop"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Explorar Productos
               </Link>
@@ -83,7 +83,7 @@ const Wishlist = () => {
                 </Link>
                 <div className="p-4">
                   <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800">
                       {item.category}
                     </span>
                   </div>
@@ -115,7 +115,7 @@ const Wishlist = () => {
                   <div className="mt-4 flex gap-2">
                     <Link
                       to={`/product/${item.id}`}
-                      className="flex-1 bg-indigo-600 border border-transparent rounded-md py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-center"
+                      className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 border border-transparent rounded-md py-2 px-4 text-sm font-medium text-white hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-center"
                     >
                       Ver Detalles
                     </Link>
