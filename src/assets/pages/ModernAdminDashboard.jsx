@@ -98,6 +98,18 @@ const ModernAdminDashboard = () => {
   // Search state for products
   const [productSearchTerm, setProductSearchTerm] = useState('');
   
+  // Search state for reviews
+  const [reviewSearchTerm, setReviewSearchTerm] = useState('');
+  
+  // Search state for orders
+  const [orderSearchTerm, setOrderSearchTerm] = useState('');
+  
+  // Search state for users
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+  
+  // Role filter state for users
+  const [userRoleFilter, setUserRoleFilter] = useState('all');
+  
   // Admin profile menu
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef(null);
@@ -1134,10 +1146,69 @@ const ModernAdminDashboard = () => {
           </div>
         );
       case 'users':
+        // Filter users based on search term and role filter
+        const filteredUsers = users.filter(user => {
+          // Apply search filter
+          const matchesSearch = !userSearchTerm || 
+            (user.email && user.email.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
+            (user.name && user.name.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
+            (user.role && user.role.toLowerCase().includes(userSearchTerm.toLowerCase()));
+          
+          // Apply role filter
+          const matchesRole = userRoleFilter === 'all' || 
+            (userRoleFilter === 'admin' && user.role === 'admin') ||
+            (userRoleFilter === 'user' && user.role === 'user');
+          
+          return matchesSearch && matchesRole;
+        });
+
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los usuarios</h2>
+              <div className="flex flex-wrap items-center gap-4">
+                {/* Role Filter Dropdown */}
+                <div className="relative">
+                  <select
+                    value={userRoleFilter}
+                    onChange={(e) => setUserRoleFilter(e.target.value)}
+                    className={`pl-4 pr-10 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-white' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
+                  >
+                    <option value="all">Todos los roles</option>
+                    <option value="admin">Administrador</option>
+                    <option value="user">Usuario</option>
+                  </select>
+                  <div className={`absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  }`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                </div>
+                
+                {/* Search Input */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Buscar usuarios..."
+                    value={userSearchTerm}
+                    onChange={(e) => setUserSearchTerm(e.target.value)}
+                    className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                  />
+                  <FiUsers className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  }`} />
+                </div>
+              </div>
             </div>
             <div className="w-full overflow-x-auto">
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
@@ -1150,7 +1221,7 @@ const ModernAdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {users.map((user) => (
+                  {filteredUsers.map((user) => (
                     <tr key={user.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{user.email}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.name || 'N/A'}</td>
@@ -1171,14 +1242,42 @@ const ModernAdminDashboard = () => {
                   ))}
                 </tbody>
               </table>
+              {filteredUsers.length === 0 && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {userSearchTerm || userRoleFilter !== 'all' ? 'No se encontraron usuarios que coincidan con los filtros.' : 'No hay usuarios disponibles.'}
+                </div>
+              )}
             </div>
           </div>
         );
       case 'reviews':
+        // Filter reviews based on search term
+        const filteredReviews = reviews.filter(review =>
+          (review.userEmail && review.userEmail.toLowerCase().includes(reviewSearchTerm.toLowerCase())) ||
+          (review.productName && review.productName.toLowerCase().includes(reviewSearchTerm.toLowerCase())) ||
+          (review.comment && review.comment.toLowerCase().includes(reviewSearchTerm.toLowerCase()))
+        );
+
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todas las reseñas</h2>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar reseñas..."
+                  value={reviewSearchTerm}
+                  onChange={(e) => setReviewSearchTerm(e.target.value)}
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <FiMessageSquare className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
             </div>
             <div className="w-full overflow-x-auto">
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
@@ -1193,7 +1292,7 @@ const ModernAdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {reviews.map((review) => (
+                  {filteredReviews.map((review) => (
                     <tr key={review.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{review.userEmail || 'Usuario eliminado'}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.productName || 'Producto eliminado'}</td>
@@ -1222,14 +1321,44 @@ const ModernAdminDashboard = () => {
                   ))}
                 </tbody>
               </table>
+              {filteredReviews.length === 0 && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {reviewSearchTerm ? 'No se encontraron reseñas que coincidan con la búsqueda.' : 'No hay reseñas disponibles.'}
+                </div>
+              )}
             </div>
           </div>
         );
       case 'orders':
+        // Filter orders based on search term
+        const filteredOrders = orderSearchTerm
+          ? orders.filter(order =>
+              (order.id && order.id.toLowerCase().includes(orderSearchTerm.toLowerCase())) ||
+              (order.userEmail && order.userEmail.toLowerCase().includes(orderSearchTerm.toLowerCase())) ||
+              (order.orderStatus && order.orderStatus.toLowerCase().includes(orderSearchTerm.toLowerCase()))
+            )
+          : orders;
+
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los pedidos</h2>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar pedidos..."
+                  value={orderSearchTerm}
+                  onChange={(e) => setOrderSearchTerm(e.target.value)}
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <FiPackage className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
             </div>
             <div className="w-full overflow-x-auto">
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
@@ -1244,7 +1373,7 @@ const ModernAdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {orders.map((order) => (
+                  {filteredOrders.map((order) => (
                     <tr key={order.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.id.substring(0, 8)}...</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{order.userEmail || 'N/A'}</td>
@@ -1292,6 +1421,11 @@ const ModernAdminDashboard = () => {
                   ))}
                 </tbody>
               </table>
+              {filteredOrders.length === 0 && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {orderSearchTerm ? 'No se encontraron pedidos que coincidan con la búsqueda.' : 'No hay pedidos disponibles.'}
+                </div>
+              )};
             </div>
           </div>
         );
