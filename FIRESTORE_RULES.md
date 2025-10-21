@@ -80,10 +80,13 @@ service cloud.firestore {
       allow create: if request.auth != null;
     }
     
-    // Allow admins to manage coupons
+    // Allow users to read coupons but only admins to manage them
     match /coupons/{couponId} {
-      // Only admins can read, create, update, and delete coupons
-      allow read, create, update, delete: if request.auth != null && 
+      // Authenticated users can read coupons (to validate them)
+      allow read: if request.auth != null;
+      
+      // Only admins can create, update, and delete coupons
+      allow create, update, delete: if request.auth != null && 
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }

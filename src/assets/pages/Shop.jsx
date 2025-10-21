@@ -224,7 +224,7 @@ const Shop = () => {
             )}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredProducts.map((product) => (
-                <div key={product.id} className="overflow-hidden transition-all duration-300 bg-white rounded-lg shadow-md hover:shadow-lg border border-gray-100">
+                <div key={product.id} className="overflow-hidden transition-all duration-300 bg-white border border-gray-100 rounded-lg shadow-md hover:shadow-lg">
                   <Link to={`/product/${product.id}`}>
                     <div className="w-full overflow-hidden aspect-w-1 aspect-h-1">
                       <img
@@ -284,7 +284,7 @@ const Shop = () => {
                           handleAddToWishlist(product);
                         }}
                       >
-                        <svg className="w-5 h-5 text-gray-500 hover:text-red-500 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-5 h-5 text-gray-500 transition-colors duration-200 hover:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4 4 0 000 6.364L12 20.364l7.682-7.682a4 4 0 00-6.364-6.364L12 7.636l-1.318-1.318a4 4 0 00-6.364 0z" />
                         </svg>
                       </button>

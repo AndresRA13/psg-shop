@@ -79,7 +79,7 @@ const Navbar = () => {
         <nav className="flex items-center justify-between p-4 mx-auto max-w-7xl">
           {/* Logo */}
           <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">
-            <Link to="/home">PSGSHOP</Link>
+            <Link to="/home">CARTSHOP</Link>
           </div>
 
           {/* Desktop Navigation Menu */}
@@ -136,7 +136,7 @@ const Navbar = () => {
             <Link to="/wishlist" className={`${iconClasses} text-xl flex items-center justify-center relative`}>
               <FaHeart />
               {wishlistItemCount > 0 && (
-                <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full -top-2 -right-3">
+                <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 -top-2 -right-3">
                   {wishlistItemCount}
                 </span>
               )}
@@ -146,7 +146,7 @@ const Navbar = () => {
             <Link to="/cart" className={`${iconClasses} text-xl flex items-center justify-center relative`}>
               <FaShoppingCart />
               {cartItemCount > 0 && (
-                <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full -top-2 -right-3">
+                <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 -top-2 -right-3">
                   {cartItemCount}
                 </span>
               )}
@@ -253,7 +253,7 @@ const Navbar = () => {
             <div className="ml-3 text-2xl cursor-pointer md:hidden text-slate-800" onClick={toggleMenu}>
               <FaBars />
               {/* Menu badge (example with 11 items) */}
-              <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full -top-1 -right-1">
+              <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 -top-1 -right-1">
                 11
               </span>
             </div>
@@ -343,14 +343,14 @@ const Navbar = () => {
             {currentUser ? (
               <button 
                 onClick={() => { handleLogout(); toggleMenu(); }}
-                className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 border border-transparent rounded-md shadow-sm hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Cerrar Sesión
               </button>
             ) : (
               <Link 
                 to="/login" 
-                className="block w-full px-4 py-2 text-sm font-medium text-center text-white bg-gradient-to-r from-indigo-500 to-purple-600 border border-transparent rounded-md shadow-sm hover:from-indigo-500 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="block w-full px-4 py-2 text-sm font-medium text-center text-white border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 onClick={toggleMenu}
               >
                 Iniciar Sesión
@@ -358,16 +358,16 @@ const Navbar = () => {
             )}
           </div>
           <div className="flex justify-center p-5 mt-auto space-x-6">
-            <a href="#" className="text-2xl text-slate-600 hover:text-indigo-600 transition-colors duration-300">
+            <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
               <FaYoutube />
             </a>
-            <a href="#" className="text-2xl text-slate-600 hover:text-indigo-600 transition-colors duration-300">
+            <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
               <FaLinkedin />
             </a>
-            <a href="#" className="text-2xl text-slate-600 hover:text-indigo-600 transition-colors duration-300">
+            <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
               <FaFacebook />
             </a>
-            <a href="#" className="text-2xl text-slate-600 hover:text-indigo-600 transition-colors duration-300">
+            <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
               <FaTwitter />
             </a>
           </div>
