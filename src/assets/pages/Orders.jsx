@@ -187,10 +187,10 @@ const Orders = () => {
 
   if (loading) {
     return (
-      <div>
+      <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
           </div>
         </div>
       </div>
@@ -198,11 +198,22 @@ const Orders = () => {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Mis Pedidos</h1>
-          <p className="mt-2 text-gray-600">Consulta el estado de tus pedidos recientes</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Mis Pedidos</h1>
+              <p className="mt-2 text-gray-600">Consulta el estado de tus pedidos recientes</p>
+            </div>
+            <div className="hidden sm:block">
+              <div className="flex items-center space-x-2 text-sm text-gray-500">
+                <span>Total de pedidos:</span>
+                <span className="font-semibold text-indigo-600">{orders.length}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {error && (
@@ -221,11 +232,13 @@ const Orders = () => {
         )}
 
         {orders.length === 0 ? (
-          <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002-2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <h3 className="mt-2 text-lg font-medium text-gray-900">No tienes pedidos</h3>
+          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-indigo-50">
+              <svg className="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002-2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <h3 className="mt-4 text-lg font-medium text-gray-900">No tienes pedidos</h3>
             <p className="mt-1 text-gray-500">Aún no has realizado ningún pedido.</p>
             <div className="mt-6">
               <Link
@@ -239,54 +252,68 @@ const Orders = () => {
         ) : (
           <div className="space-y-6">
             {orders.map((order) => (
-              <div key={order.id} className="bg-white shadow overflow-hidden sm:rounded-lg">
-                <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <div key={order.id} className="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+                {/* Order Header */}
+                <div className="px-6 py-5 border-b border-gray-100">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        Pedido #{order.id.substring(0, 8)}
-                      </h3>
-                      <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                        Realizado el {formatDate(order.createdAt)}
-                      </p>
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-indigo-50 flex items-center justify-center">
+                        <svg className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                      </div>
+                      <div className="ml-4">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Pedido #{order.id.substring(0, 8)}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Realizado el {formatDate(order.createdAt)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="mt-4 md:mt-0 flex items-center space-x-2">
+                    <div className="mt-4 md:mt-0 flex items-center space-x-3">
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeClass(order.orderStatus)}`}>
                         {getOrderStatusText(order.orderStatus)}
                       </span>
                       <button
                         onClick={() => openOrderDetails(order)}
-                        className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300"
                       >
                         Ver detalles
                       </button>
                     </div>
                   </div>
                 </div>
-                <div className="px-4 py-5 sm:px-6">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div>
+                
+                {/* Order Summary */}
+                <div className="px-6 py-5">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="border-l-4 border-indigo-500 pl-4">
                       <p className="text-sm text-gray-500">Total</p>
-                      <p className="text-lg font-medium text-gray-900">{formatCurrency(order.totalAmount)}</p>
+                      <p className="text-lg font-semibold text-gray-900">{formatCurrency(order.totalAmount)}</p>
                     </div>
-                    <div>
+                    <div className="border-l-4 border-purple-500 pl-4">
                       <p className="text-sm text-gray-500">Productos</p>
-                      <p className="text-lg font-medium text-gray-900">
-                        {order.items?.length || 0} {order.items?.length === 1 ? 'producto' : 'productos'}
+                      <p className="text-lg font-semibold text-gray-900">
+                        {order.items?.length || 0}
                       </p>
                     </div>
-                    <div>
+                    <div className="border-l-4 border-pink-500 pl-4">
                       <p className="text-sm text-gray-500">Método de Pago</p>
-                      <p className="text-lg font-medium text-gray-900">{order.paymentMethod || 'N/A'}</p>
+                      <p className="text-lg font-semibold text-gray-900">{order.paymentMethod || 'N/A'}</p>
+                    </div>
+                    <div className="border-l-4 border-teal-500 pl-4">
+                      <p className="text-sm text-gray-500">Estado</p>
+                      <p className="text-lg font-semibold text-gray-900 capitalize">{order.paymentStatus || 'N/A'}</p>
                     </div>
                   </div>
                   
                   {/* Products in order with review option */}
                   <div className="mt-6">
-                    <h4 className="text-md font-medium text-gray-900 mb-3">Productos en este pedido</h4>
-                    <div className="space-y-4">
+                    <h4 className="text-md font-semibold text-gray-900 mb-3">Productos en este pedido</h4>
+                    <div className="space-y-3">
                       {order.items?.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 w-16 h-16 border border-gray-200 rounded-md overflow-hidden">
                               <img
@@ -301,12 +328,16 @@ const Orders = () => {
                             </div>
                             <div className="ml-4">
                               <h5 className="text-sm font-medium text-gray-900">{item.name}</h5>
-                              <p className="text-sm text-gray-500">Cantidad: {item.quantity}</p>
+                              <div className="flex items-center mt-1">
+                                <span className="text-sm text-gray-500">Cantidad: {item.quantity}</span>
+                                <span className="mx-2 text-gray-300">•</span>
+                                <span className="text-sm font-medium text-gray-900">{formatCurrency(item.price * item.quantity)}</span>
+                              </div>
                             </div>
                           </div>
                           <button
                             onClick={() => openReviewForm(item)}
-                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300"
                           >
                             Dejar reseña
                           </button>
@@ -324,7 +355,7 @@ const Orders = () => {
       {/* Review Modal */}
       {reviewingProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-black bg-opacity-50">
-          <div className="relative w-full max-w-md mx-auto my-8 bg-white rounded-lg shadow-xl">
+          <div className="relative w-full max-w-md mx-auto my-8 bg-white rounded-xl shadow-xl">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-gray-900">Dejar una reseña</h3>
@@ -372,7 +403,7 @@ const Orders = () => {
                     rows={4}
                     value={reviewingProduct.comment}
                     onChange={handleReviewChange}
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md p-3"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-lg p-3"
                     placeholder="Comparte tu experiencia con este producto..."
                   />
                 </div>
@@ -381,13 +412,13 @@ const Orders = () => {
                   <button
                     type="button"
                     onClick={() => setReviewingProduct(null)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={submitReview}
-                    className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-700 border border-transparent rounded-md shadow-sm hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-700 border border-transparent rounded-lg shadow-sm hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Enviar Reseña
                   </button>

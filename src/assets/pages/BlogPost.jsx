@@ -18,19 +18,19 @@ const BlogPost = () => {
       content: `
         <p>Seleccionar el moño perfecto para una ocasión especial puede ser un desafío, pero con los consejos adecuados, puedes encontrar el accesorio ideal que complemente tu estilo y la naturaleza del evento.</p>
         
-        <h2 className="text-2xl font-bold mt-8 mb-4">Considera la ocasión</h2>
+        <h2 className="mt-8 mb-4 text-2xl font-bold">Considera la ocasión</h2>
         <p>El tipo de evento es el primer factor a considerar. Un moño para una boda requiere un enfoque diferente que uno para una cena casual. Los eventos formales suelen llamar a diseños más elaborados y materiales de mayor calidad.</p>
         
-        <h2 className="text-2xl font-bold mt-8 mb-4">Combina con tu atuendo</h2>
+        <h2 className="mt-8 mb-4 text-2xl font-bold">Combina con tu atuendo</h2>
         <p>El color y el estilo de tu ropa deben ser el punto de partida. Un moño debe complementar, no competir con tu outfit. Si llevas un vestido con estampado, opta por un moño en tonos neutros. Para atuendos sólidos, puedes experimentar con colores vibrantes o texturas interesantes.</p>
         
-        <h2 className="text-2xl font-bold mt-8 mb-4">Considera la temporada</h2>
+        <h2 className="mt-8 mb-4 text-2xl font-bold">Considera la temporada</h2>
         <p>Los materiales y colores apropiados varían según la época del año. En verano, los moños de seda liviana y colores claros son ideales. En invierno, puedes optar por tejidos más gruesos como el terciopelo o el brocado en tonos más oscuros.</p>
         
-        <h2 className="text-2xl font-bold mt-8 mb-4">Conoce tu rostro</h2>
+        <h2 className="mt-8 mb-4 text-2xl font-bold">Conoce tu rostro</h2>
         <p>La forma de tu rostro puede influir en el estilo de moño que mejor te queda. Los moños más anchos tienden a favorecer los rostros más estrechos, mientras que los diseños más delgados pueden equilibrar los rostros más anchos.</p>
         
-        <h2 className="text-2xl font-bold mt-8 mb-4">Calidad sobre cantidad</h2>
+        <h2 className="mt-8 mb-4 text-2xl font-bold">Calidad sobre cantidad</h2>
         <p>Invierte en un moño de calidad que se mantenga bien con el tiempo. Los materiales premium no solo se ven mejor, sino que también duran más. En PSG SHOP, nos especializamos en moños hechos con materiales de primera calidad que mantienen su forma y color después de múltiples usos.</p>
         
         <p className="mt-8">Con estos consejos, estarás lista para elegir el moño perfecto para cualquier ocasión especial. Recuerda que el mejor accesorio es aquel que te hace sentir segura y elegante.</p>
@@ -46,19 +46,19 @@ const BlogPost = () => {
       content: `
         <p>La moda de los moños continúa evolucionando, y esta temporada trae consigo emocionantes novedades que están revolucionando el mundo de los accesorios. Desde colores vibrantes hasta texturas innovadoras, descubre las tendencias que dominarán tu guardarropa.</p>
         
-        <h2 className="text-2xl font-bold mt-8 mb-4">1. Colores Bold y Saturados</h2>
+        <h2 className="mt-8 mb-4 text-2xl font-bold">1. Colores Bold y Saturados</h2>
         <p>Esta temporada, los colores intensos están en todas partes. Desde el magenta profundo hasta el turquesa eléctrico, los moños en tonos vibrantes son la forma perfecta de agregar un toque de personalidad a cualquier atuendo. Estos colores no solo llaman la atención, sino que también transmiten confianza y estilo.</p>
         
-        <h2 className="text-2xl font-bold mt-8 mb-4">2. Texturas Mixtas</h2>
+        <h2 className="mt-8 mb-4 text-2xl font-bold">2. Texturas Mixtas</h2>
         <p>La combinación de diferentes texturas en un solo moño es una tendencia que está ganando popularidad. Piensa en moños que combinan seda con encaje, o terciopelo con detalles metálicos. Esta mezcla de texturas agrega profundidad visual y crea piezas verdaderamente únicas.</p>
         
-        <h2 className="text-2xl font-bold mt-8 mb-4">3. Moños Extra Anchos</h2>
+        <h2 className="mt-8 mb-4 text-2xl font-bold">3. Moños Extra Anchos</h2>
         <p>El tamaño importa, y esta temporada los moños extra anchos son los protagonistas. Estos moños hacen una declaración audaz y pueden convertirse en el punto focal de cualquier outfit. Son especialmente populares para looks de oficina y eventos formales.</p>
         
-        <h2 className="text-2xl font-bold mt-8 mb-4">4. Estampados Abstractos</h2>
+        <h2 className="mt-8 mb-4 text-2xl font-bold">4. Estampados Abstractos</h2>
         <p>Los patrones abstractos están reemplazando a los estampados florales tradicionales. Diseños geométricos, formas orgánicas y patrones artísticos están apareciendo en moños de alta gama. Estos estampados agregan interés visual sin abrumar el resto del atuendo.</p>
         
-        <h2 className="text-2xl font-bold mt-8 mb-4">5. Detalles Sostenibles</h2>
+        <h2 className="mt-8 mb-4 text-2xl font-bold">5. Detalles Sostenibles</h2>
         <p>Con el creciente enfoque en la moda sostenible, los moños hechos de materiales ecológicos y mediante procesos éticos están ganando terreno. Desde sedas orgánicas hasta tintes naturales, los consumidores conscientes buscan opciones que reflejen sus valores.</p>
         
         <p className="mt-8">En PSG SHOP, estamos al tanto de estas tendencias y ofrecemos una cuidadosa selección de moños que combinan estilo contemporáneo con calidad excepcional. Nuestra colección de esta temporada incorpora muchos de estos elementos para que puedas lucir a la moda sin sacrificar la elegancia clásica.</p>
@@ -75,8 +75,8 @@ const BlogPost = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumb */}
-      <div className="bg-white py-4">
-        <div className="container mx-auto px-4">
+      <div className="py-4 bg-white">
+        <div className="container px-4 mx-auto">
           <nav className="text-sm">
             <Link to="/home" className="text-indigo-600 hover:text-indigo-800">Inicio</Link>
             <span className="mx-2 text-gray-400">/</span>
@@ -88,16 +88,16 @@ const BlogPost = () => {
       </div>
 
       {/* Blog Post Content */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <div className="container px-4 py-12 mx-auto">
+        <div className="flex flex-col gap-8 lg:flex-row">
           {/* Main Content */}
           <div className="lg:w-2/3">
-            <article className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="h-96 overflow-hidden">
+            <article className="overflow-hidden bg-white shadow-md rounded-xl">
+              <div className="overflow-hidden h-96">
                 <img 
                   src={post.image} 
                   alt={post.title} 
-                  className="w-full h-full object-cover"
+                  className="object-cover w-full h-full"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = 'https://via.placeholder.com/800x600.png?text=Imagen+Blog';
@@ -106,16 +106,16 @@ const BlogPost = () => {
               </div>
               <div className="p-8">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                  <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-indigo-800 bg-indigo-100 rounded-full">
                     {post.category}
                   </span>
                   <span className="text-gray-500">{post.date}</span>
                 </div>
                 
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
+                <h1 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">{post.title}</h1>
                 
-                <div className="flex items-center mb-8 pb-6 border-b border-gray-200">
-                  <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-bold mr-3">
+                <div className="flex items-center pb-6 mb-8 border-b border-gray-200">
+                  <div className="flex items-center justify-center w-10 h-10 mr-3 font-bold text-indigo-800 bg-indigo-100 rounded-full">
                     {post.author.charAt(0)}
                   </div>
                   <div>
@@ -125,15 +125,15 @@ const BlogPost = () => {
                 </div>
                 
                 <div 
-                  className="prose max-w-none text-gray-700"
+                  className="prose text-gray-700 max-w-none"
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
                 
-                <div className="mt-12 pt-8 border-t border-gray-200">
+                <div className="pt-8 mt-12 border-t border-gray-200">
                   <div className="flex items-center justify-between">
                     <Link 
                       to="/blog" 
-                      className="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium"
+                      className="inline-flex items-center font-medium text-indigo-600 hover:text-indigo-800"
                     >
                       ← Volver a Sobre Nosotros
                     </Link>
@@ -163,16 +163,16 @@ const BlogPost = () => {
           {/* Sidebar */}
           <div className="lg:w-1/3">
             {/* Related Posts */}
-            <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Artículos Relacionados</h3>
+            <div className="p-6 mb-8 bg-white shadow-md rounded-xl">
+              <h3 className="mb-4 text-xl font-bold text-gray-900">Artículos Relacionados</h3>
               <div className="space-y-4">
                 {relatedPosts.map(post => (
                   <div key={post.id} className="flex group">
-                    <div className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden">
+                    <div className="flex-shrink-0 w-20 h-20 overflow-hidden rounded-lg">
                       <img 
                         src={post.image} 
                         alt={post.title} 
-                        className="w-full h-full object-cover"
+                        className="object-cover w-full h-full"
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = 'https://via.placeholder.com/100x100.png?text=Blog';
@@ -180,11 +180,11 @@ const BlogPost = () => {
                       />
                     </div>
                     <div className="ml-4">
-                      <span className="text-xs text-indigo-600 font-medium">{post.category}</span>
-                      <h4 className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors duration-300 mt-1">
+                      <span className="text-xs font-medium text-indigo-600">{post.category}</span>
+                      <h4 className="mt-1 font-medium text-gray-900 transition-colors duration-300 group-hover:text-indigo-600">
                         <Link to={`/blog/${post.id}`}>{post.title}</Link>
                       </h4>
-                      <p className="text-xs text-gray-500 mt-1">{post.date}</p>
+                      <p className="mt-1 text-xs text-gray-500">{post.date}</p>
                     </div>
                   </div>
                 ))}
@@ -192,14 +192,14 @@ const BlogPost = () => {
             </div>
 
             {/* Categories */}
-            <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Categorías</h3>
+            <div className="p-6 mb-8 bg-white shadow-md rounded-xl">
+              <h3 className="mb-4 text-xl font-bold text-gray-900">Categorías</h3>
               <ul className="space-y-2">
                 {['Guía de Estilo', 'Tendencias', 'Cuidado', 'Historia', 'Eventos', 'Personalización'].map((category, index) => (
                   <li key={index}>
                     <Link 
                       to="#" 
-                      className="block py-2 px-4 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-300"
+                      className="block px-4 py-2 text-gray-600 transition-colors duration-300 rounded-lg hover:bg-gray-100"
                     >
                       {category}
                     </Link>
@@ -209,8 +209,8 @@ const BlogPost = () => {
             </div>
 
             {/* Newsletter */}
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl shadow-md p-6 text-white">
-              <h3 className="text-xl font-bold mb-2">Boletín Informativo</h3>
+            <div className="p-6 text-white shadow-md bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl">
+              <h3 className="mb-2 text-xl font-bold">Boletín Informativo</h3>
               <p className="mb-4 opacity-90">
                 Suscríbete para recibir las últimas novedades y artículos del blog
               </p>
@@ -218,11 +218,11 @@ const BlogPost = () => {
                 <input 
                   type="email" 
                   placeholder="Tu correo electrónico" 
-                  className="w-full px-4 py-2 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className="w-full px-4 py-2 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"
                 />
                 <button 
                   type="submit" 
-                  className="w-full bg-white text-indigo-700 font-medium py-2 rounded-lg hover:bg-gray-100 transition-colors duration-300"
+                  className="w-full py-2 font-medium text-indigo-700 transition-colors duration-300 bg-white rounded-lg hover:bg-gray-100"
                 >
                   Suscribirse
                 </button>
