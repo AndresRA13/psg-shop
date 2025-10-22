@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaSearch, FaShoppingCart, FaHeart, FaBars, FaTimes, FaYoutube, FaLinkedin, FaFacebook, FaTwitter, FaUser, FaCog, FaSignOutAlt, FaList } from 'react-icons/fa';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -7,6 +6,9 @@ import { useWishlist } from '../context/WishlistContext';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { BsCart3 } from "react-icons/bs";
+import { GoHeart } from "react-icons/go";
+import { FiSearch, FiUser, FiSettings, FiList, FiLogOut, FiMenu, FiX, FiYoutube, FiLinkedin, FiFacebook, FiTwitter, FiHome, FiPackage, FiBook, FiMail } from "react-icons/fi";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -75,13 +77,13 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 font-sans bg-white shadow-sm">
+      <header className="sticky top-0 z-50 font-sans bg-white shadow-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
         <nav className="flex items-center justify-between p-4 mx-auto max-w-7xl">
           {/* Left section with menu button and logo */}
           <div className="flex items-center">
             {/* Mobile Menu Button - Moved to the left with minimal spacing */}
             <div className="mr-0 text-2xl cursor-pointer md:hidden text-slate-800" onClick={toggleMenu}>
-              <FaBars />
+              <FiMenu />
               {/* Menu badge removed - was showing "11" unnecessarily */}
             </div>
             
@@ -138,12 +140,12 @@ const Navbar = () => {
           {/* Right-aligned Icons */}
           <div className="flex items-center space-x-4">
             <div className={`hidden md:block ${iconClasses} text-xl`}>
-              <FaSearch />
+              <FiSearch />
             </div>
             
             {/* Wishlist Icon */}
             <Link to="/wishlist" className={`${iconClasses} text-xl flex items-center justify-center relative`}>
-              <FaHeart />
+              <GoHeart />
               {wishlistItemCount > 0 && (
                 <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 -top-2 -right-3">
                   {wishlistItemCount}
@@ -153,7 +155,7 @@ const Navbar = () => {
             
             {/* Cart Icon */}
             <Link to="/cart" className={`${iconClasses} text-xl flex items-center justify-center relative`}>
-              <FaShoppingCart />
+              <BsCart3 />
               {cartItemCount > 0 && (
                 <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 -top-2 -right-3">
                   {cartItemCount}
@@ -181,7 +183,7 @@ const Navbar = () => {
               ) : (
                 // Default user icon for non-logged in users - redirect to login
                 <Link to="/login" className="flex items-center justify-center w-8 h-8 bg-gray-200 border border-gray-300 rounded-full cursor-pointer">
-                  <FaUser className="text-gray-600" />
+                  <FiUser className="text-gray-600" />
                 </Link>
               )}
               
@@ -220,7 +222,7 @@ const Navbar = () => {
                         className="flex items-center px-4 py-2 text-sm text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
                         onClick={closeProfileMenu}
                       >
-                        <FaCog className="mr-3 text-gray-400" />
+                        <FiSettings className="mr-3 text-gray-400" />
                         <span>Administrar página</span>
                       </Link>
                     )}
@@ -230,7 +232,7 @@ const Navbar = () => {
                       className="flex items-center px-4 py-2 text-sm text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
                       onClick={closeProfileMenu}
                     >
-                      <FaUser className="mr-3 text-gray-400" />
+                      <FiUser className="mr-3 text-gray-400" />
                       <span>Editar perfil</span>
                     </Link>
                     
@@ -241,7 +243,7 @@ const Navbar = () => {
                         className="flex items-center px-4 py-2 text-sm text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
                         onClick={closeProfileMenu}
                       >
-                        <FaList className="mr-3 text-gray-400" />
+                        <FiList className="mr-3 text-gray-400" />
                         <span>Mis Pedidos</span>
                       </Link>
                     </div>
@@ -250,7 +252,7 @@ const Navbar = () => {
                       onClick={handleLogout}
                       className="flex items-center w-full px-4 py-2 text-sm text-left text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
                     >
-                      <FaSignOutAlt className="mr-3 text-gray-400" />
+                      <FiLogOut className="mr-3 text-gray-400" />
                       <span>Cerrar sesión</span>
                     </button>
                   </div>
@@ -264,66 +266,84 @@ const Navbar = () => {
       {/* Mobile Menu (Off-canvas) */}
       <>
         {isMenuOpen && <div className="fixed inset-0 z-40 bg-black/40" onClick={toggleMenu}></div>}
-        <aside className={`fixed top-0 left-0 h-full w-72 bg-white shadow-xl transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out z-50 p-5 flex flex-col font-sans`}>
+        <aside className={`fixed top-0 left-0 h-full w-72 bg-white shadow-xl transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out z-50 p-5 flex flex-col font-sans`} style={{ fontFamily: 'Inter, sans-serif' }}>
           <div className="flex items-center justify-between mb-10">
             <div className="text-xl font-bold text-slate-800">BOWSHOP</div>
             <button onClick={toggleMenu} className="text-2xl cursor-pointer text-slate-600 hover:text-slate-900">
-              <FaTimes />
+              <FiX />
             </button>
           </div>
           <ul className="flex-grow space-y-4">
             <li>
               <Link 
                 to="/home" 
-                className={`text-lg ${isActiveLink('/home') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                className={`text-lg ${isActiveLink('/home') ? 'text-indigo-600 font-medium' : 'text-slate-800'}`} 
                 onClick={toggleMenu}
               >
-                Inicio
+                <div className="flex items-center">
+                  <FiHome className={`mr-3 ${isActiveLink('/home') ? 'text-indigo-600' : 'text-slate-800'}`} />
+                  <span>Inicio</span>
+                </div>
               </Link>
             </li>
             <li>
               <Link 
                 to="/shop" 
-                className={`text-lg ${isActiveLink('/shop') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                className={`text-lg ${isActiveLink('/shop') ? 'text-indigo-600 font-medium' : 'text-slate-800'}`} 
                 onClick={toggleMenu}
               >
-                Productos
+                <div className="flex items-center">
+                  <FiPackage className={`mr-3 ${isActiveLink('/shop') ? 'text-indigo-600' : 'text-slate-800'}`} />
+                  <span>Productos</span>
+                </div>
               </Link>
             </li>
             <li>
               <Link 
                 to="/blog" 
-                className={`text-lg ${isActiveLink('/blog') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                className={`text-lg ${isActiveLink('/blog') ? 'text-indigo-600 font-medium' : 'text-slate-800'}`} 
                 onClick={toggleMenu}
               >
-                Blog
+                <div className="flex items-center">
+                  <FiBook className={`mr-3 ${isActiveLink('/blog') ? 'text-indigo-600' : 'text-slate-800'}`} />
+                  <span>Blog</span>
+                </div>
               </Link>
             </li>
             <li>
               <Link 
                 to="/contact" 
-                className={`text-lg ${isActiveLink('/contact') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                className={`text-lg ${isActiveLink('/contact') ? 'text-indigo-600 font-medium' : 'text-slate-800'}`} 
                 onClick={toggleMenu}
               >
-                Contacto
+                <div className="flex items-center">
+                  <FiMail className={`mr-3 ${isActiveLink('/contact') ? 'text-indigo-600' : 'text-slate-800'}`} />
+                  <span>Contacto</span>
+                </div>
               </Link>
             </li>
             <li>
               <Link 
                 to="/cart" 
-                className={`text-lg ${isActiveLink('/cart') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                className={`text-lg ${isActiveLink('/cart') ? 'text-indigo-600 font-medium' : 'text-slate-800'}`} 
                 onClick={toggleMenu}
               >
-                Carrito
+                <div className="flex items-center">
+                  <BsCart3 className={`mr-3 ${isActiveLink('/cart') ? 'text-indigo-600' : 'text-slate-800'}`} />
+                  <span>Carrito</span>
+                </div>
               </Link>
             </li>
             <li>
               <Link 
                 to="/wishlist" 
-                className={`text-lg ${isActiveLink('/wishlist') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : navLinkClasses}`} 
+                className={`text-lg ${isActiveLink('/wishlist') ? 'text-indigo-600 font-medium' : 'text-slate-800'}`} 
                 onClick={toggleMenu}
               >
-                Favoritos
+                <div className="flex items-center">
+                  <GoHeart className={`mr-3 ${isActiveLink('/wishlist') ? 'text-indigo-600' : 'text-slate-800'}`} />
+                  <span>Favoritos</span>
+                </div>
               </Link>
             </li>
           </ul>
@@ -360,16 +380,16 @@ const Navbar = () => {
           </div>
           <div className="flex justify-center p-5 mt-auto space-x-6">
             <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
-              <FaYoutube />
+              <FiYoutube />
             </a>
             <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
-              <FaLinkedin />
+              <FiLinkedin />
             </a>
             <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
-              <FaFacebook />
+              <FiFacebook />
             </a>
             <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
-              <FaTwitter />
+              <FiTwitter />
             </a>
           </div>
         </aside>
