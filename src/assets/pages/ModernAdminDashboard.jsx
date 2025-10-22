@@ -1181,7 +1181,6 @@ const ModernAdminDashboard = () => {
           // Apply search filter
           const matchesSearch = !userSearchTerm || 
             (user.email && user.email.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
-            (user.name && user.name.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
             (user.role && user.role.toLowerCase().includes(userSearchTerm.toLowerCase()));
           
           // Apply role filter
@@ -1232,7 +1231,6 @@ const ModernAdminDashboard = () => {
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
                 <thead>
                   <tr>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Email</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Rol</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
@@ -1241,7 +1239,6 @@ const ModernAdminDashboard = () => {
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
                   {filteredUsers.map((user) => (
                     <tr key={user.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{user.name}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.email}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.role}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
@@ -1272,9 +1269,8 @@ const ModernAdminDashboard = () => {
         }
         // Filter reviews based on search term
         const filteredReviews = reviews.filter(review =>
-          (review.userEmail && review.userEmail.toLowerCase().includes(reviewSearchTerm.toLowerCase())) ||
           (review.productName && review.productName.toLowerCase().includes(reviewSearchTerm.toLowerCase())) ||
-          (review.comment && review.comment.toLowerCase().includes(reviewSearchTerm.toLowerCase()))
+          (review.createdAt && formatDate(review.createdAt).toLowerCase().includes(reviewSearchTerm.toLowerCase()))
         );
 
         return (
@@ -1302,10 +1298,7 @@ const ModernAdminDashboard = () => {
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
                 <thead>
                   <tr>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Usuario</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Producto</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Calificación</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Comentario</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
                   </tr>
@@ -1313,10 +1306,7 @@ const ModernAdminDashboard = () => {
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
                   {filteredReviews.map((review) => (
                     <tr key={review.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{review.userEmail || 'Usuario eliminado'}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.productName || 'Producto eliminado'}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.rating}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.comment}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(review.createdAt)}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
                         <button 
