@@ -213,6 +213,26 @@ const ModernAdminDashboard = () => {
     return 'N/A';
   };
 
+  // Delete order function
+  const deleteOrder = async (orderId) => {
+    const confirmDelete = window.confirm('¿Estás seguro de que quieres eliminar este pedido? Esta acción no se puede deshacer.');
+    if (!confirmDelete) return;
+
+    try {
+      const orderDoc = doc(db, 'orders', orderId);
+      await deleteDoc(orderDoc);
+      
+      // Update the orders state to remove the deleted order
+      setOrders(orders.filter(order => order.id !== orderId));
+      
+      // Show success message
+      showSuccessMessage('Pedido eliminado exitosamente!');
+    } catch (err) {
+      console.error('Error deleting order:', err);
+      setError('Error al eliminar el pedido. Por favor, intenta de nuevo.');
+    }
+  };
+
   // Update order status
   const updateOrderStatusHandler = async (orderId, newStatus) => {
     try {
@@ -1417,6 +1437,14 @@ const ModernAdminDashboard = () => {
                           }`}
                         >
                           <FiShoppingBag />
+                        </button>
+                        <button 
+                          onClick={() => deleteOrder(order.id)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                          }`}
+                        >
+                          <FiTrash2 />
                         </button>
                       </td>
                     </tr>
