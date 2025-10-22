@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 // Removed duplicate Navbar import since it's already rendered in App.jsx
-import { getProductById } from '../../services/productService';
+import { getProductById, getProductsByCategory } from '../../services/productService';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
 import StarRating from '../../components/StarRating';
 import Swal from 'sweetalert2';
-import { createReview, getReviewsByProductId } from '../../services/reviewService';
+import { getReviewsByProductId } from '../../services/reviewService';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -24,11 +24,10 @@ const ProductDetail = () => {
   // Review states
   const [reviews, setReviews] = useState([]);
   const [reviewLoading, setReviewLoading] = useState(true);
-  const [reviewForm, setReviewForm] = useState({
-    rating: 0,
-    comment: ''
-  });
-  const [submittingReview, setSubmittingReview] = useState(false);
+  
+  // Related products states
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [relatedLoading, setRelatedLoading] = useState(true);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -38,6 +37,23 @@ const ProductDetail = () => {
         setProduct(productData);
         // Reset selected image index when product changes
         setSelectedImageIndex(0);
+        
+        // Fetch related products based on category
+        if (productData.category) {
+          try {
+            setRelatedLoading(true);
+            const related = await getProductsByCategory(productData.category);
+            // Filter out the current product and limit to 4 related products
+            const filteredRelated = related
+              .filter(p => p.id !== productData.id)
+              .slice(0, 4);
+            setRelatedProducts(filteredRelated);
+          } catch (err) {
+            console.error('Error fetching related products:', err);
+          } finally {
+            setRelatedLoading(false);
+          }
+        }
       } catch (err) {
         setError('Failed to load product');
         console.error('Error fetching product:', err);
@@ -221,108 +237,6 @@ const ProductDetail = () => {
     return images[selectedImageIndex] || images[0];
   };
 
-  // Handle review form changes
-  const handleReviewChange = (e) => {
-    const { name, value } = e.target;
-    setReviewForm(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  // Handle star rating click
-  const handleRatingClick = (rating) => {
-    setReviewForm(prev => ({
-      ...prev,
-      rating
-    }));
-  };
-
-  // Submit review
-  const handleSubmitReview = async (e) => {
-    e.preventDefault();
-    
-    // Check if user is logged in
-    if (!currentUser) {
-      Swal.fire({
-        title: 'Inicia sesión',
-        text: 'Debes iniciar sesión para dejar una reseña',
-        icon: 'warning',
-        confirmButtonText: 'Iniciar sesión',
-        showCancelButton: true,
-        cancelButtonText: 'Cancelar'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate('/login');
-        }
-      });
-      return;
-    }
-
-    // Validate review
-    if (reviewForm.rating === 0) {
-      Swal.fire({
-        title: 'Error',
-        text: 'Por favor selecciona una calificación',
-        icon: 'error',
-        confirmButtonText: 'Aceptar'
-      });
-      return;
-    }
-
-    if (reviewForm.comment.trim() === '') {
-      Swal.fire({
-        title: 'Error',
-        text: 'Por favor escribe un comentario',
-        icon: 'error',
-        confirmButtonText: 'Aceptar'
-      });
-      return;
-    }
-
-    setSubmittingReview(true);
-
-    try {
-      const reviewData = {
-        productId: id,
-        userId: currentUser.uid,
-        userEmail: currentUser.email,
-        userName: currentUser.displayName || currentUser.email.split('@')[0],
-        rating: reviewForm.rating,
-        comment: reviewForm.comment.trim()
-      };
-
-      await createReview(reviewData);
-      
-      // Reset form
-      setReviewForm({
-        rating: 0,
-        comment: ''
-      });
-      
-      // Refresh reviews
-      const reviewsData = await getReviewsByProductId(id);
-      setReviews(reviewsData);
-      
-      Swal.fire({
-        title: 'Reseña enviada',
-        text: 'Tu reseña ha sido enviada correctamente',
-        icon: 'success',
-        confirmButtonText: 'Aceptar'
-      });
-    } catch (error) {
-      console.error('Error submitting review:', error);
-      Swal.fire({
-        title: 'Error',
-        text: 'Hubo un error al enviar tu reseña. Por favor intenta nuevamente.',
-        icon: 'error',
-        confirmButtonText: 'Aceptar'
-      });
-    } finally {
-      setSubmittingReview(false);
-    }
-  };
-
   // Format date for display
   const formatDate = (date) => {
     if (!date) return 'N/A';
@@ -333,6 +247,55 @@ const ProductDetail = () => {
       return date.toDate().toLocaleDateString('es-CO');
     }
     return 'N/A';
+  };
+
+  // Handle adding related product to cart
+  const handleAddRelatedToCart = (product) => {
+    // Check if user is logged in
+    if (!currentUser) {
+      Swal.fire({
+        title: 'Inicia sesión',
+        text: 'Debes iniciar sesión para agregar productos al carrito',
+        icon: 'warning',
+        confirmButtonText: 'Iniciar sesión',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Redirect to login page
+          navigate('/login');
+        }
+      });
+      return;
+    }
+
+    // Check if product has stock
+    const stockLimit = product.stock !== undefined ? product.stock : Infinity;
+    if (stockLimit === 0) {
+      Swal.fire({
+        title: 'Producto agotado',
+        text: 'Este producto no está disponible actualmente.',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+    
+    // Get the primary product image as selected in the admin panel
+    const mainImage = getPrimaryImageUrl(product);
+    
+    addToCart({
+      ...product,
+      imageUrl: mainImage, // Ensure we use the primary image selected in admin panel
+      quantity: 1
+    });
+    
+    Swal.fire({
+      title: 'Producto agregado',
+      text: 'Producto agregado correctamente al carrito',
+      icon: 'success',
+      confirmButtonText: 'Aceptar'
+    });
   };
 
   if (loading) {
@@ -541,75 +504,7 @@ const ProductDetail = () => {
           <div className="border-t border-gray-200 pt-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-8">Reseñas de Clientes</h2>
             
-            {/* Review Form */}
-            {currentUser && (
-              <div className="mb-12 bg-white rounded-2xl shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Deja tu reseña</h3>
-                <form onSubmit={handleSubmitReview} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Calificación</label>
-                    <div className="flex items-center">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() => handleRatingClick(star)}
-                          className="text-2xl focus:outline-none transition-colors duration-200"
-                        >
-                          {star <= reviewForm.rating ? (
-                            <span className="text-yellow-400">★</span>
-                          ) : (
-                            <span className="text-gray-300">☆</span>
-                          )}
-                        </button>
-                      ))}
-                      <span className="ml-2 text-sm text-gray-500">
-                        {reviewForm.rating > 0 ? `${reviewForm.rating} de 5 estrellas` : 'Selecciona una calificación'}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
-                      Comentario
-                    </label>
-                    <textarea
-                      id="comment"
-                      name="comment"
-                      rows={4}
-                      value={reviewForm.comment}
-                      onChange={handleReviewChange}
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-lg p-3 transition-colors duration-200"
-                      placeholder="Comparte tu experiencia con este producto..."
-                    />
-                  </div>
-                  
-                  <div>
-                    <button
-                      type="submit"
-                      disabled={submittingReview}
-                      className={`inline-flex justify-center py-2.5 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 ${
-                        submittingReview 
-                          ? 'bg-indigo-400 cursor-not-allowed' 
-                          : 'bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 shadow-md hover:shadow-lg'
-                      }`}
-                    >
-                      {submittingReview ? (
-                        <>
-                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Enviando...
-                        </>
-                      ) : 'Enviar Reseña'}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-            
-            {/* Reviews List */}
+            {/* Reviews List - Only showing existing reviews, no form */}
             <div>
               {reviewLoading ? (
                 <div className="flex justify-center py-12">
@@ -622,18 +517,8 @@ const ProductDetail = () => {
                   </svg>
                   <h3 className="mt-2 text-lg font-medium text-gray-900">No hay reseñas aún</h3>
                   <p className="mt-1 text-gray-500">
-                    Sé el primero en dejar una reseña para este producto.
+                    Este producto aún no tiene reseñas.
                   </p>
-                  {!currentUser && (
-                    <div className="mt-6">
-                      <Link 
-                        to="/login" 
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800"
-                      >
-                        Inicia sesión para dejar una reseña
-                      </Link>
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -657,6 +542,72 @@ const ProductDetail = () => {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Related Products Section */}
+        <div className="mt-20">
+          <div className="border-t border-gray-200 pt-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">Productos Relacionados</h2>
+            
+            {relatedLoading ? (
+              <div className="flex items-center justify-center h-32">
+                <div className="w-8 h-8 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
+              </div>
+            ) : relatedProducts.length === 0 ? (
+              <div className="text-center py-8 bg-white rounded-2xl shadow-sm p-6">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <h3 className="mt-2 text-lg font-medium text-gray-900">No hay productos relacionados</h3>
+                <p className="mt-1 text-gray-500">
+                  No encontramos otros productos en la misma categoría.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {relatedProducts.map((relatedProduct) => (
+                  <div key={relatedProduct.id} className="overflow-hidden transition-all duration-300 bg-white border border-gray-100 rounded-lg shadow-md hover:shadow-lg">
+                    <Link to={`/product/${relatedProduct.id}`}>
+                      <div className="w-full overflow-hidden aspect-w-1 aspect-h-1">
+                        <img
+                          src={getPrimaryImageUrl(relatedProduct)}
+                          alt={relatedProduct.name}
+                          className="object-cover w-full h-48"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://via.placeholder.com/300x300.png?text=Moño';
+                          }}
+                        />
+                      </div>
+                    </Link>
+                    <div className="p-4">
+                      <h3 className="text-lg font-medium text-gray-900 truncate">{relatedProduct.name}</h3>
+                      
+                      {relatedProduct.rating > 0 && (
+                        <div className="mt-1">
+                          <StarRating rating={relatedProduct.rating} size="sm" />
+                        </div>
+                      )}
+                      
+                      <div className="mt-2">
+                        <span className="text-lg font-semibold text-indigo-700">${parseFloat(relatedProduct.price).toLocaleString('es-CO')}</span>
+                      </div>
+                      
+                      <button 
+                        className="w-full mt-4 px-4 py-2 text-sm font-medium text-white transition-all duration-300 border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleAddRelatedToCart(relatedProduct);
+                        }}
+                      >
+                        Agregar al Carrito
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
