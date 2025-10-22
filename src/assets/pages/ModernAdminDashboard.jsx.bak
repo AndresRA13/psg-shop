@@ -21,7 +21,6 @@ import { getSalesData, getSalesByCategory, getOrderStatusDistribution, getTopSel
 import CouponManager from '../../components/CouponManager';
 import OrderDetailsModal from '../../components/OrderDetailsModal';
 import StarRating from '../../components/StarRating';
-import Loader from '../../components/Loader';
 // Add chart components imports
 import SalesTrendChart from '../../components/charts/SalesTrendChart';
 import SalesByCategoryChart from '../../components/charts/SalesByCategoryChart';
@@ -846,7 +845,7 @@ const ModernAdminDashboard = () => {
     { id: 'products', label: 'Productos', icon: <FiShoppingBag /> },
     { id: 'users', label: 'Usuarios', icon: <FiUsers /> },
     { id: 'reviews', label: 'Reviews', icon: <FiMessageSquare /> },
-    { id: 'coupons', label: 'Cupones', icon: <FiTag /> },
+    { id: 'coupons', label: 'Códigos Promocionales', icon: <FiTag /> },
     { id: 'orders', label: 'Pedidos', icon: <FiPackage /> },
   ];
 
@@ -854,9 +853,6 @@ const ModernAdminDashboard = () => {
   const renderContent = () => {
     switch (activeSection) {
       case 'analytics':
-        if (loading) {
-          return <Loader text="Cargando datos analíticos..." size="lg" />;
-        }
         return (
           <div className="w-full space-y-6">
             {/* Date Range Selector */}
@@ -1060,9 +1056,6 @@ const ModernAdminDashboard = () => {
           </div>
         );
       case 'products':
-        if (productsLoading) {
-          return <Loader text="Cargando productos..." size="lg" />;
-        }
         // Filter products based on search term
         const filteredProducts = productSearchTerm
           ? products.filter(product =>
@@ -1106,56 +1099,96 @@ const ModernAdminDashboard = () => {
                 </button>
               </div>
             </div>
-            <div className="w-full overflow-x-auto">
-              <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
-                <thead>
-                  <tr>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Precio</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Stock</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {filteredProducts.map((product) => (
-                    <tr key={product.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatCurrency(product.price)}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{product.stock}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
-                        <button 
-                          onClick={() => openEditProductModal(product)} 
-                          className={`p-1 rounded hover:opacity-80 ${
-                            theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
-                          }`}
-                        >
-                          <FiEdit />
-                        </button>
-                        <button 
-                          onClick={() => deleteProduct(product.id, product.name)} 
-                          className={`p-1 rounded hover:opacity-80 ${
-                            theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
-                          }`}
-                        >
-                          <FiTrash2 />
-                        </button>
-                      </td>
+            
+            {/* Skeleton Loader for Products */}
+            {productsLoading ? (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Precio</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Stock</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filteredProducts.length === 0 && (
-                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {productSearchTerm ? 'No se encontraron productos que coincidan con la búsqueda.' : 'No hay productos disponibles.'}
-                </div>
-              )}
-            </div>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {[...Array(5)].map((_, index) => (
+                      <tr key={index} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex space-x-2">
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Precio</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Stock</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {filteredProducts.map((product) => (
+                      <tr key={product.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatCurrency(product.price)}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{product.stock}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                          <button 
+                            onClick={() => openEditProductModal(product)} 
+                            className={`p-1 rounded hover:opacity-80 ${
+                              theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                            }`}
+                          >
+                            <FiEdit />
+                          </button>
+                          <button 
+                            onClick={() => deleteProduct(product.id, product.name)} 
+                            className={`p-1 rounded hover:opacity-80 ${
+                              theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                            }`}
+                          >
+                            <FiTrash2 />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {filteredProducts.length === 0 && !productSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No hay productos disponibles.
+                  </div>
+                )}
+                {filteredProducts.length === 0 && productSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No se encontraron productos que coincidan con la búsqueda.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         );
       case 'users':
-        if (usersLoading) {
-          return <Loader text="Cargando usuarios..." size="lg" />;
-        }
         // Filter users based on search term and role filter
         const filteredUsers = users.filter(user => {
           // Apply search filter
@@ -1193,27 +1226,556 @@ const ModernAdminDashboard = () => {
                     theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                   }`} />
                 </div>
-                <select
-                  value={userRoleFilter}
-                  onChange={(e) => setUserRoleFilter(e.target.value)}
-                  className={`px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    theme === 'dark' 
-                      ? 'bg-gray-700 border-gray-600 text-white' 
-                      : 'bg-white border-gray-300 text-gray-900'
-                  }`}
-                >
-                  <option value="all">Todos</option>
-                  <option value="admin">Administradores</option>
-                  <option value="user">Clientes</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={userRoleFilter}
+                    onChange={(e) => setUserRoleFilter(e.target.value)}
+                    className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                  >
+                    <option value="all">Todos</option>
+                    <option value="admin">Administradores</option>
+                    <option value="user">Usuarios</option>
+                  </select>
+                </div>
               </div>
+            </div>
+            
+            {/* Skeleton Loader for Users */}
+            {usersLoading ? (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Email</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Rol</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {[...Array(5)].map((_, index) => (
+                      <tr key={index} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex space-x-2">
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Email</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Rol</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {filteredUsers.map((user) => (
+                      <tr key={user.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{user.name}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.email}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.role}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                          <button 
+                            onClick={() => updateUserRole(user.id, user.role === 'admin' ? 'user' : 'admin')}
+                            className={`p-1 rounded hover:opacity-80 ${
+                              theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                            }`}
+                          >
+                            {user.role === 'admin' ? 'Convertir a Usuario' : 'Convertir a Administrador'}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {filteredUsers.length === 0 && !userSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No hay usuarios disponibles.
+                  </div>
+                )}
+                {filteredUsers.length === 0 && userSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No se encontraron usuarios que coincidan con la búsqueda.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      case 'reviews':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todas las reseñas</h2>
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Buscar reseñas..."
+                    value={reviewSearchTerm}
+                    onChange={(e) => setReviewSearchTerm(e.target.value)}
+                    className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                  />
+                  <FiMessageSquare className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  }`} />
+                </div>
+              </div>
+            </div>
+            
+            {/* Skeleton Loader for Reviews */}
+            {reviewsLoading ? (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Usuario</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Producto</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Calificación</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Comentario</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {[...Array(5)].map((_, index) => (
+                      <tr key={index} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex space-x-2">
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Usuario</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Producto</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Calificación</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Comentario</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {reviews.map((review) => (
+                      <tr key={review.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{review.userName}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.productName}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.rating}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.comment}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                          <button 
+                            onClick={() => openEditReviewModal(review)} 
+                            className={`p-1 rounded hover:opacity-80 ${
+                              theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                            }`}
+                          >
+                            <FiEdit />
+                          </button>
+                          <button 
+                            onClick={() => deleteReviewHandler(review.id)} 
+                            className={`p-1 rounded hover:opacity-80 ${
+                              theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                            }`}
+                          >
+                            <FiTrash2 />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {reviews.length === 0 && !reviewSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No hay reseñas disponibles.
+                  </div>
+                )}
+                {reviews.length === 0 && reviewSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No se encontraron reseñas que coincidan con la búsqueda.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      case 'orders':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los pedidos</h2>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar pedidos..."
+                  value={orderSearchTerm}
+                  onChange={(e) => setOrderSearchTerm(e.target.value)}
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <FiPackage className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
+            </div>
+            
+            {/* Skeleton Loader for Orders */}
+            {ordersLoading ? (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {[...Array(5)].map((_, index) => (
+                      <tr key={index} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-6 w-20 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex space-x-2">
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                            <div className={`h-6 w-20 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {filteredOrders.map((order) => (
+                      <tr key={order.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.id.substring(0, 8)}...</td>
+                        <td className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.userEmail || 'N/A'}</td>
+                        <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(order.createdAt)}</td>
+                        <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatCurrency(order.totalAmount || 0)}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap`}>
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending', theme)}`}>
+                            {getOrderStatusText(order.orderStatus || 'pending')}
+                          </span>
+                        </td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                          <button 
+                            onClick={() => openOrderDetails(order)} 
+                            className={`p-1 rounded hover:opacity-80 ${
+                              theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                            }`}
+                          >
+                            <FiEye />
+                          </button>
+                          <select
+                            value={order.orderStatus}
+                            onChange={(e) => updateOrderStatusHandler(order.id, e.target.value)}
+                            disabled={orderStatusUpdating[order.id]}
+                            className={`pl-4 pr-10 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none ${
+                              theme === 'dark' 
+                                ? 'bg-gray-700 border-gray-600 text-white' 
+                                : 'bg-white border-gray-300 text-gray-900'
+                            }`}
+                          >
+                            <option value="pending" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Pendiente</option>
+                            <option value="processing" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Procesando</option>
+                            <option value="shipped" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Enviado</option>
+                            <option value="delivered" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Entregado</option>
+                            <option value="cancelled" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Cancelado</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {filteredOrders.length === 0 && !orderSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No hay pedidos disponibles.
+                  </div>
+                )}
+                {filteredOrders.length === 0 && orderSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No se encontraron pedidos que coincidan con la búsqueda.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      case 'coupons':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Códigos Promocionales</h2>
+            <CouponManager />
+          </div>
+        );
+      case 'orders':
+        // Filter orders based on search term
+        const filteredOrders = orderSearchTerm
+          ? orders.filter(order =>
+              (order.id && order.id.toLowerCase().includes(orderSearchTerm.toLowerCase())) ||
+              (order.userEmail && order.userEmail.toLowerCase().includes(orderSearchTerm.toLowerCase())) ||
+              (order.orderStatus && order.orderStatus.toLowerCase().includes(orderSearchTerm.toLowerCase()))
+            )
+          : orders;
+
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los pedidos</h2>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar pedidos..."
+                  value={orderSearchTerm}
+                  onChange={(e) => setOrderSearchTerm(e.target.value)}
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <FiPackage className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
+            </div>
+            
+            {/* Skeleton Loader for Orders */}
+            {ordersLoading ? (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {[...Array(5)].map((_, index) => (
+                      <tr key={index} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-6 w-20 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex space-x-2">
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                            <div className={`h-6 w-20 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {filteredOrders.map((order) => (
+                      <tr key={order.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.id.substring(0, 8)}...</td>
+                        <td className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.userEmail || 'N/A'}</td>
+                        <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(order.createdAt)}</td>
+                        <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatCurrency(order.totalAmount || 0)}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap`}>
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending', theme)}`}>
+                            {getOrderStatusText(order.orderStatus || 'pending')}
+                          </span>
+                        </td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                          <button 
+                            onClick={() => openOrderDetails(order)} 
+                            className={`p-1 rounded hover:opacity-80 ${
+                              theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                            }`}
+                          >
+                            <FiEye />
+                          </button>
+                          <select
+                            value={order.orderStatus}
+                            onChange={(e) => updateOrderStatusHandler(order.id, e.target.value)}
+                            disabled={orderStatusUpdating[order.id]}
+                            className={`pl-4 pr-10 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none ${
+                              theme === 'dark' 
+                                ? 'bg-gray-700 border-gray-600 text-white' 
+                                : 'bg-white border-gray-300 text-gray-900'
+                            }`}
+                          >
+                            <option value="pending" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Pendiente</option>
+                            <option value="processing" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Procesando</option>
+                            <option value="shipped" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Enviado</option>
+                            <option value="delivered" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Entregado</option>
+                            <option value="cancelled" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Cancelado</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {filteredOrders.length === 0 && !orderSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No hay pedidos disponibles.
+                  </div>
+                )}
+                {filteredOrders.length === 0 && orderSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No se encontraron pedidos que coincidan con la búsqueda.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      case 'coupons':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <CouponManager />
+          </div>
+        );
+      case 'users':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los usuarios</h2>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar usuarios..."
+                  value={userSearchTerm}
+                  onChange={(e) => setUserSearchTerm(e.target.value)}
+                  className={`pl-8 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <FiUser className={`absolute left-2 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
+              <select
+                value={userRoleFilter}
+                onChange={(e) => setUserRoleFilter(e.target.value)}
+                className={`pl-4 pr-10 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none ${
+                  theme === 'dark' 
+                    ? 'bg-gray-700 border-gray-600 text-white' 
+                    : 'bg-white border-gray-300 text-gray-900'
+                }`}
+              >
+                <option value="all" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Todos</option>
+                <option value="admin" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Admin</option>
+                <option value="user" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Usuario</option>
+              </select>
             </div>
             <div className="w-full overflow-x-auto">
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
                 <thead>
                   <tr>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Email</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Rol</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
                   </tr>
@@ -1221,17 +1783,19 @@ const ModernAdminDashboard = () => {
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
                   {filteredUsers.map((user) => (
                     <tr key={user.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{user.name}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.email}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{user.email}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.name || 'N/A'}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.role}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
                         <button 
                           onClick={() => updateUserRole(user.id, user.role === 'admin' ? 'user' : 'admin')} 
-                          className={`p-1 rounded hover:opacity-80 ${
-                            theme === 'dark' ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-900'
-                          }`}
+                          className={`px-3 py-1 text-xs rounded-md ${
+                            user.role === 'admin' 
+                              ? (theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800') 
+                              : (theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800')
+                          } hover:opacity-80`}
                         >
-                          <FiEdit />
+                          {user.role === 'admin' ? 'Usuario' : 'Admin'}
                         </button>
                       </td>
                     </tr>
@@ -1240,16 +1804,13 @@ const ModernAdminDashboard = () => {
               </table>
               {filteredUsers.length === 0 && (
                 <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {userSearchTerm ? 'No se encontraron usuarios que coincidan con la búsqueda.' : 'No hay usuarios disponibles.'}
+                  {userSearchTerm || userRoleFilter !== 'all' ? 'No se encontraron usuarios que coincidan con los filtros.' : 'No hay usuarios disponibles.'}
                 </div>
               )}
             </div>
           </div>
         );
       case 'reviews':
-        if (reviewsLoading) {
-          return <Loader text="Cargando reseñas..." size="lg" />;
-        }
         // Filter reviews based on search term
         const filteredReviews = reviews.filter(review =>
           (review.userEmail && review.userEmail.toLowerCase().includes(reviewSearchTerm.toLowerCase())) ||
@@ -1278,60 +1839,103 @@ const ModernAdminDashboard = () => {
                 }`} />
               </div>
             </div>
-            <div className="w-full overflow-x-auto">
-              <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
-                <thead>
-                  <tr>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Usuario</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Producto</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Calificación</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Comentario</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {filteredReviews.map((review) => (
-                    <tr key={review.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{review.userEmail || 'Usuario eliminado'}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.productName || 'Producto eliminado'}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.rating}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.comment}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(review.createdAt)}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
-                        <button 
-                          onClick={() => openEditReviewModal(review)} 
-                          className={`p-1 rounded hover:opacity-80 ${
-                            theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
-                          }`}
-                        >
-                          <FiEdit />
-                        </button>
-                        <button 
-                          onClick={() => deleteReviewHandler(review.id)} 
-                          className={`p-1 rounded hover:opacity-80 ${
-                            theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
-                          }`}
-                        >
-                          <FiTrash2 />
-                        </button>
-                      </td>
+            
+            {/* Skeleton Loader for Reviews */}
+            {reviewsLoading ? (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Usuario</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Producto</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Calificación</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Comentario</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filteredReviews.length === 0 && (
-                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {reviewSearchTerm ? 'No se encontraron reseñas que coincidan con la búsqueda.' : 'No hay reseñas disponibles.'}
-                </div>
-              )}
-            </div>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {[...Array(5)].map((_, index) => (
+                      <tr key={index} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex space-x-2">
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Usuario</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Producto</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Calificación</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Comentario</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {filteredReviews.map((review) => (
+                      <tr key={review.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{review.userEmail || 'Usuario eliminado'}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.productName || 'Producto eliminado'}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.rating}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.comment}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(review.createdAt)}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                          <button 
+                            onClick={() => openEditReviewModal(review)} 
+                            className={`p-1 rounded hover:opacity-80 ${
+                              theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                            }`}
+                          >
+                            <FiEdit />
+                          </button>
+                          <button 
+                            onClick={() => deleteReviewHandler(review.id)} 
+                            className={`p-1 rounded hover:opacity-80 ${
+                              theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                            }`}
+                          >
+                            <FiTrash2 />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {filteredReviews.length === 0 && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {reviewSearchTerm ? 'No se encontraron reseñas que coincidan con la búsqueda.' : 'No hay reseñas disponibles.'}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         );
       case 'orders':
-        if (ordersLoading) {
-          return <Loader text="Cargando pedidos..." size="lg" />;
-        }
         // Filter orders based on search term
         const filteredOrders = orderSearchTerm
           ? orders.filter(order =>
@@ -1349,6 +1953,257 @@ const ModernAdminDashboard = () => {
                 <input
                   type="text"
                   placeholder="Buscar pedidos..."
+                  value={orderSearchTerm}
+                  onChange={(e) => setOrderSearchTerm(e.target.value)}
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <FiPackage className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
+            </div>
+            
+            {/* Skeleton Loader for Orders */}
+            {ordersLoading ? (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {[...Array(5)].map((_, index) => (
+                      <tr key={index} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-6 w-20 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex space-x-2">
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                            <div className={`h-6 w-20 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {filteredOrders.map((order) => (
+                      <tr key={order.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.id.substring(0, 8)}...</td>
+                        <td className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.userEmail || 'N/A'}</td>
+                        <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(order.createdAt)}</td>
+                        <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatCurrency(order.totalAmount || 0)}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap`}>
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending', theme)}`}>
+                            {getOrderStatusText(order.orderStatus || 'pending')}
+                          </span>
+                        </td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                          <button 
+                            onClick={() => openOrderDetails(order)} 
+                            className={`p-1 rounded hover:opacity-80 ${
+                              theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                            }`}
+                          >
+                            <FiEye />
+                          </button>
+                          <select
+                            value={order.orderStatus}
+                            onChange={(e) => updateOrderStatusHandler(order.id, e.target.value)}
+                            disabled={orderStatusUpdating[order.id]}
+                            className={`pl-4 pr-10 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none ${
+                              theme === 'dark' 
+                                ? 'bg-gray-700 border-gray-600 text-white' 
+                                : 'bg-white border-gray-300 text-gray-900'
+                            }`}
+                          >
+                            <option value="pending" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Pendiente</option>
+                            <option value="processing" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Procesando</option>
+                            <option value="shipped" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Enviado</option>
+                            <option value="delivered" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Entregado</option>
+                            <option value="cancelled" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Cancelado</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {filteredOrders.length === 0 && !orderSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No hay pedidos disponibles.
+                  </div>
+                )}
+                {filteredOrders.length === 0 && orderSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No se encontraron pedidos que coincidan con la búsqueda.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      case 'coupons':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Códigos Promocionales</h2>
+            </div>
+            <div className="w-full overflow-x-auto">
+              <CouponManager theme={theme} />
+            </div>
+          </div>
+        );
+      default:
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {[...Array(5)].map((_, index) => (
+                      <tr key={index} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-4 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`h-6 w-20 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex space-x-2">
+                            <div className={`h-6 w-6 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                            <div className={`h-6 w-20 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`}></div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="w-full overflow-x-auto">
+                <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                  <thead>
+                    <tr>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                      <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                    {filteredOrders.map((order) => (
+                      <tr key={order.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.id.substring(0, 8)}...</td>
+                        <td className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.userEmail || 'N/A'}</td>
+                        <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(order.createdAt)}</td>
+                        <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatCurrency(order.totalAmount || 0)}</td>
+                        <td className={`px-6 py-4 whitespace-nowrap`}>
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending', theme)}`}>
+                            {getOrderStatusText(order.orderStatus || 'pending')}
+                          </span>
+                        </td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                          <button 
+                            onClick={() => openOrderDetails(order)} 
+                            className={`p-1 rounded hover:opacity-80 ${
+                              theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                            }`}
+                          >
+                            <FiEye />
+                          </button>
+                          <select
+                            value={order.orderStatus}
+                            onChange={(e) => updateOrderStatusHandler(order.id, e.target.value)}
+                            disabled={orderStatusUpdating[order.id]}
+                            className={`pl-4 pr-10 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none ${
+                              theme === 'dark' 
+                                ? 'bg-gray-700 border-gray-600 text-white' 
+                                : 'bg-white border-gray-300 text-gray-900'
+                            }`}
+                          >
+                            <option value="pending" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Pendiente</option>
+                            <option value="processing" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Procesando</option>
+                            <option value="shipped" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Enviado</option>
+                            <option value="delivered" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Entregado</option>
+                            <option value="cancelled" className={`text-gray-900 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>Cancelado</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {filteredOrders.length === 0 && !orderSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No hay pedidos disponibles.
+                  </div>
+                )}
+                {filteredOrders.length === 0 && orderSearchTerm && (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    No se encontraron pedidos que coincidan con la búsqueda.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      case 'coupons':
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <CouponManager />
+          </div>
+        );
                   value={orderSearchTerm}
                   onChange={(e) => setOrderSearchTerm(e.target.value)}
                   className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
@@ -1427,7 +2282,7 @@ const ModernAdminDashboard = () => {
                 <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                   {orderSearchTerm ? 'No se encontraron pedidos que coincidan con la búsqueda.' : 'No hay pedidos disponibles.'}
                 </div>
-              )}
+              )};
             </div>
           </div>
         );
@@ -1435,7 +2290,7 @@ const ModernAdminDashboard = () => {
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los códigos promocionales</h2>
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Códigos Promocionales</h2>
             </div>
             <div className="w-full overflow-x-auto">
               <CouponManager theme={theme} />
@@ -1453,10 +2308,6 @@ const ModernAdminDashboard = () => {
   };
 
   return (
-    <div className={`min-h-screen flex w-full ${theme === 'dark' ? 'dark:bg-gray-900 bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-      {/* Success/Error Messages */}
-      {successMessage && (
-        <div className="fixed z-50 px-6 py-4 text-white bg-green-600 rounded-lg shadow-lg top-4 right-4">
           {successMessage}
         </div>
       )}
@@ -1573,20 +2424,6 @@ const ModernAdminDashboard = () => {
                         Administrador
                       </p>
                     </div>
-                    <button
-                      onClick={() => {
-                        navigate('/');
-                        closeProfileMenu();
-                      }}
-                      className={`flex items-center w-full px-4 py-2 text-sm text-left ${
-                        theme === 'dark' 
-                          ? 'text-gray-300 hover:bg-gray-700' 
-                          : 'text-gray-700 hover:bg-gray-100'
-                      }`}
-                    >
-                      <FiHome className="mr-2" />
-                      Ir a la página
-                    </button>
                     <button
                       onClick={handleLogout}
                       className={`flex items-center w-full px-4 py-2 text-sm text-left ${

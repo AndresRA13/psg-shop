@@ -78,13 +78,28 @@ const CouponManager = ({ theme = 'light' }) => {
     }
     
     try {
+      // Validate and handle expiryDate properly
+      let expiryDateValue = null;
+      if (newCoupon.expiryDate) {
+        if (newCoupon.expiryDate instanceof Date) {
+          expiryDateValue = newCoupon.expiryDate;
+        } else {
+          // Try to create a Date object from the string
+          const dateObj = new Date(newCoupon.expiryDate);
+          // Check if the date is valid
+          if (!isNaN(dateObj.getTime())) {
+            expiryDateValue = dateObj;
+          }
+        }
+      }
+
       const couponData = {
         code: newCoupon.code.toUpperCase(),
         discountType: newCoupon.discountType,
         discountValue: parseFloat(newCoupon.discountValue),
         isActive: newCoupon.isActive,
         createdAt: new Date(),
-        ...(newCoupon.expiryDate && { expiryDate: new Date(newCoupon.expiryDate) })
+        ...(expiryDateValue && { expiryDate: expiryDateValue })
       };
       
       await addDoc(couponsCollectionRef, couponData);
@@ -140,13 +155,28 @@ const CouponManager = ({ theme = 'light' }) => {
     
     try {
       const couponDoc = doc(db, "coupons", editingCoupon.id);
+      // Validate and handle expiryDate properly
+      let expiryDateValue = null;
+      if (editingCoupon.expiryDate) {
+        if (editingCoupon.expiryDate instanceof Date) {
+          expiryDateValue = editingCoupon.expiryDate;
+        } else {
+          // Try to create a Date object from the string
+          const dateObj = new Date(editingCoupon.expiryDate);
+          // Check if the date is valid
+          if (!isNaN(dateObj.getTime())) {
+            expiryDateValue = dateObj;
+          }
+        }
+      }
+
       const updateData = {
         code: editingCoupon.code.toUpperCase(),
         discountType: editingCoupon.discountType,
         discountValue: parseFloat(editingCoupon.discountValue),
         isActive: editingCoupon.isActive,
         updatedAt: new Date(),
-        ...(editingCoupon.expiryDate && { expiryDate: new Date(editingCoupon.expiryDate) })
+        ...(expiryDateValue && { expiryDate: expiryDateValue })
       };
       
       await updateDoc(couponDoc, updateData);
