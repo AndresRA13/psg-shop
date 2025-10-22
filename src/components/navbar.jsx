@@ -88,8 +88,11 @@ const Navbar = () => {
             </div>
             
             {/* Logo */}
-            <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">
-              <Link to="/home">CARTSHOP</Link>
+            <div className="text-2xl font-bold">
+              <Link to="/home">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">CART</span>
+                <span className="text-slate-800">SHOP</span>
+              </Link>
             </div>
           </div>
 
@@ -139,10 +142,6 @@ const Navbar = () => {
 
           {/* Right-aligned Icons */}
           <div className="flex items-center space-x-4">
-            <div className={`hidden md:block ${iconClasses} text-xl`}>
-              <FiSearch />
-            </div>
-            
             {/* Wishlist Icon */}
             <Link to="/wishlist" className={`${iconClasses} text-xl flex items-center justify-center relative`}>
               <GoHeart />
@@ -189,8 +188,8 @@ const Navbar = () => {
               
               {/* User Dropdown Menu */}
               {currentUser && isProfileMenuOpen && (
-                <div className="absolute right-0 z-50 w-64 mt-2 bg-gray-800 rounded-lg shadow-lg">
-                  <div className="p-4 border-b border-gray-700">
+                <div className="absolute right-0 z-50 w-64 mt-2 bg-white rounded-lg shadow-lg border border-gray-200">
+                  <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center">
                       <div className="flex items-center justify-center w-10 h-10 bg-gray-200 border border-gray-300 rounded-full">
                         {userProfile?.profileImage ? (
@@ -206,10 +205,10 @@ const Navbar = () => {
                         )}
                       </div>
                       <div className="ml-3">
-                        <p className="text-sm font-bold text-white">
+                        <p className="text-sm font-bold text-gray-900">
                           {userProfile?.displayName || currentUser.email?.split('@')[0] || 'Usuario'}
                         </p>
-                        <p className="text-xs text-gray-400">{currentUser.email}</p>
+                        <p className="text-xs text-gray-500">{currentUser.email}</p>
                       </div>
                     </div>
                   </div>
@@ -219,7 +218,7 @@ const Navbar = () => {
                     {isAdmin && (
                       <Link 
                         to="/admin" 
-                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={closeProfileMenu}
                       >
                         <FiSettings className="mr-3 text-gray-400" />
@@ -229,7 +228,7 @@ const Navbar = () => {
                     
                     <Link 
                       to="/profile" 
-                      className="flex items-center px-4 py-2 text-sm text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={closeProfileMenu}
                     >
                       <FiUser className="mr-3 text-gray-400" />
@@ -237,10 +236,10 @@ const Navbar = () => {
                     </Link>
                     
                     {/* Orders Link */}
-                    <div className="border-t border-gray-700">
+                    <div className="border-t border-gray-200">
                       <Link 
                         to="/orders" 
-                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={closeProfileMenu}
                       >
                         <FiList className="mr-3 text-gray-400" />
@@ -250,7 +249,7 @@ const Navbar = () => {
                     
                     <button 
                       onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-sm text-left text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600"
+                      className="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
                     >
                       <FiLogOut className="mr-3 text-gray-400" />
                       <span>Cerrar sesión</span>
@@ -268,7 +267,10 @@ const Navbar = () => {
         {isMenuOpen && <div className="fixed inset-0 z-40 bg-black/40" onClick={toggleMenu}></div>}
         <aside className={`fixed top-0 left-0 h-full w-72 bg-white shadow-xl transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out z-50 p-5 flex flex-col font-sans`} style={{ fontFamily: 'Inter, sans-serif' }}>
           <div className="flex items-center justify-between mb-10">
-            <div className="text-xl font-bold text-slate-800">BOWSHOP</div>
+            <div className="text-xl font-bold">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">CART</span>
+              <span className="text-slate-800">SHOP</span>
+            </div>
             <button onClick={toggleMenu} className="text-2xl cursor-pointer text-slate-600 hover:text-slate-900">
               <FiX />
             </button>
@@ -377,20 +379,6 @@ const Navbar = () => {
                 Iniciar Sesión
               </Link>
             )}
-          </div>
-          <div className="flex justify-center p-5 mt-auto space-x-6">
-            <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
-              <FiYoutube />
-            </a>
-            <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
-              <FiLinkedin />
-            </a>
-            <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
-              <FiFacebook />
-            </a>
-            <a href="#" className="text-2xl transition-colors duration-300 text-slate-600 hover:text-indigo-600">
-              <FiTwitter />
-            </a>
           </div>
         </aside>
       </>

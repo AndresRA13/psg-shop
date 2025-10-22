@@ -34,9 +34,9 @@ export const getReviewsByProductId = async (productId) => {
     }));
     return reviewList;
   } catch (error) {
-    console.error('Error fetching reviews:', error);
     // Check if it's a missing index error
     if (error.code === 'failed-precondition' || (error.message && error.message.includes('index'))) {
+      console.warn('Missing index for reviews query, using fallback method. Create the required index for better performance.');
       // Fallback to unordered query and sort in memory
       try {
         const reviewsCollection = collection(db, 'reviews');
@@ -49,8 +49,43 @@ export const getReviewsByProductId = async (productId) => {
         
         // Sort in memory by createdAt (descending)
         const sortedReviews = reviewList.sort((a, b) => {
-          const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
-          const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+          // Handle different date formats
+          let dateA, dateB;
+          
+          // For Firestore timestamps
+          if (a.createdAt && typeof a.createdAt.toDate === 'function') {
+            dateA = a.createdAt.toDate();
+          } 
+          // For JavaScript Date objects
+          else if (a.createdAt instanceof Date) {
+            dateA = a.createdAt;
+          } 
+          // For string dates
+          else if (typeof a.createdAt === 'string') {
+            dateA = new Date(a.createdAt);
+          } 
+          // For numeric timestamps
+          else if (typeof a.createdAt === 'number') {
+            dateA = new Date(a.createdAt);
+          } 
+          // Default
+          else {
+            dateA = new Date(0);
+          }
+          
+          // Same for dateB
+          if (b.createdAt && typeof b.createdAt.toDate === 'function') {
+            dateB = b.createdAt.toDate();
+          } else if (b.createdAt instanceof Date) {
+            dateB = b.createdAt;
+          } else if (typeof b.createdAt === 'string') {
+            dateB = new Date(b.createdAt);
+          } else if (typeof b.createdAt === 'number') {
+            dateB = new Date(b.createdAt);
+          } else {
+            dateB = new Date(0);
+          }
+          
           return dateB - dateA;
         });
         
@@ -60,6 +95,7 @@ export const getReviewsByProductId = async (productId) => {
         throw fallbackErr;
       }
     } else {
+      console.error('Error fetching reviews:', error);
       throw error;
     }
   }
@@ -77,9 +113,9 @@ export const getAllReviews = async () => {
     }));
     return reviewList;
   } catch (error) {
-    console.error('Error fetching all reviews:', error);
     // Check if it's a missing index error
     if (error.code === 'failed-precondition' || (error.message && error.message.includes('index'))) {
+      console.warn('Missing index for all reviews query, using fallback method. Create the required index for better performance.');
       // Fallback to unordered query and sort in memory
       try {
         const reviewsCollection = collection(db, 'reviews');
@@ -91,8 +127,43 @@ export const getAllReviews = async () => {
         
         // Sort in memory by createdAt (descending)
         const sortedReviews = reviewList.sort((a, b) => {
-          const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
-          const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+          // Handle different date formats
+          let dateA, dateB;
+          
+          // For Firestore timestamps
+          if (a.createdAt && typeof a.createdAt.toDate === 'function') {
+            dateA = a.createdAt.toDate();
+          } 
+          // For JavaScript Date objects
+          else if (a.createdAt instanceof Date) {
+            dateA = a.createdAt;
+          } 
+          // For string dates
+          else if (typeof a.createdAt === 'string') {
+            dateA = new Date(a.createdAt);
+          } 
+          // For numeric timestamps
+          else if (typeof a.createdAt === 'number') {
+            dateA = new Date(a.createdAt);
+          } 
+          // Default
+          else {
+            dateA = new Date(0);
+          }
+          
+          // Same for dateB
+          if (b.createdAt && typeof b.createdAt.toDate === 'function') {
+            dateB = b.createdAt.toDate();
+          } else if (b.createdAt instanceof Date) {
+            dateB = b.createdAt;
+          } else if (typeof b.createdAt === 'string') {
+            dateB = new Date(b.createdAt);
+          } else if (typeof b.createdAt === 'number') {
+            dateB = new Date(b.createdAt);
+          } else {
+            dateB = new Date(0);
+          }
+          
           return dateB - dateA;
         });
         
@@ -102,6 +173,7 @@ export const getAllReviews = async () => {
         throw fallbackErr;
       }
     } else {
+      console.error('Error fetching all reviews:', error);
       throw error;
     }
   }
