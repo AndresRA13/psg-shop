@@ -125,7 +125,7 @@ const Navbar = () => {
                   ? "text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium" 
                   : navLinkClasses}
               >
-                Blog
+                Sobre Nosotros
               </Link>
             </li>
             <li>
@@ -308,7 +308,7 @@ const Navbar = () => {
               >
                 <div className="flex items-center">
                   <FiBook className={`mr-3 ${isActiveLink('/blog') ? 'text-indigo-600' : 'text-slate-800'}`} />
-                  <span>Blog</span>
+                  <span>Sobre Nosotros</span>
                 </div>
               </Link>
             </li>

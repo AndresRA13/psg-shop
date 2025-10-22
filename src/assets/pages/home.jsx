@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 import { Link } from 'react-router-dom';
 import { getProducts } from '../../services/productService';
@@ -18,6 +18,12 @@ const Home = () => {
 
   // State for testimonials slider
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  
+  // Refs for touch events
+  const sliderRef = useRef(null);
+  const startXRef = useRef(0);
+  const endXRef = useRef(0);
+  const isDraggingRef = useRef(false);
 
   // Formspree form setup
   const [state, handleSubmit] = useForm("mpwybkly");
@@ -56,18 +62,21 @@ const Home = () => {
     {
       id: 1,
       name: "María González",
+      role: "Cliente frecuente",
       text: "Los moños son de excelente calidad y el envío fue rápido. ¡Definitivamente volveré a comprar!",
       rating: 5
     },
     {
       id: 2,
       name: "Carlos Rodríguez",
+      role: "Cliente satisfecho",
       text: "Excelente atención al cliente y productos de alta calidad. Muy recomendado para eventos especiales.",
       rating: 5
     },
     {
       id: 3,
       name: "Ana Martínez",
+      role: "Cliente feliz",
       text: "Compré varios moños para una boda y todos quedaron hermosos. La calidad superó mis expectativas.",
       rating: 5
     }
@@ -237,7 +246,7 @@ const Home = () => {
       description: "Protegemos tus datos de pago",
       icon: (
         <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 01-8 0v4h8z"></path>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 11-8 0v4h8z"></path>
         </svg>
       )
     }
@@ -251,54 +260,176 @@ const Home = () => {
     { id: 4, name: "Moños para Damas", image: "https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" }
   ];
 
+  // Handle touch events for mobile swipe
+  const handleTouchStart = (e) => {
+    startXRef.current = e.touches[0].clientX;
+    isDraggingRef.current = true;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDraggingRef.current) return;
+    endXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    
+    const swipeThreshold = 50;
+    
+    if (startXRef.current - endXRef.current > swipeThreshold) {
+      // Swipe left - next testimonial
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    } else if (endXRef.current - startXRef.current > swipeThreshold) {
+      // Swipe right - previous testimonial
+      setCurrentTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
+    }
+    
+    // Reset values
+    startXRef.current = 0;
+    endXRef.current = 0;
+  };
+  
+  // Handle mouse events for desktop drag
+  const handleMouseDown = (e) => {
+    startXRef.current = e.clientX;
+    isDraggingRef.current = true;
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDraggingRef.current) return;
+    endXRef.current = e.clientX;
+  };
+
+  const handleMouseUp = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    
+    const swipeThreshold = 50;
+    
+    if (startXRef.current - endXRef.current > swipeThreshold) {
+      // Swipe left - next testimonial
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    } else if (endXRef.current - startXRef.current > swipeThreshold) {
+      // Swipe right - previous testimonial
+      setCurrentTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
+    }
+    
+    // Reset values
+    startXRef.current = 0;
+    endXRef.current = 0;
+  };
+  
+  const handleMouseLeave = () => {
+    isDraggingRef.current = false;
+    startXRef.current = 0;
+    endXRef.current = 0;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section - Enhanced with gradient and better typography */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-indigo-700 to-purple-800">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
-        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <div className="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-            <main className="px-4 mx-auto mt-10 max-w-7xl sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-              <div className="sm:text-center lg:text-left">
-                <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
-                  <span className="block">Elegancia en cada</span>
-                  <span className="block text-indigo-200">detalle perfecto</span>
-                </h1>
-                <p className="mt-3 text-base text-indigo-100 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  Colección exclusiva de moños artesanales para todas las ocasiones. Calidad premium, diseño único y entrega rápida.
-                </p>
-                <div className="flex flex-col gap-4 mt-8 sm:mt-10 sm:flex-row sm:justify-center lg:justify-start">
-                  <Link
-                    to="/shop"
-                    className="px-8 py-4 text-base font-medium text-center text-indigo-700 transition-all duration-300 bg-white border border-transparent rounded-lg shadow-md hover:bg-indigo-50 md:py-4 md:text-lg md:px-10 hover:shadow-lg"
-                  >
-                    Comprar Ahora
-                  </Link>
-                  <Link
-                    to="/shop"
-                    className="px-8 py-4 text-base font-medium text-center text-white transition-all duration-300 bg-transparent border-2 border-white rounded-lg hover:bg-white hover:bg-opacity-10 md:py-4 md:text-lg md:px-10"
-                  >
-                    Ver Catálogo
-                  </Link>
-                </div>
-              </div>
-            </main>
+      {/* Hero Section - New design with cards and gradient */}
+      <section className="flex flex-col lg:flex-row gap-6 p-6 max-w-7xl mx-auto">
+        {/* Bloque principal */}
+        <div className="flex-1 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-8 flex flex-col lg:flex-row items-center justify-between shadow-sm">
+          <div className="max-w-md">
+            {/* Etiqueta superior */}
+            <div className="flex items-center gap-2 mb-4">
+              <span className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-3 py-1 rounded-full">
+                NUEVO
+              </span>
+              <span className="text-sm bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-3 py-1 rounded-full flex items-center gap-1">
+                ¡Envío gratis en compras mayores a $100.000!
+                <span className="text-white">→</span>
+              </span>
+            </div>
+
+            {/* Título */}
+            <h1 className="text-3xl md:text-4xl font-semibold leading-snug mb-4 text-gray-900">
+              Elegancia en cada{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-700">detalle</span>{" "}
+              perfecto
+            </h1>
+
+            {/* Descripción */}
+            <p className="text-sm text-gray-600 mb-6">
+              Colección exclusiva de moños artesanales para todas las ocasiones. Calidad premium, diseño único y entrega rápida.
+            </p>
+
+            {/* Botón */}
+            <Link
+              to="/shop"
+              className="bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-semibold text-sm transition shadow-md hover:shadow-lg"
+            >
+              VER CATÁLOGO
+            </Link>
           </div>
-        </div>
-        <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-          <div className="w-full h-56 sm:h-72 md:h-96 lg:w-full lg:h-full">
+
+          {/* Imagen principal */}
+          <div className="mt-6 lg:mt-0">
             <img
-              className="object-cover w-full h-full"
-              src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+              src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
               alt="Elegante colección de moños"
+              className="w-64 md:w-72 rounded-xl object-cover"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/1200x600.png?text=Elegante+Colecci%C3%B3n+de+Mo%C3%B1os';
+                e.target.src = 'https://via.placeholder.com/600x600.png?text=Elegante+Colecci%C3%B3n+de+Mo%C3%B1os';
               }}
             />
           </div>
         </div>
-      </div>
+
+        {/* Panel lateral derecho */}
+        <div className="flex flex-col gap-6 md:w-1/3">
+          {/* Tarjeta 1 */}
+          <div className="bg-indigo-100 rounded-2xl p-6 flex items-center justify-between shadow-sm h-full">
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Mejores <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-700">moños</span>
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Descubre nuestra selección premium de moños artesanales
+              </p>
+              <Link to="/shop" className="text-sm bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-4 py-2 rounded-lg inline-flex items-center gap-1 hover:from-indigo-700 hover:to-purple-800 transition">
+                Ver más →
+              </Link>
+            </div>
+            <img
+              src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+              alt="Moño elegante"
+              className="w-20 h-20 object-contain rounded-lg ml-4"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://via.placeholder.com/100x100.png?text=Moño';
+              }}
+            />
+          </div>
+
+          {/* Tarjeta 2 */}
+          <div className="bg-purple-100 rounded-2xl p-6 flex items-center justify-between shadow-sm h-full">
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-700">20%</span> de descuento
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                En nuestra colección de moños especiales por tiempo limitado
+              </p>
+              <Link to="/shop" className="text-sm bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-4 py-2 rounded-lg inline-flex items-center gap-1 hover:from-indigo-700 hover:to-purple-800 transition">
+                Ver más →
+              </Link>
+            </div>
+            <img
+              src="https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+              alt="Moño en oferta"
+              className="w-20 h-20 object-contain rounded-lg ml-4"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://via.placeholder.com/100x100.png?text=Oferta';
+              }}
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Stats Section - Added to match blog style */}
       <div className="py-12 bg-white">
@@ -511,83 +642,131 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Testimonials Section - Simplified slider design */}
+      {/* Testimonials Section - Enhanced slider design with white background and purple colors */}
       <div className="py-16 bg-white">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <div className="mb-16 lg:text-center">
-            <h2 className="text-base font-semibold tracking-wide text-indigo-600 uppercase">Testimonios</h2>
-            <p className="mt-2 text-3xl font-extrabold leading-8 tracking-tight text-gray-900 sm:text-4xl">
-              Lo que dicen nuestros clientes
+          <div className="mb-16 text-center">
+            <h2 className="text-4xl font-semibold mb-4 text-gray-900">Lo que dicen nuestros clientes</h2>
+            <p className="text-gray-600 mb-12 max-w-2xl mx-auto">
+              Descubre lo que nuestros clientes satisfechos tienen que decir sobre sus experiencias con nuestros productos/servicios.
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto mt-10">
-            <div className="relative p-8 shadow-sm bg-gray-50 rounded-2xl">
-              <div className="text-center">
-                <div className="flex justify-center mb-4">
-                  {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
-                    <svg key={i} className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
+          <div className="max-w-6xl mx-auto">
+            {/* Testimonial Cards Container */}
+            <div className="relative">
+              {/* Testimonial Card */}
+              <div 
+                className="overflow-hidden testimonial-slider"
+                ref={sliderRef}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
+              >
+                <div 
+                  className="transition-all duration-500 ease-in-out flex"
+                  style={{ transform: `translateX(-${currentTestimonial * 100}%)` }}
+                >
+                  {testimonials.map((testimonial, index) => (
+                    <div 
+                      key={testimonial.id} 
+                      className="flex-shrink-0 w-full px-4"
+                    >
+                      <div className="mx-auto rounded-2xl bg-white shadow-lg hover:shadow-xl transition relative border border-gray-100 testimonial-card">
+                        <div className="p-6 md:p-8">
+                          <div className="flex flex-col items-center text-center">
+                            {/* Testimonial Image */}
+                            <div className="flex-shrink-0 mb-4">
+                              <div className="relative w-16 h-16 mx-auto">
+                                <img
+                                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(testimonial.name)}&background=4f46e5&color=ffffff&size=64`}
+                                  alt={testimonial.name}
+                                  className="rounded-full mx-auto"
+                                />
+                              </div>
+                            </div>
+                            
+                            {/* Testimonial Content */}
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold mb-1 text-gray-900">{testimonial.name}</h3>
+                              <p className="text-sm text-indigo-600 mb-2">{testimonial.role}</p>
+                              
+                              <div className="flex justify-center mb-3">
+                                {[...Array(testimonial.rating)].map((_, i) => (
+                                  <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                  </svg>
+                                ))}
+                                <span className="ml-2 text-sm text-gray-500">({testimonial.rating})</span>
+                              </div>
+                              
+                              <div className="border-t border-gray-200 my-4"></div>
+                              
+                              <blockquote className="text-gray-600 text-sm md:text-base italic px-2">
+                                "{testimonial.text}"
+                              </blockquote>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
-                <blockquote className="text-xl italic text-gray-600">
-                  "{testimonials[currentTestimonial].text}"
-                </blockquote>
-                <figcaption className="mt-6">
-                  <div className="font-bold text-gray-900">{testimonials[currentTestimonial].name}</div>
-                </figcaption>
               </div>
-            </div>
 
-            {/* Slider controls */}
-            <div className="flex justify-center mt-8 space-x-2">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentTestimonial(index)}
-                  className={`w-3 h-3 rounded-full ${
-                    index === currentTestimonial ? 'bg-indigo-600' : 'bg-gray-300'
-                  }`}
-                  aria-label={`Ver testimonio ${index + 1}`}
-                />
-              ))}
+              {/* Slider Indicators */}
+              <div className="flex justify-center mt-8 space-x-2">
+                {testimonials.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentTestimonial(index)}
+                    className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                      index === currentTestimonial ? 'bg-indigo-600' : 'bg-gray-300'
+                    }`}
+                    aria-label={`Ver testimonio ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Blog Preview Section - Replaces newsletter for logged-in users */}
+      {/* Sobre Nosotros Section - Replaces blog preview */}
       <div className="py-16 bg-gradient-to-r from-indigo-50 to-purple-50">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="mb-16 lg:text-center">
-            <h2 className="text-base font-semibold tracking-wide text-indigo-600 uppercase">Últimas Entradas</h2>
+            <h2 className="text-base font-semibold tracking-wide text-indigo-600 uppercase">Nuestra Historia</h2>
             <p className="mt-2 text-3xl font-extrabold leading-8 tracking-tight text-gray-900 sm:text-4xl">
-              Descubre consejos y tendencias
+              Conoce nuestro compromiso
             </p>
             <p className="max-w-2xl mt-4 text-xl text-gray-500 lg:mx-auto">
-              Explora nuestros artículos sobre estilo, cuidado y novedades en el mundo de los moños
+              Descubre quiénes somos y qué nos impulsa a crear los mejores moños del mercado
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-8 mt-10 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Nuestra Historia */}
             <div className="overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl">
               <div className="h-48 overflow-hidden">
                 <img 
                   src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
-                  alt="Cómo elegir el moño perfecto" 
+                  alt="Nuestra Historia" 
                   className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
                 />
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
                   <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-indigo-800 bg-indigo-100 rounded-full">
-                    Guía de Estilo
+                    Historia
                   </span>
-                  <span className="text-sm text-gray-500">15 Oct 2025</span>
                 </div>
-                <h3 className="mb-3 text-xl font-bold text-gray-900">Cómo elegir el moño perfecto para tu ocasión especial</h3>
-                <p className="mb-4 text-gray-600">Descubre los factores clave para seleccionar el moño ideal que complemente tu estilo y la ocasión.</p>
+                <h3 className="mb-3 text-xl font-bold text-gray-900">Nuestra Trayectoria</h3>
+                <p className="mb-4 text-gray-600">Desde 2015, hemos crecido desde un pequeño taller artesanal hasta convertirnos en referentes de calidad en accesorios de moda.</p>
                 <Link 
                   to="/blog" 
                   className="inline-flex items-center font-medium text-indigo-600 transition-colors duration-300 hover:text-indigo-800"
@@ -600,52 +779,52 @@ const Home = () => {
               </div>
             </div>
 
-            <div className="overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl">
-              <div className="h-48 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
-                  alt="Tendencias de moda en moños" 
-                  className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
-                />
-              </div>
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-indigo-800 bg-indigo-100 rounded-full">
-                    Tendencias
-                  </span>
-                  <span className="text-sm text-gray-500">10 Oct 2025</span>
-                </div>
-                <h3 className="mb-3 text-xl font-bold text-gray-900">Tendencias de moda en moños para esta temporada</h3>
-                <p className="mb-4 text-gray-600">Explora las últimas tendencias en moños y cómo incorporarlas a tu guardarropa diario.</p>
-                <Link 
-                  to="/blog" 
-                  className="inline-flex items-center font-medium text-indigo-600 transition-colors duration-300 hover:text-indigo-800"
-                >
-                  Leer más
-                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </Link>
-              </div>
-            </div>
-
+            {/* Nuestros Valores */}
             <div className="overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl">
               <div className="h-48 overflow-hidden">
                 <img 
                   src="https://images.unsplash.com/photo-1595173425119-1c5134b706b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
-                  alt="Cuidado y mantenimiento" 
+                  alt="Nuestros Valores" 
                   className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
                 />
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
                   <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-indigo-800 bg-indigo-100 rounded-full">
-                    Cuidado
+                    Valores
                   </span>
-                  <span className="text-sm text-gray-500">5 Oct 2025</span>
                 </div>
-                <h3 className="mb-3 text-xl font-bold text-gray-900">Cuidado y mantenimiento de tus moños favoritos</h3>
-                <p className="mb-4 text-gray-600">Consejos profesionales para mantener tus moños en perfecto estado durante más tiempo.</p>
+                <h3 className="mb-3 text-xl font-bold text-gray-900">Compromiso con la Calidad</h3>
+                <p className="mb-4 text-gray-600">Cada moño es creado con materiales premium y técnicas tradicionales perfeccionadas a lo largo de generaciones.</p>
+                <Link 
+                  to="/blog" 
+                  className="inline-flex items-center font-medium text-indigo-600 transition-colors duration-300 hover:text-indigo-800"
+                >
+                  Leer más
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
+            {/* Nuestro Equipo */}
+            <div className="overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+                  alt="Nuestro Equipo" 
+                  className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="inline-flex items-center px-3 py-1 text-sm font-medium text-indigo-800 bg-indigo-100 rounded-full">
+                    Equipo
+                  </span>
+                </div>
+                <h3 className="mb-3 text-xl font-bold text-gray-900">Conoce a Nuestro Talento</h3>
+                <p className="mb-4 text-gray-600">Un equipo apasionado de diseñadores y artesanos dedicados a crear accesorios únicos para cada ocasión.</p>
                 <Link 
                   to="/blog" 
                   className="inline-flex items-center font-medium text-indigo-600 transition-colors duration-300 hover:text-indigo-800"
@@ -664,7 +843,7 @@ const Home = () => {
               to="/blog"
               className="inline-flex items-center px-6 py-3 text-base font-medium text-white transition-all duration-300 border border-transparent rounded-lg shadow-md bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800"
             >
-              Ver todos los artículos
+              Conoce más sobre nosotros
             </Link>
           </div>
         </div>
