@@ -77,9 +77,18 @@ const Navbar = () => {
     <>
       <header className="sticky top-0 z-50 font-sans bg-white shadow-sm">
         <nav className="flex items-center justify-between p-4 mx-auto max-w-7xl">
-          {/* Logo */}
-          <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">
-            <Link to="/home">CARTSHOP</Link>
+          {/* Left section with menu button and logo */}
+          <div className="flex items-center">
+            {/* Mobile Menu Button - Moved to the left with minimal spacing */}
+            <div className="mr-0 text-2xl cursor-pointer md:hidden text-slate-800" onClick={toggleMenu}>
+              <FaBars />
+              {/* Menu badge removed - was showing "11" unnecessarily */}
+            </div>
+            
+            {/* Logo */}
+            <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">
+              <Link to="/home">CARTSHOP</Link>
+            </div>
           </div>
 
           {/* Desktop Navigation Menu */}
@@ -248,15 +257,6 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-            
-            {/* Mobile Menu Button */}
-            <div className="ml-3 text-2xl cursor-pointer md:hidden text-slate-800" onClick={toggleMenu}>
-              <FaBars />
-              {/* Menu badge (example with 11 items) */}
-              <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-semibold text-white rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 -top-1 -right-1">
-                11
-              </span>
-            </div>
           </div>
         </nav>
       </header>
@@ -326,27 +326,28 @@ const Navbar = () => {
                 Favoritos
               </Link>
             </li>
-            {/* Admin Panel button in mobile menu - only visible to admin users */}
-            {currentUser && isAdmin && (
-              <li>
-                <Link 
-                  to="/admin" 
-                  className={`text-lg ${isActiveLink('/admin') ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 font-medium' : 'text-blue-600'}`} 
-                  onClick={toggleMenu}
-                >
-                  Panel administrativo 
-                </Link>
-              </li>
-            )}
           </ul>
           <div className="mt-4">
             {currentUser ? (
-              <button 
-                onClick={() => { handleLogout(); toggleMenu(); }}
-                className="w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Cerrar Sesión
-              </button>
+              <>
+                {/* Admin Panel button - only visible to admin users */}
+                {isAdmin && (
+                  <Link 
+                    to="/admin" 
+                    className="block w-full px-4 py-2 mb-2 text-sm font-medium text-center text-white border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    onClick={toggleMenu}
+                  >
+                    Panel administrativo 
+                  </Link>
+                )}
+                
+                <button 
+                  onClick={() => { handleLogout(); toggleMenu(); }}
+                  className="w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Cerrar Sesión
+                </button>
+              </>
             ) : (
               <Link 
                 to="/login" 
