@@ -77,11 +77,6 @@ const Blog = () => {
           <p className="max-w-2xl mx-auto mb-8 text-xl">
             {companyInfo.description}
           </p>
-          <div className="flex justify-center">
-            <div className="flex items-center justify-center w-24 h-24 bg-white rounded-full">
-              <span className="text-3xl font-bold text-indigo-700">PS</span>
-            </div>
-          </div>
         </div>
       </div>
 
