@@ -188,7 +188,7 @@ const Navbar = () => {
               
               {/* User Dropdown Menu */}
               {currentUser && isProfileMenuOpen && (
-                <div className="absolute right-0 z-50 w-64 mt-2 bg-white rounded-lg shadow-lg border border-gray-200">
+                <div className="absolute right-0 z-50 w-64 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg">
                   <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center">
                       <div className="flex items-center justify-center w-10 h-10 bg-gray-200 border border-gray-300 rounded-full">
