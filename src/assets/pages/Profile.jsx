@@ -34,8 +34,7 @@ const Profile = () => {
     city: '',
     state: '',
     zipCode: '',
-    country: '',
-    isDefault: false
+    country: 'Colombia'
   });
   
   // Editing address state
@@ -47,8 +46,7 @@ const Profile = () => {
     city: '',
     state: '',
     zipCode: '',
-    country: '',
-    isDefault: false
+    country: 'Colombia'
   });
   
   const [activeTab, setActiveTab] = useState('profile');
@@ -326,7 +324,7 @@ const Profile = () => {
     setAddressSaving(true);
     
     // Validate required fields
-    if (!newAddress.name || !newAddress.street || !newAddress.city || !newAddress.state || !newAddress.zipCode || !newAddress.country) {
+    if (!newAddress.name || !newAddress.street || !newAddress.city || !newAddress.state || !newAddress.zipCode) {
       Swal.fire({
         title: 'Error',
         text: 'Por favor completa todos los campos de la dirección',
@@ -369,7 +367,7 @@ const Profile = () => {
         confirmButtonText: 'Aceptar'
       });
       
-      // Reset form
+      // Reset form but keep country as Colombia
       setNewAddress({
         id: Date.now(),
         name: '',
@@ -377,8 +375,7 @@ const Profile = () => {
         city: '',
         state: '',
         zipCode: '',
-        country: '',
-        isDefault: false
+        country: 'Colombia'
       });
     } catch (error) {
       console.error('Error adding address:', error);
@@ -409,8 +406,7 @@ const Profile = () => {
       city: '',
       state: '',
       zipCode: '',
-      country: '',
-      isDefault: false
+      country: 'Colombia'
     });
   };
   
@@ -420,7 +416,7 @@ const Profile = () => {
     setAddressSaving(true);
     
     // Validate required fields
-    if (!editAddressData.name || !editAddressData.street || !editAddressData.city || !editAddressData.state || !editAddressData.zipCode || !editAddressData.country) {
+    if (!editAddressData.name || !editAddressData.street || !editAddressData.city || !editAddressData.state || !editAddressData.zipCode) {
       Swal.fire({
         title: 'Error',
         text: 'Por favor completa todos los campos de la dirección',
@@ -463,7 +459,7 @@ const Profile = () => {
         confirmButtonText: 'Aceptar'
       });
       
-      // Reset editing state
+      // Reset editing state but keep country as Colombia
       setEditingAddress(null);
       setEditAddressData({
         id: null,
@@ -472,8 +468,7 @@ const Profile = () => {
         city: '',
         state: '',
         zipCode: '',
-        country: '',
-        isDefault: false
+        country: 'Colombia'
       });
     } catch (error) {
       console.error('Error updating address:', error);
@@ -614,9 +609,9 @@ const Profile = () => {
   if (loading) {
     return (
       <div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="w-12 h-12 border-b-2 border-gray-900 rounded-full animate-spin"></div>
           </div>
         </div>
       </div>
@@ -625,13 +620,13 @@ const Profile = () => {
   
   return (
     <div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Mi Perfil</h1>
+          <h1 className="mb-8 text-3xl font-bold text-gray-900">Mi Perfil</h1>
           
           {/* Tabs */}
-          <div className="border-b border-gray-200 mb-8">
-            <nav className="-mb-px flex space-x-8">
+          <div className="mb-8 border-b border-gray-200">
+            <nav className="flex -mb-px space-x-8">
               <button
                 onClick={() => setActiveTab('profile')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
@@ -667,23 +662,23 @@ const Profile = () => {
           
           {/* Profile Tab */}
           {activeTab === 'profile' && (
-            <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="overflow-hidden bg-white rounded-lg shadow">
               <div className="px-6 py-8">
                 <form onSubmit={handleSaveProfile}>
                   {/* Profile Image Section */}
                   <div className="mb-8">
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Foto de Perfil</h2>
+                    <h2 className="mb-4 text-lg font-medium text-gray-900">Foto de Perfil</h2>
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
                         {profileData.profileImage ? (
                           <img 
                             src={profileData.profileImage} 
                             alt="Profile" 
-                            className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                            className="object-cover w-24 h-24 border-2 border-gray-300 rounded-full"
                           />
                         ) : (
-                          <div className="w-24 h-24 rounded-full bg-gray-200 border-2 border-gray-300 flex items-center justify-center">
-                            <span className="text-gray-500 text-3xl font-bold">
+                          <div className="flex items-center justify-center w-24 h-24 bg-gray-200 border-2 border-gray-300 rounded-full">
+                            <span className="text-3xl font-bold text-gray-500">
                               {profileData.displayName?.charAt(0) || profileData.email?.charAt(0) || 'U'}
                             </span>
                           </div>
@@ -691,7 +686,7 @@ const Profile = () => {
                       </div>
                       <div className="ml-6">
                         <label className="block">
-                          <span className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer">
+                          <span className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm cursor-pointer hover:bg-gray-50">
                             Cambiar foto
                           </span>
                           <input 
@@ -710,7 +705,7 @@ const Profile = () => {
                   
                   {/* Personal Information */}
                   <div className="mb-8">
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Información Personal</h2>
+                    <h2 className="mb-4 text-lg font-medium text-gray-900">Información Personal</h2>
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                       <div>
                         <label htmlFor="displayName" className="block text-sm font-medium text-gray-700">
@@ -722,7 +717,7 @@ const Profile = () => {
                           id="displayName"
                           value={profileData.displayName}
                           onChange={handleProfileChange}
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       
@@ -736,7 +731,7 @@ const Profile = () => {
                           id="email"
                           value={profileData.email}
                           disabled
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-100"
+                          className="block w-full px-3 py-2 mt-1 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                         <p className="mt-1 text-sm text-gray-500">
                           El correo no puede ser modificado
@@ -753,7 +748,7 @@ const Profile = () => {
                           id="phone"
                           value={profileData.phone}
                           onChange={handleProfileChange}
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       
@@ -768,7 +763,7 @@ const Profile = () => {
                           id="role"
                           value={userRole || 'customer'}
                           disabled
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-100"
+                          className="block w-full px-3 py-2 mt-1 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                         <p className="mt-1 text-sm text-gray-500">
                           El rol no puede ser modificado
@@ -782,7 +777,7 @@ const Profile = () => {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                      className="inline-flex justify-center px-4 py-2 ml-3 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                     >
                       {saving ? 'Guardando...' : 'Guardar Cambios'}
                     </button>
@@ -794,11 +789,11 @@ const Profile = () => {
           
           {/* Security Tab */}
           {activeTab === 'security' && (
-            <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="overflow-hidden bg-white rounded-lg shadow">
               <div className="px-6 py-8">
                 <form onSubmit={handleChangePassword}>
                   <div className="mb-8">
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Cambiar Contraseña</h2>
+                    <h2 className="mb-4 text-lg font-medium text-gray-900">Cambiar Contraseña</h2>
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                       <div>
                         <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
@@ -810,7 +805,7 @@ const Profile = () => {
                           id="currentPassword"
                           value={securityData.currentPassword}
                           onChange={handleSecurityChange}
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                     </div>
@@ -826,7 +821,7 @@ const Profile = () => {
                           id="newPassword"
                           value={securityData.newPassword}
                           onChange={handleSecurityChange}
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       
@@ -840,7 +835,7 @@ const Profile = () => {
                           id="confirmNewPassword"
                           value={securityData.confirmNewPassword}
                           onChange={handleSecurityChange}
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                     </div>
@@ -851,7 +846,7 @@ const Profile = () => {
                     <button
                       type="submit"
                       disabled={securitySaving}
-                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                      className="inline-flex justify-center px-4 py-2 ml-3 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                     >
                       {securitySaving ? 'Guardando...' : 'Cambiar Contraseña'}
                     </button>
@@ -860,12 +855,12 @@ const Profile = () => {
                 
                 {/* Active Devices Section */}
                 <div className="mt-12">
-                  <h2 className="text-lg font-medium text-gray-900 mb-4">Dispositivos Activos</h2>
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <h2 className="mb-4 text-lg font-medium text-gray-900">Dispositivos Activos</h2>
+                  <div className="p-4 rounded-lg bg-gray-50">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
-                        <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                          <svg className="h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="flex items-center justify-center w-10 h-10 bg-indigo-100 rounded-full">
+                          <svg className="w-6 h-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                           </svg>
                         </div>
@@ -892,11 +887,11 @@ const Profile = () => {
           
           {/* Addresses Tab */}
           {activeTab === 'addresses' && (
-            <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="overflow-hidden bg-white rounded-lg shadow">
               <div className="px-6 py-8">
                 {/* Add/Edit Address Form */}
                 <div className="mb-8">
-                  <h2 className="text-lg font-medium text-gray-900 mb-4">
+                  <h2 className="mb-4 text-lg font-medium text-gray-900">
                     {editingAddress ? 'Editar Dirección' : 'Agregar Nueva Dirección'}
                   </h2>
                   <form onSubmit={editingAddress ? saveEditedAddress : handleAddAddress}>
@@ -912,7 +907,7 @@ const Profile = () => {
                           value={editingAddress ? editAddressData.name : newAddress.name}
                           onChange={editingAddress ? handleEditAddressChange : handleAddressChange}
                           placeholder="Ej: Casa, Trabajo"
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       
@@ -927,7 +922,7 @@ const Profile = () => {
                           value={editingAddress ? editAddressData.street : newAddress.street}
                           onChange={editingAddress ? handleEditAddressChange : handleAddressChange}
                           placeholder="Ej: Av. Principal 123"
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       
@@ -941,7 +936,7 @@ const Profile = () => {
                           id="addressCity"
                           value={editingAddress ? editAddressData.city : newAddress.city}
                           onChange={editingAddress ? handleEditAddressChange : handleAddressChange}
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       
@@ -955,7 +950,7 @@ const Profile = () => {
                           id="addressState"
                           value={editingAddress ? editAddressData.state : newAddress.state}
                           onChange={editingAddress ? handleEditAddressChange : handleAddressChange}
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       
@@ -969,7 +964,7 @@ const Profile = () => {
                           id="addressZipCode"
                           value={editingAddress ? editAddressData.zipCode : newAddress.zipCode}
                           onChange={editingAddress ? handleEditAddressChange : handleAddressChange}
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       
@@ -981,36 +976,21 @@ const Profile = () => {
                           type="text"
                           name="country"
                           id="addressCountry"
-                          value={editingAddress ? editAddressData.country : newAddress.country}
-                          onChange={editingAddress ? handleEditAddressChange : handleAddressChange}
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          value="Colombia"
+                          disabled
+                          className="block w-full px-3 py-2 mt-1 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         />
-                      </div>
-                      
-                      <div className="flex items-center">
-                        <input
-                          id="addressIsDefault"
-                          name="isDefault"
-                          type="checkbox"
-                          checked={editingAddress ? editAddressData.isDefault : newAddress.isDefault}
-                          onChange={(e) => 
-                            editingAddress 
-                              ? setEditAddressData(prev => ({...prev, isDefault: e.target.checked}))
-                              : setNewAddress(prev => ({...prev, isDefault: e.target.checked}))
-                          }
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="addressIsDefault" className="ml-2 block text-sm text-gray-900">
-                          Establecer como dirección predeterminada
-                        </label>
+                        <p className="mt-1 text-sm text-gray-500">
+                          Este ecommerce solo opera en Colombia
+                        </p>
                       </div>
                     </div>
                     
-                    <div className="mt-6 flex space-x-3">
+                    <div className="flex mt-6 space-x-3">
                       <button
                         type="submit"
                         disabled={addressSaving}
-                        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                        className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                       >
                         {addressSaving ? 'Guardando...' : (editingAddress ? 'Guardar Cambios' : 'Agregar Dirección')}
                       </button>
@@ -1019,7 +999,7 @@ const Profile = () => {
                         <button
                           type="button"
                           onClick={cancelEditingAddress}
-                          className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          className="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                           Cancelar
                         </button>
@@ -1030,10 +1010,10 @@ const Profile = () => {
                 
                 {/* Saved Addresses */}
                 <div>
-                  <h2 className="text-lg font-medium text-gray-900 mb-4">Direcciones Guardadas</h2>
+                  <h2 className="mb-4 text-lg font-medium text-gray-900">Direcciones Guardadas</h2>
                   {addresses.length === 0 ? (
-                    <div className="text-center py-8">
-                      <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="py-8 text-center">
+                      <svg className="w-12 h-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -1043,37 +1023,58 @@ const Profile = () => {
                   ) : (
                     <div className="space-y-4">
                       {addresses.map((address) => (
-                        <div key={address.id} className="border border-gray-200 rounded-lg p-4">
-                          <div className="flex justify-between">
-                            <div>
-                              <h3 className="text-sm font-medium text-gray-900">{address.name}</h3>
-                              <p className="text-sm text-gray-500">{address.street}</p>
-                              <p className="text-sm text-gray-500">{address.city}, {address.state} {address.zipCode}</p>
-                              <p className="text-sm text-gray-500">{address.country}</p>
-                              {address.isDefault && (
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 mt-2">
-                                  Predeterminada
-                                </span>
-                              )}
+                        <div key={address.id} className="p-4 transition-shadow duration-200 border border-gray-200 rounded-lg hover:shadow-md">
+                          <div className="flex flex-col md:flex-row md:justify-between md:items-start">
+                            <div className="flex-1">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4">
+                                <div className="flex-1">
+                                  <div className="flex items-start space-x-2">
+                                    <h3 className="text-base font-medium text-gray-900">{address.name}</h3>
+                                    {address.isDefault && (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                        Predeterminada
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="mt-2 text-sm text-gray-600">
+                                    <p>{address.street}</p>
+                                    <p>{address.city}, {address.state} {address.zipCode}</p>
+                                    <p>{address.country}</p>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex space-x-2">
+                            <div className="flex flex-col mt-4 space-y-2 md:mt-0 sm:flex-row sm:space-x-2 sm:space-y-0">
                               <button
                                 onClick={() => startEditingAddress(address)}
-                                className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
+                                className="inline-flex items-center justify-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-indigo-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
                               >
+                                <svg className="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
                                 Editar
                               </button>
                               <button
                                 onClick={() => handleSetDefaultAddress(address.id)}
                                 disabled={address.isDefault}
-                                className={`inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 ${address.isDefault ? 'bg-gray-100' : 'bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200'}`}
+                                className={`inline-flex items-center justify-center px-3 py-1.5 border text-xs font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 ${
+                                  address.isDefault 
+                                    ? 'border-gray-300 text-gray-500 bg-gray-100 cursor-not-allowed' 
+                                    : 'border-indigo-300 text-indigo-700 bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100'
+                                }`}
                               >
-                                {address.isDefault ? 'Predeterminada' : 'Hacer Predeterminada'}
+                                <svg className={`mr-1 h-4 w-4 ${address.isDefault ? 'text-gray-400' : 'text-indigo-500'}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                {address.isDefault ? 'Predeterminada' : 'Predeterminada'}
                               </button>
                               <button
                                 onClick={() => handleDeleteAddress(address.id)}
-                                className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200"
+                                className="inline-flex items-center justify-center px-3 py-1.5 border border-red-300 text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
                               >
+                                <svg className="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
                                 Eliminar
                               </button>
                             </div>

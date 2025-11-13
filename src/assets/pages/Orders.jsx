@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getOrdersByUserId } from '../../services/orderService';
 import OrderDetailsModal from '../../components/OrderDetailsModal';
-import { createReview } from '../../services/reviewService';
+import { createReview, getUserReviewForProduct, updateReview, deleteReview } from '../../services/reviewService';
 import Swal from 'sweetalert2';
 
 const Orders = () => {
@@ -84,13 +84,42 @@ const Orders = () => {
   };
 
   // Open review form for a product
-  const openReviewForm = (product) => {
-    setReviewingProduct({
-      productId: product.id,
-      productName: product.name,
-      rating: 0,
-      comment: ''
-    });
+  const openReviewForm = async (product) => {
+    try {
+      // Check if user already has a review for this product
+      const existingReview = await getUserReviewForProduct(currentUser.uid, product.id);
+      
+      if (existingReview) {
+        // User already has a review, open edit mode
+        setReviewingProduct({
+          id: existingReview.id,
+          productId: product.id,
+          productName: product.name,
+          rating: existingReview.rating,
+          comment: existingReview.comment,
+          isEditing: true
+        });
+      } else {
+        // User doesn't have a review yet, open create mode
+        setReviewingProduct({
+          productId: product.id,
+          productName: product.name,
+          rating: 0,
+          comment: '',
+          isEditing: false
+        });
+      }
+    } catch (error) {
+      console.error('Error checking existing review:', error);
+      // Fallback to create mode if there's an error
+      setReviewingProduct({
+        productId: product.id,
+        productName: product.name,
+        rating: 0,
+        comment: '',
+        isEditing: false
+      });
+    }
   };
 
   // Handle review form changes
@@ -110,7 +139,7 @@ const Orders = () => {
     }));
   };
 
-  // Submit review
+  // Submit review (create or update)
   const submitReview = async () => {
     // Validate review
     if (reviewingProduct.rating === 0) {
@@ -143,25 +172,73 @@ const Orders = () => {
         comment: reviewingProduct.comment.trim()
       };
 
-      await createReview(reviewData);
-      
-      Swal.fire({
-        title: 'Reseña enviada',
-        text: 'Tu reseña ha sido enviada correctamente',
-        icon: 'success',
-        confirmButtonText: 'Aceptar'
-      });
+      if (reviewingProduct.isEditing) {
+        // Update existing review
+        await updateReview(reviewingProduct.id, reviewData);
+        Swal.fire({
+          title: 'Reseña actualizada',
+          text: 'Tu reseña ha sido actualizada correctamente',
+          icon: 'success',
+          confirmButtonText: 'Aceptar'
+        });
+      } else {
+        // Create new review
+        await createReview(reviewData);
+        Swal.fire({
+          title: 'Reseña enviada',
+          text: 'Tu reseña ha sido enviada correctamente',
+          icon: 'success',
+          confirmButtonText: 'Aceptar'
+        });
+      }
       
       setReviewingProduct(null);
     } catch (error) {
       console.error('Error submitting review:', error);
       Swal.fire({
         title: 'Error',
-        text: 'Hubo un error al enviar tu reseña. Por favor intenta nuevamente.',
+        text: 'Hubo un error al procesar tu reseña. Por favor intenta nuevamente.',
         icon: 'error',
         confirmButtonText: 'Aceptar'
       });
     }
+  };
+
+  // Delete review
+  const deleteReviewHandler = async () => {
+    if (!reviewingProduct || !reviewingProduct.isEditing) return;
+
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Esta acción eliminará tu reseña permanentemente',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteReview(reviewingProduct.id);
+          Swal.fire({
+            title: 'Reseña eliminada',
+            text: 'Tu reseña ha sido eliminada correctamente',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+          });
+          setReviewingProduct(null);
+        } catch (error) {
+          console.error('Error deleting review:', error);
+          Swal.fire({
+            title: 'Error',
+            text: 'Hubo un error al eliminar tu reseña. Por favor intenta nuevamente.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      }
+    });
   };
 
   useEffect(() => {
@@ -358,7 +435,9 @@ const Orders = () => {
           <div className="relative w-full max-w-md mx-auto my-8 bg-white rounded-xl shadow-xl">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-gray-900">Dejar una reseña</h3>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {reviewingProduct.isEditing ? 'Editar reseña' : 'Dejar una reseña'}
+                </h3>
                 <button
                   onClick={() => setReviewingProduct(null)}
                   className="text-2xl font-bold text-gray-400 hover:text-gray-500"
@@ -409,6 +488,15 @@ const Orders = () => {
                 </div>
                 
                 <div className="mt-6 flex justify-end space-x-3">
+                  {reviewingProduct.isEditing && (
+                    <button
+                      type="button"
+                      onClick={deleteReviewHandler}
+                      className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    >
+                      Eliminar
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => setReviewingProduct(null)}
@@ -420,7 +508,7 @@ const Orders = () => {
                     onClick={submitReview}
                     className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-700 border border-transparent rounded-lg shadow-sm hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
-                    Enviar Reseña
+                    {reviewingProduct.isEditing ? 'Actualizar Reseña' : 'Enviar Reseña'}
                   </button>
                 </div>
               </div>

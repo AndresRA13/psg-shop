@@ -532,10 +532,13 @@ const Checkout = () => {
                             type="text"
                             name="country"
                             id="country"
-                            value={newAddress.country}
-                            onChange={handleAddressChange}
-                            className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            value="Colombia"
+                            disabled
+                            className="block w-full px-3 py-2 mt-1 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                           />
+                          <p className="mt-1 text-xs text-gray-500">
+                            Este ecommerce solo opera en Colombia
+                          </p>
                         </div>
                       </div>
                       

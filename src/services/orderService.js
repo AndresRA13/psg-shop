@@ -108,9 +108,12 @@ export const getOrdersByUserId = async (userId) => {
     }));
     return orderList;
   } catch (error) {
-    console.error('Error fetching orders:', error);
     // Check if it's a missing index error
-    if (error.code === 'failed-precondition' || (error.message && error.message.includes('index'))) {
+    if (error.code === 'failed-precondition' || 
+        error.code === 'invalid-argument' ||
+        (error.message && (error.message.includes('index') || error.message.includes('query requires an index')))) {
+      console.warn('Missing index for orders query, using fallback method. Create the required index for better performance.');
+      console.warn('Index creation link:', error.message.match(/https:\/\/[^"]*/)?.[0] || 'Check Firebase Console');
       // Fallback to unordered query and sort in memory
       try {
         const ordersCollection = collection(db, 'orders');
@@ -123,8 +126,43 @@ export const getOrdersByUserId = async (userId) => {
         
         // Sort in memory by createdAt (descending)
         const sortedOrders = orderList.sort((a, b) => {
-          const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
-          const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+          // Handle different date formats
+          let dateA, dateB;
+          
+          // For Firestore timestamps
+          if (a.createdAt && typeof a.createdAt.toDate === 'function') {
+            dateA = a.createdAt.toDate();
+          } 
+          // For JavaScript Date objects
+          else if (a.createdAt instanceof Date) {
+            dateA = a.createdAt;
+          } 
+          // For string dates
+          else if (typeof a.createdAt === 'string') {
+            dateA = new Date(a.createdAt);
+          } 
+          // For numeric timestamps
+          else if (typeof a.createdAt === 'number') {
+            dateA = new Date(a.createdAt);
+          } 
+          // Default
+          else {
+            dateA = new Date(0);
+          }
+          
+          // Same for dateB
+          if (b.createdAt && typeof b.createdAt.toDate === 'function') {
+            dateB = b.createdAt.toDate();
+          } else if (b.createdAt instanceof Date) {
+            dateB = b.createdAt;
+          } else if (typeof b.createdAt === 'string') {
+            dateB = new Date(b.createdAt);
+          } else if (typeof b.createdAt === 'number') {
+            dateB = new Date(b.createdAt);
+          } else {
+            dateB = new Date(0);
+          }
+          
           return dateB - dateA;
         });
         
@@ -134,6 +172,7 @@ export const getOrdersByUserId = async (userId) => {
         throw fallbackErr;
       }
     } else {
+      console.error('Error fetching orders:', error);
       throw error;
     }
   }
@@ -185,9 +224,12 @@ export const getAllOrders = async () => {
     }));
     return orderList;
   } catch (error) {
-    console.error('Error fetching all orders:', error);
     // Check if it's a missing index error
-    if (error.code === 'failed-precondition' || (error.message && error.message.includes('index'))) {
+    if (error.code === 'failed-precondition' || 
+        error.code === 'invalid-argument' ||
+        (error.message && (error.message.includes('index') || error.message.includes('query requires an index')))) {
+      console.warn('Missing index for all orders query, using fallback method. Create the required index for better performance.');
+      console.warn('Index creation link:', error.message.match(/https:\/\/[^"]*/)?.[0] || 'Check Firebase Console');
       // Fallback to unordered query and sort in memory
       try {
         const ordersCollection = collection(db, 'orders');
@@ -199,8 +241,43 @@ export const getAllOrders = async () => {
         
         // Sort in memory by createdAt (descending)
         const sortedOrders = orderList.sort((a, b) => {
-          const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
-          const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+          // Handle different date formats
+          let dateA, dateB;
+          
+          // For Firestore timestamps
+          if (a.createdAt && typeof a.createdAt.toDate === 'function') {
+            dateA = a.createdAt.toDate();
+          } 
+          // For JavaScript Date objects
+          else if (a.createdAt instanceof Date) {
+            dateA = a.createdAt;
+          } 
+          // For string dates
+          else if (typeof a.createdAt === 'string') {
+            dateA = new Date(a.createdAt);
+          } 
+          // For numeric timestamps
+          else if (typeof a.createdAt === 'number') {
+            dateA = new Date(a.createdAt);
+          } 
+          // Default
+          else {
+            dateA = new Date(0);
+          }
+          
+          // Same for dateB
+          if (b.createdAt && typeof b.createdAt.toDate === 'function') {
+            dateB = b.createdAt.toDate();
+          } else if (b.createdAt instanceof Date) {
+            dateB = b.createdAt;
+          } else if (typeof b.createdAt === 'string') {
+            dateB = new Date(b.createdAt);
+          } else if (typeof b.createdAt === 'number') {
+            dateB = new Date(b.createdAt);
+          } else {
+            dateB = new Date(0);
+          }
+          
           return dateB - dateA;
         });
         
@@ -210,6 +287,7 @@ export const getAllOrders = async () => {
         throw fallbackErr;
       }
     } else {
+      console.error('Error fetching all orders:', error);
       throw error;
     }
   }

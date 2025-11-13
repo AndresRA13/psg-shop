@@ -101,6 +101,33 @@ export const getReviewsByProductId = async (productId) => {
   }
 };
 
+// Get reviews by user ID and product ID (to check if user already reviewed a product)
+export const getUserReviewForProduct = async (userId, productId) => {
+  try {
+    const reviewsCollection = collection(db, 'reviews');
+    const q = query(
+      reviewsCollection,
+      where('userId', '==', userId),
+      where('productId', '==', productId)
+    );
+    const reviewSnapshot = await getDocs(q);
+    
+    if (reviewSnapshot.empty) {
+      return null;
+    }
+    
+    // Return the first (and should be only) review
+    const reviewDoc = reviewSnapshot.docs[0];
+    return {
+      id: reviewDoc.id,
+      ...reviewDoc.data()
+    };
+  } catch (error) {
+    console.error('Error fetching user review for product:', error);
+    throw error;
+  }
+};
+
 // Get all reviews (for admin)
 export const getAllReviews = async () => {
   try {
