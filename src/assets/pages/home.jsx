@@ -252,12 +252,12 @@ const Home = () => {
     }
   ];
 
-  // Categories data
+  // Categories data - Updated to use local images from public folder with correct base path
   const categories = [
-    { id: 1, name: "Moños Clásicos", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" },
-    { id: 2, name: "Moños Modernos", image: "https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" },
-    { id: 3, name: "Moños Infantiles", image: "https://images.unsplash.com/photo-1595173425119-1c5134b706b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" },
-    { id: 4, name: "Moños para Damas", image: "https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" }
+    { id: 1, name: "Moños Clásicos", image: "/psg-shop/clasicos.jpg" },
+    { id: 2, name: "Moños Modernos", image: "/psg-shop/modernos.jpg" },
+    { id: 3, name: "Moños Infantiles", image: "/psg-shop/infantiles.jpg" },
+    { id: 4, name: "Moños para Damas", image: "/psg-shop/dama.jpg" }
   ];
 
   // Handle touch events for mobile swipe
@@ -329,37 +329,37 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section - New design with cards and gradient */}
-      <section className="flex flex-col lg:flex-row gap-6 p-6 max-w-7xl mx-auto">
+      <section className="flex flex-col gap-6 p-6 mx-auto lg:flex-row max-w-7xl">
         {/* Bloque principal */}
-        <div className="flex-1 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-8 flex flex-col lg:flex-row items-center justify-between shadow-sm">
+        <div className="flex flex-col items-center justify-between flex-1 p-8 shadow-sm bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl lg:flex-row">
           <div className="max-w-md">
             {/* Etiqueta superior */}
             <div className="flex items-center gap-2 mb-4">
-              <span className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-3 py-1 rounded-full">
+              <span className="px-3 py-1 text-xs font-semibold text-indigo-800 bg-indigo-100 rounded-full">
                 NUEVO
               </span>
-              <span className="text-sm bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-3 py-1 rounded-full flex items-center gap-1">
+              <span className="flex items-center gap-1 px-3 py-1 text-sm text-white rounded-full bg-gradient-to-r from-indigo-600 to-purple-700">
                 ¡Envío gratis en compras mayores a $100.000!
                 <span className="text-white">→</span>
               </span>
             </div>
 
             {/* Título */}
-            <h1 className="text-3xl md:text-4xl font-semibold leading-snug mb-4 text-gray-900">
+            <h1 className="mb-4 text-3xl font-semibold leading-snug text-gray-900 md:text-4xl">
               Elegancia en cada{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-700">detalle</span>{" "}
               perfecto
             </h1>
 
             {/* Descripción */}
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="mb-6 text-sm text-gray-600">
               Colección exclusiva de moños artesanales para todas las ocasiones. Calidad premium, diseño único y entrega rápida.
             </p>
 
             {/* Botón */}
             <Link
               to="/shop"
-              className="bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-semibold text-sm transition shadow-md hover:shadow-lg"
+              className="px-6 py-3 text-sm font-semibold text-white transition rounded-lg shadow-md bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 hover:shadow-lg"
             >
               VER CATÁLOGO
             </Link>
@@ -368,9 +368,9 @@ const Home = () => {
           {/* Imagen principal */}
           <div className="mt-6 lg:mt-0">
             <img
-              src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+              src="/psg-shop/mejores.jpg"
               alt="Elegante colección de moños"
-              className="w-64 md:w-72 rounded-xl object-cover"
+              className="object-cover w-64 md:w-72 rounded-xl rotate-270"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = 'https://via.placeholder.com/600x600.png?text=Elegante+Colecci%C3%B3n+de+Mo%C3%B1os';
@@ -382,22 +382,22 @@ const Home = () => {
         {/* Panel lateral derecho */}
         <div className="flex flex-col gap-6 md:w-1/3">
           {/* Tarjeta 1 */}
-          <div className="bg-indigo-100 rounded-2xl p-6 flex items-center justify-between shadow-sm h-full">
+          <div className="flex items-center justify-between h-full p-6 bg-indigo-100 shadow-sm rounded-2xl">
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="mb-2 text-xl font-semibold text-gray-900">
                 Mejores <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-700">moños</span>
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="mb-4 text-sm text-gray-600">
                 Descubre nuestra selección premium de moños artesanales
               </p>
-              <Link to="/shop" className="text-sm bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-4 py-2 rounded-lg inline-flex items-center gap-1 hover:from-indigo-700 hover:to-purple-800 transition">
+              <Link to="/shop" className="inline-flex items-center gap-1 px-4 py-2 text-sm text-white transition rounded-lg bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800">
                 Ver más →
               </Link>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+              src="/psg-shop/counteer.jpg"
               alt="Moño elegante"
-              className="w-20 h-20 object-contain rounded-lg ml-4"
+              className="object-contain w-20 h-20 ml-4 rounded-lg"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = 'https://via.placeholder.com/100x100.png?text=Moño';
@@ -406,22 +406,22 @@ const Home = () => {
           </div>
 
           {/* Tarjeta 2 */}
-          <div className="bg-purple-100 rounded-2xl p-6 flex items-center justify-between shadow-sm h-full">
+          <div className="flex items-center justify-between h-full p-6 bg-purple-100 shadow-sm rounded-2xl">
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="mb-2 text-xl font-semibold text-gray-900">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-700">20%</span> de descuento
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="mb-4 text-sm text-gray-600">
                 En nuestra colección de moños especiales por tiempo limitado
               </p>
-              <Link to="/shop" className="text-sm bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-4 py-2 rounded-lg inline-flex items-center gap-1 hover:from-indigo-700 hover:to-purple-800 transition">
+              <Link to="/shop" className="inline-flex items-center gap-1 px-4 py-2 text-sm text-white transition rounded-lg bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800">
                 Ver más →
               </Link>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+              src="/psg-shop/discount.jpg"
               alt="Moño en oferta"
-              className="w-20 h-20 object-contain rounded-lg ml-4"
+              className="object-contain w-20 h-20 ml-4 rounded-lg"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = 'https://via.placeholder.com/100x100.png?text=Oferta';
@@ -646,8 +646,8 @@ const Home = () => {
       <div className="py-16 bg-white">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
-            <h2 className="text-4xl font-semibold mb-4 text-gray-900">Lo que dicen nuestros clientes</h2>
-            <p className="text-gray-600 mb-12 max-w-2xl mx-auto">
+            <h2 className="mb-4 text-4xl font-semibold text-gray-900">Lo que dicen nuestros clientes</h2>
+            <p className="max-w-2xl mx-auto mb-12 text-gray-600">
               Descubre lo que nuestros clientes satisfechos tienen que decir sobre sus experiencias con nuestros productos/servicios.
             </p>
           </div>
@@ -668,7 +668,7 @@ const Home = () => {
                 onMouseLeave={handleMouseLeave}
               >
                 <div 
-                  className="transition-all duration-500 ease-in-out flex"
+                  className="flex transition-all duration-500 ease-in-out"
                   style={{ transform: `translateX(-${currentTestimonial * 100}%)` }}
                 >
                   {testimonials.map((testimonial, index) => (
@@ -676,7 +676,7 @@ const Home = () => {
                       key={testimonial.id} 
                       className="flex-shrink-0 w-full px-4"
                     >
-                      <div className="mx-auto rounded-2xl bg-white shadow-lg hover:shadow-xl transition relative border border-gray-100 testimonial-card">
+                      <div className="relative mx-auto transition bg-white border border-gray-100 shadow-lg rounded-2xl hover:shadow-xl testimonial-card">
                         <div className="p-6 md:p-8">
                           <div className="flex flex-col items-center text-center">
                             {/* Testimonial Image */}
@@ -685,15 +685,15 @@ const Home = () => {
                                 <img
                                   src={`https://ui-avatars.com/api/?name=${encodeURIComponent(testimonial.name)}&background=4f46e5&color=ffffff&size=64`}
                                   alt={testimonial.name}
-                                  className="rounded-full mx-auto"
+                                  className="mx-auto rounded-full"
                                 />
                               </div>
                             </div>
                             
                             {/* Testimonial Content */}
                             <div className="flex-1">
-                              <h3 className="text-lg font-semibold mb-1 text-gray-900">{testimonial.name}</h3>
-                              <p className="text-sm text-indigo-600 mb-2">{testimonial.role}</p>
+                              <h3 className="mb-1 text-lg font-semibold text-gray-900">{testimonial.name}</h3>
+                              <p className="mb-2 text-sm text-indigo-600">{testimonial.role}</p>
                               
                               <div className="flex justify-center mb-3">
                                 {[...Array(testimonial.rating)].map((_, i) => (
@@ -704,9 +704,9 @@ const Home = () => {
                                 <span className="ml-2 text-sm text-gray-500">({testimonial.rating})</span>
                               </div>
                               
-                              <div className="border-t border-gray-200 my-4"></div>
+                              <div className="my-4 border-t border-gray-200"></div>
                               
-                              <blockquote className="text-gray-600 text-sm md:text-base italic px-2">
+                              <blockquote className="px-2 text-sm italic text-gray-600 md:text-base">
                                 "{testimonial.text}"
                               </blockquote>
                             </div>
@@ -754,7 +754,7 @@ const Home = () => {
             <div className="overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl">
               <div className="h-48 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+                  src="/psg-shop/trayectoria.jpg" 
                   alt="Nuestra Historia" 
                   className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
                 />
@@ -783,7 +783,7 @@ const Home = () => {
             <div className="overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl">
               <div className="h-48 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1595173425119-1c5134b706b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+                  src="/psg-shop/compromiso.jpg" 
                   alt="Nuestros Valores" 
                   className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
                 />
@@ -812,7 +812,7 @@ const Home = () => {
             <div className="overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl">
               <div className="h-48 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1611849785508-1f152a6489d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+                 src="/psg-shop/talento.jpg" 
                   alt="Nuestro Equipo" 
                   className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
                 />
