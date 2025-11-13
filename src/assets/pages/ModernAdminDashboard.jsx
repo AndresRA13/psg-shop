@@ -18,6 +18,7 @@ import { getAllUsers, updateUserRole as updateUserServiceRole } from '../../serv
 import { getAllReviews, deleteReview, updateReview } from '../../services/reviewService';
 import { getAllOrders, updateOrderStatus, getOrderStatusText, getStatusBadgeClass } from '../../services/orderService';
 import { getSalesData, getSalesByCategory, getOrderStatusDistribution, getTopSellingProducts, getUserRegistrationData, getRevenueByPaymentMethod } from '../../services/analyticsService';
+import { getCategories, createCategory, updateCategory, deleteCategory, uploadCategoryImage } from '../../services/categoryService';
 import CouponManager from '../../components/CouponManager';
 import OrderDetailsModal from '../../components/OrderDetailsModal';
 import StarRating from '../../components/StarRating';
@@ -31,7 +32,7 @@ import UserRegistrationChart from '../../components/charts/UserRegistrationChart
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
-import { FiMenu, FiX, FiHome, FiShoppingBag, FiUsers, FiMessageSquare, FiTag, FiPackage, FiBarChart2, FiPlus, FiEdit, FiTrash2, FiLogOut, FiShoppingCart, FiSun, FiMoon } from 'react-icons/fi';
+import { FiMenu, FiX, FiHome, FiShoppingBag, FiUsers, FiMessageSquare, FiTag, FiPackage, FiBarChart2, FiPlus, FiEdit, FiTrash2, FiLogOut, FiShoppingCart, FiSun, FiMoon, FiList } from 'react-icons/fi';
 
 const ModernAdminDashboard = () => {
   const { currentUser, isAdmin } = useAuth();
@@ -111,6 +112,19 @@ const ModernAdminDashboard = () => {
   // Role filter state for users
   const [userRoleFilter, setUserRoleFilter] = useState('all');
   
+  // Categories state
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [newCategory, setNewCategory] = useState({ name: '', description: '' });
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [categoryModalMode, setCategoryModalMode] = useState('add'); // 'add' or 'edit'
+  const [categorySearchTerm, setCategorySearchTerm] = useState('');
+  const [categoryImage, setCategoryImage] = useState(null);
+  const [categoryImagePreview, setCategoryImagePreview] = useState(null);
+  const [editingCategoryImage, setEditingCategoryImage] = useState(null);
+  const [editingCategoryImagePreview, setEditingCategoryImagePreview] = useState(null);
+  
   // Admin profile menu
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef(null);
@@ -172,6 +186,206 @@ const ModernAdminDashboard = () => {
   // Close profile menu
   const closeProfileMenu = () => {
     setIsProfileMenuOpen(false);
+  };
+
+  // Fetch categories
+  const fetchCategories = async () => {
+    try {
+      setCategoriesLoading(true);
+      const categoriesList = await getCategories();
+      console.log('Fetched categories:', categoriesList);
+      setCategories(categoriesList);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setError('Error al cargar las categorías');
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
+
+  // Handle category form changes
+  const handleCategoryChange = (e) => {
+    setNewCategory({ ...newCategory, [e.target.name]: e.target.value });
+  };
+
+  // Handle edit category form changes
+  const handleEditCategoryChange = (e) => {
+    setEditingCategory({ ...editingCategory, [e.target.name]: e.target.value });
+  };
+
+  // Handle category image upload and convert to base64
+  const handleCategoryImageUpload = async (e, isEditing = false) => {
+    try {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+        const errorMsg = "Por favor, sube una imagen válida (JPEG, JPG, PNG, GIF).";
+        console.error('File type validation error:', errorMsg);
+        setError(errorMsg);
+        alert(errorMsg);
+        return;
+      }
+
+      // Validate file size (max 1MB to avoid Firestore limits)
+      if (file.size > 1024 * 1024) {
+        const errorMsg = "La imagen debe ser menor a 1MB.";
+        console.error('File size validation error:', errorMsg);
+        setError(errorMsg);
+        alert(errorMsg);
+        return;
+      }
+
+      // Convert file to base64
+      const base64Data = await fileToBase64(file);
+      
+      if (isEditing) {
+        setEditingCategoryImage(base64Data);
+        setEditingCategoryImagePreview(base64Data);
+      } else {
+        setCategoryImage(base64Data);
+        setCategoryImagePreview(base64Data);
+      }
+    } catch (err) {
+      console.error("Error handling image upload: ", err);
+      const errorMsg = `Error al procesar la imagen: ${err.message || 'Unknown error'}`;
+      setError(errorMsg);
+      alert(errorMsg);
+    }
+  };
+
+  // Clear category image
+  const clearCategoryImage = (isEditing = false) => {
+    if (isEditing) {
+      setEditingCategoryImage(null);
+      setEditingCategoryImagePreview(null);
+      if (editingCategory?.imageUrl) {
+        setEditingCategory({ ...editingCategory, imageUrl: null });
+      }
+    } else {
+      setCategoryImage(null);
+      setCategoryImagePreview(null);
+      setNewCategory({ ...newCategory, imageUrl: null });
+    }
+  };
+
+  // Create category
+  const createCategoryHandler = async (e) => {
+    e.preventDefault();
+    console.log('Attempting to create category with data:', newCategory);
+    
+    // Validate category name
+    if (!newCategory.name || newCategory.name.trim() === '') {
+      const errorMsg = "Por favor, introduce un nombre para la categoría.";
+      console.error('Validation error:', errorMsg);
+      setError(errorMsg);
+      alert(errorMsg);
+      return;
+    }
+    
+    try {
+      // Prepare category data
+      const categoryData = { ...newCategory };
+      
+      // If there's an image, add it as base64
+      if (categoryImage) {
+        categoryData.imageUrl = categoryImage;
+      }
+      
+      console.log('Creating category with data:', categoryData);
+      
+      // Create the category with all data including image
+      const createdCategory = await createCategory(categoryData);
+      console.log('Category created:', createdCategory);
+      
+      if (!createdCategory || !createdCategory.id) {
+        throw new Error('Failed to create category');
+      }
+      
+      setNewCategory({ name: '', description: '' });
+      setCategoryImage(null);
+      setCategoryImagePreview(null);
+      showSuccessMessage("Categoría creada exitosamente!");
+      alert("Categoría creada exitosamente!");
+      setCategoryModalOpen(false);
+      fetchCategories();
+    } catch (err) {
+      console.error("Error creating category: ", err);
+      setUploading(false);
+      const errorMsg = `Error al crear la categoría: ${err.message || 'Unknown error'}. ¿Tienes permisos de escritura?`;
+      setError(errorMsg);
+      // Also show error in an alert for better visibility
+      alert(errorMsg);
+    }
+  };
+
+  // Update category
+  const updateCategoryHandler = async (e) => {
+    e.preventDefault();
+    if (!editingCategory.name) {
+      const errorMsg = "Por favor, introduce un nombre para la categoría.";
+      setError(errorMsg);
+      alert(errorMsg);
+      return;
+    }
+    
+    try {
+      // Update the category data
+      const categoryData = { ...editingCategory };
+      
+      // If there's a new image, use the base64 data
+      if (editingCategoryImage) {
+        categoryData.imageUrl = editingCategoryImage;
+      }
+      
+      await updateCategory(editingCategory.id, categoryData);
+      showSuccessMessage("Categoría actualizada exitosamente!");
+      alert("Categoría actualizada exitosamente!");
+      setCategoryModalOpen(false);
+      setEditingCategory(null);
+      setEditingCategoryImage(null);
+      setEditingCategoryImagePreview(null);
+      fetchCategories();
+    } catch (err) {
+      console.error("Error updating category: ", err);
+      setUploading(false);
+      const errorMsg = "Error al actualizar la categoría. ¿Tienes permisos de escritura?";
+      setError(errorMsg);
+      alert(errorMsg);
+    }
+  };
+
+  // Delete category
+  const deleteCategoryHandler = async (id, name) => {
+    const confirmDelete = window.confirm(`¿Estás seguro de que quieres eliminar la categoría "${name}"?`);
+    if (!confirmDelete) return;
+
+    try {
+      await deleteCategory(id);
+      setCategories(categories.filter((category) => category.id !== id));
+      showSuccessMessage("Categoría eliminada exitosamente!");
+    } catch (err) {
+      console.error("Error deleting category: ", err);
+      setError("Error al eliminar la categoría. ¿Tienes permisos de escritura?");
+    }
+  };
+
+  // Open add category modal
+  const openAddCategoryModal = () => {
+    setNewCategory({ name: '', description: '' });
+    setCategoryModalMode('add');
+    setCategoryModalOpen(true);
+  };
+
+  // Open edit category modal
+  const openEditCategoryModal = (category) => {
+    setEditingCategory({ ...category });
+    setEditingCategoryImage(null);
+    setEditingCategoryImagePreview(null);
+    setCategoryModalMode('edit');
+    setCategoryModalOpen(true);
   };
 
   // Handle logout
@@ -251,11 +465,9 @@ const ModernAdminDashboard = () => {
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({ ...selectedOrder, orderStatus: newStatus, updatedAt: new Date() });
       }
-      
-      showSuccessMessage(`Estado del pedido actualizado a ${getOrderStatusText(newStatus)}`);
-    } catch (error) {
-      console.error("Error updating order status:", error);
-      setError("Error al actualizar el estado del pedido");
+    } catch (err) {
+      console.error('Error updating order status:', err);
+      setError('Error al actualizar el estado del pedido. Por favor, intenta de nuevo.');
     } finally {
       setOrderStatusUpdating(prev => ({ ...prev, [orderId]: false }));
     }
@@ -447,6 +659,7 @@ const ModernAdminDashboard = () => {
         case 'products':
           setProductsLoading(true);
           fetchProducts();
+          fetchCategories();
           break;
         case 'users':
           setUsersLoading(true);
@@ -459,6 +672,10 @@ const ModernAdminDashboard = () => {
         case 'orders':
           setOrdersLoading(true);
           fetchOrders();
+          break;
+        case 'categories':
+          setCategoriesLoading(true);
+          fetchCategories();
           break;
         default:
           fetchDashboardStats();
@@ -864,6 +1081,7 @@ const ModernAdminDashboard = () => {
   const navItems = [
     { id: 'analytics', label: 'Analytics', icon: <FiBarChart2 /> },
     { id: 'products', label: 'Productos', icon: <FiShoppingBag /> },
+    { id: 'categories', label: 'Categorías', icon: <FiList /> },
     { id: 'users', label: 'Usuarios', icon: <FiUsers /> },
     { id: 'reviews', label: 'Reviews', icon: <FiMessageSquare /> },
     { id: 'coupons', label: 'Cupones', icon: <FiTag /> },
@@ -1450,6 +1668,111 @@ const ModernAdminDashboard = () => {
           </div>
         );
       case 'coupons':
+        case 'categories':
+        if (categoriesLoading) {
+          return <Loader text="Cargando categorías..." size="lg" />;
+        }
+        // Filter categories based on search term
+        const filteredCategories = categorySearchTerm
+          ? categories.filter(category =>
+              category.name.toLowerCase().includes(categorySearchTerm.toLowerCase()) ||
+              (category.description && category.description.toLowerCase().includes(categorySearchTerm.toLowerCase()))
+            )
+          : categories;
+
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todas las categorías</h2>
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Buscar categorías..."
+                    value={categorySearchTerm}
+                    onChange={(e) => setCategorySearchTerm(e.target.value)}
+                    className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                  />
+                  <FiList className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  }`} />
+                </div>
+                <button 
+                  onClick={openAddCategoryModal} 
+                  className={`flex items-center px-4 py-2 text-sm font-medium rounded-full ${
+                    theme === 'dark' 
+                      ? 'text-gray-200 bg-gray-700 hover:bg-gray-600' 
+                      : 'text-gray-700 bg-gray-200 hover:bg-gray-300'
+                  }`}
+                >
+                  <FiPlus className="mr-1" />
+                  Añadir Nueva
+                </button>
+              </div>
+            </div>
+            <div className="w-full overflow-x-auto">
+              <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                <thead>
+                  <tr>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Imagen</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Descripción</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                  {filteredCategories.map((category) => (
+                    <tr key={category.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {category.imageUrl ? (
+                          <img 
+                            src={category.imageUrl} 
+                            alt={category.name} 
+                            className="object-cover w-12 h-12 rounded-lg"
+                          />
+                        ) : (
+                          <div className={`flex items-center justify-center w-12 h-12 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                            <FiList className={`w-6 h-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                          </div>
+                        )}
+                      </td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{category.name}</td>
+                      <td className={`px-6 py-4 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{category.description || 'Sin descripción'}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                        <button 
+                          onClick={() => openEditCategoryModal(category)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                          }`}
+                        >
+                          <FiEdit />
+                        </button>
+                        <button 
+                          onClick={() => deleteCategoryHandler(category.id, category.name)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                          }`}
+                        >
+                          <FiTrash2 />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {filteredCategories.length === 0 && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {categorySearchTerm ? 'No se encontraron categorías que coincidan con la búsqueda.' : 'No hay categorías disponibles.'}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      case 'coupons':
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -1848,24 +2171,15 @@ const ModernAdminDashboard = () => {
                         <option value="" className={theme === 'dark' ? 'bg-gray-700' : 'bg-white'}>
                           Seleccionar categoría
                         </option>
-                        <option value="Moños Elegantes" className={theme === 'dark' ? 'bg-gray-700' : 'bg-white'}>
-                          Moños Elegantes
-                        </option>
-                        <option value="Moños Infantiles" className={theme === 'dark' ? 'bg-gray-700' : 'bg-white'}>
-                          Moños Infantiles
-                        </option>
-                        <option value="Moños Deportivos" className={theme === 'dark' ? 'bg-gray-700' : 'bg-white'}>
-                          Moños Deportivos
-                        </option>
-                        <option value="Moños Casuales" className={theme === 'dark' ? 'bg-gray-700' : 'bg-white'}>
-                          Moños Casuales
-                        </option>
-                        <option value="Moños de Novia" className={theme === 'dark' ? 'bg-gray-700' : 'bg-white'}>
-                          Moños de Novia
-                        </option>
-                        <option value="Moños de Gala" className={theme === 'dark' ? 'bg-gray-700' : 'bg-white'}>
-                          Moños de Gala
-                        </option>
+                        {categories.map((category) => (
+                          <option 
+                            key={category.id} 
+                            value={category.name} 
+                            className={theme === 'dark' ? 'bg-gray-700' : 'bg-white'}
+                          >
+                            {category.name}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     
@@ -2108,6 +2422,147 @@ const ModernAdminDashboard = () => {
                         } border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2`}
                       >
                         Guardar Cambios
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Order Details Modal */}
+      {/* Category Modal */}
+      {categoryModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div 
+              className="fixed transition-opacity bg-opacity-50" 
+              aria-hidden="true"
+              onClick={() => setCategoryModalOpen(false)}
+            ></div>
+            
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            {/* Modern Modal Design */}
+            <div className={`z-50 inline-block overflow-hidden text-left align-bottom transition-all transform shadow-xl rounded-2xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full ${
+              theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+            }`} style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.1)', width: '650px' }}>
+              <div className="px-8 py-8">
+                <div className="mb-8 text-center">
+                  <h3 className={`text-2xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {categoryModalMode === 'add' ? 'Añadir Categoría' : 'Editar Categoría'}
+                  </h3>
+                  <p className={`mt-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {categoryModalMode === 'add' ? 'Ingresa los detalles de la nueva categoría' : 'Modifica la información de la categoría'}
+                  </p>
+                </div>
+                
+                <div className="mt-2">
+                  <form onSubmit={categoryModalMode === 'add' ? createCategoryHandler : updateCategoryHandler} className="space-y-6">
+                    <div>
+                      <label className={`block mb-3 text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Nombre de la Categoría</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={categoryModalMode === 'add' ? newCategory.name : editingCategory?.name}
+                        onChange={categoryModalMode === 'add' ? handleCategoryChange : handleEditCategoryChange}
+                        className={`w-full px-4 py-3 transition-all border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                          theme === 'dark' 
+                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                        }`}
+                        placeholder="Nombre de la categoría"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className={`block mb-3 text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                      <textarea
+                        name="description"
+                        value={categoryModalMode === 'add' ? newCategory.description : editingCategory?.description}
+                        onChange={categoryModalMode === 'add' ? handleCategoryChange : handleEditCategoryChange}
+                        className={`w-full px-4 py-3 transition-all border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                          theme === 'dark' 
+                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                        }`}
+                        rows="4"
+                        placeholder="Descripción de la categoría"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className={`block mb-3 text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imagen de la Categoría</label>
+                      <div className="mt-2">
+                        {/* Image preview */}
+                        {(categoryModalMode === 'add' && categoryImagePreview) || (categoryModalMode === 'edit' && (editingCategoryImagePreview || editingCategory?.imageUrl)) ? (
+                          <div className="relative mb-4">
+                            <img 
+                              src={categoryModalMode === 'add' ? categoryImagePreview : (editingCategoryImagePreview || editingCategory?.imageUrl)} 
+                              alt="Preview" 
+                              className="object-cover w-32 h-32 rounded-lg"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => clearCategoryImage(categoryModalMode === 'edit')}
+                              className="absolute top-0 right-0 p-1 text-white bg-red-600 rounded-full hover:bg-red-700"
+                            >
+                              <FiX size={16} />
+                            </button>
+                          </div>
+                        ) : null}
+                        
+                        {/* Upload button - only show if no image is selected */}
+                        {((categoryModalMode === 'add' && !categoryImagePreview) || (categoryModalMode === 'edit' && !editingCategoryImagePreview && !editingCategory?.imageUrl)) ? (
+                          <label className={`flex flex-col items-center justify-center px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer ${
+                            theme === 'dark' 
+                              ? 'border-gray-600 hover:border-gray-500 bg-gray-700' 
+                              : 'border-gray-300 hover:border-gray-400 bg-gray-50'
+                          }`}>
+                            <FiPlus className={`w-8 h-8 mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                            <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                              Seleccionar imagen
+                            </span>
+                            <input 
+                              type="file" 
+                              className="hidden" 
+                              accept="image/*" 
+                              onChange={(e) => handleCategoryImageUpload(e, categoryModalMode === 'edit')}
+                            />
+                          </label>
+                        ) : null}
+                        <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                          PNG, JPG, GIF hasta 2MB
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className={`flex justify-between px-8 py-5 border-t ${
+                      theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
+                    }`}>
+                      <button
+                        type="button"
+                        onClick={() => setCategoryModalOpen(false)}
+                        className={`inline-flex justify-center px-5 py-2.5 text-sm font-medium rounded-lg transition-all ${
+                          theme === 'dark' 
+                            ? 'text-gray-300 bg-gray-700 border border-gray-600 hover:bg-gray-600' 
+                            : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                        } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        className={`inline-flex justify-center px-5 py-2.5 text-sm font-medium text-white rounded-lg transition-all ${
+                          theme === 'dark' 
+                            ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500' 
+                            : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                        } border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2`}
+                      >
+                        {categoryModalMode === 'add' ? 'Añadir Categoría' : 'Actualizar Categoría'}
                       </button>
                     </div>
                   </form>

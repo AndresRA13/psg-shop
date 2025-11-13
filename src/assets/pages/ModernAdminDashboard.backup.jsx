@@ -18,9 +18,11 @@ import { getAllUsers, updateUserRole as updateUserServiceRole } from '../../serv
 import { getAllReviews, deleteReview, updateReview } from '../../services/reviewService';
 import { getAllOrders, updateOrderStatus, getOrderStatusText, getStatusBadgeClass } from '../../services/orderService';
 import { getSalesData, getSalesByCategory, getOrderStatusDistribution, getTopSellingProducts, getUserRegistrationData, getRevenueByPaymentMethod } from '../../services/analyticsService';
+import { getCategories, createCategory, updateCategory, deleteCategory } from '../../services/categoryService';
 import CouponManager from '../../components/CouponManager';
 import OrderDetailsModal from '../../components/OrderDetailsModal';
 import StarRating from '../../components/StarRating';
+import Loader from '../../components/Loader';
 // Add chart components imports
 import SalesTrendChart from '../../components/charts/SalesTrendChart';
 import SalesByCategoryChart from '../../components/charts/SalesByCategoryChart';
@@ -30,7 +32,7 @@ import UserRegistrationChart from '../../components/charts/UserRegistrationChart
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
-import { FiMenu, FiX, FiHome, FiShoppingBag, FiUsers, FiMessageSquare, FiTag, FiPackage, FiBarChart2, FiPlus, FiEdit, FiTrash2, FiLogOut, FiShoppingCart, FiSun, FiMoon } from 'react-icons/fi';
+import { FiMenu, FiX, FiHome, FiShoppingBag, FiUsers, FiMessageSquare, FiTag, FiPackage, FiBarChart2, FiPlus, FiEdit, FiTrash2, FiLogOut, FiShoppingCart, FiSun, FiMoon, FiList } from 'react-icons/fi';
 
 const ModernAdminDashboard = () => {
   const { currentUser, isAdmin } = useAuth();
@@ -78,6 +80,14 @@ const ModernAdminDashboard = () => {
   const [productModalOpen, setProductModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
   
+  // Categories state
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [newCategory, setNewCategory] = useState({ name: '' });
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [categoryModalMode, setCategoryModalMode] = useState('add'); // 'add' or 'edit'
+  
   // Users state
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
@@ -97,6 +107,21 @@ const ModernAdminDashboard = () => {
   
   // Search state for products
   const [productSearchTerm, setProductSearchTerm] = useState('');
+  
+  // Search state for reviews
+  const [reviewSearchTerm, setReviewSearchTerm] = useState('');
+  
+  // Search state for orders
+  const [orderSearchTerm, setOrderSearchTerm] = useState('');
+  
+  // Search state for users
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+  
+  // Search state for categories
+  const [categorySearchTerm, setCategorySearchTerm] = useState('');
+  
+  // Role filter state for users
+  const [userRoleFilter, setUserRoleFilter] = useState('all');
   
   // Admin profile menu
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -198,6 +223,26 @@ const ModernAdminDashboard = () => {
       return date.toDate().toLocaleDateString('es-CO');
     }
     return 'N/A';
+  };
+
+  // Delete order function
+  const deleteOrder = async (orderId) => {
+    const confirmDelete = window.confirm('¿Estás seguro de que quieres eliminar este pedido? Esta acción no se puede deshacer.');
+    if (!confirmDelete) return;
+
+    try {
+      const orderDoc = doc(db, 'orders', orderId);
+      await deleteDoc(orderDoc);
+      
+      // Update the orders state to remove the deleted order
+      setOrders(orders.filter(order => order.id !== orderId));
+      
+      // Show success message
+      showSuccessMessage('Pedido eliminado exitosamente!');
+    } catch (err) {
+      console.error('Error deleting order:', err);
+      setError('Error al eliminar el pedido. Por favor, intenta de nuevo.');
+    }
   };
 
   // Update order status
@@ -397,6 +442,96 @@ const ModernAdminDashboard = () => {
     }
   };
 
+  // Fetch categories
+  const fetchCategories = async () => {
+    try {
+      setCategoriesLoading(true);
+      const categoriesList = await getCategories();
+      setCategories(categoriesList);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setError('Error al cargar las categorías');
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
+
+  // Create category
+  const createCategoryHandler = async (e) => {
+    e.preventDefault();
+    if (!newCategory.name.trim()) {
+      setError("Por favor, introduce un nombre para la categoría.");
+      return;
+    }
+    
+    try {
+      await createCategory({ name: newCategory.name.trim() });
+      setNewCategory({ name: '' });
+      showSuccessMessage("Categoría creada exitosamente!");
+      setCategoryModalOpen(false);
+      fetchCategories();
+    } catch (err) {
+      console.error("Firebase error: ", err);
+      setError("Error al crear la categoría. ¿Tienes permisos de escritura?");
+    }
+  };
+
+  // Update category
+  const updateCategoryHandler = async (e) => {
+    e.preventDefault();
+    if (!editingCategory.name.trim()) {
+      setError("Por favor, introduce un nombre para la categoría.");
+      return;
+    }
+    
+    try {
+      await updateCategory(editingCategory.id, { name: editingCategory.name.trim() });
+      setEditingCategory(null);
+      showSuccessMessage("Categoría actualizada exitosamente!");
+      setCategoryModalOpen(false);
+      fetchCategories();
+    } catch (err) {
+      console.error("Firebase error: ", err);
+      setError("Error al actualizar la categoría. ¿Tienes permisos de escritura?");
+    }
+  };
+
+  // Delete category
+  const deleteCategoryHandler = async (id) => {
+    const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar esta categoría?");
+    if (!confirmDelete) return;
+
+    try {
+      await deleteCategory(id);
+      showSuccessMessage("Categoría eliminada exitosamente!");
+      fetchCategories();
+    } catch (err) {
+      console.error("Firebase error: ", err);
+      setError("Error al eliminar la categoría. ¿Tienes permisos de escritura?");
+    }
+  };
+
+  // Open add category modal
+  const openAddCategoryModal = () => {
+    setNewCategory({ name: '' });
+    setCategoryModalMode('add');
+    setCategoryModalOpen(true);
+  };
+
+  // Open edit category modal
+  const openEditCategoryModal = (category) => {
+    setEditingCategory({ ...category });
+    setCategoryModalMode('edit');
+    setCategoryModalOpen(true);
+  };
+
+  // Filter categories based on search term
+  const filteredCategories = categorySearchTerm
+    ? categories.filter(category =>
+        category.name.toLowerCase().includes(categorySearchTerm.toLowerCase())
+      )
+    : categories;
+
   // Initialize data based on active section
   useEffect(() => {
     if (isAdmin) {
@@ -414,6 +549,7 @@ const ModernAdminDashboard = () => {
         case 'products':
           setProductsLoading(true);
           fetchProducts();
+          fetchCategories();
           break;
         case 'users':
           setUsersLoading(true);
@@ -831,9 +967,10 @@ const ModernAdminDashboard = () => {
   const navItems = [
     { id: 'analytics', label: 'Analytics', icon: <FiBarChart2 /> },
     { id: 'products', label: 'Productos', icon: <FiShoppingBag /> },
+    { id: 'categories', label: 'Categorías', icon: <FiList /> },
     { id: 'users', label: 'Usuarios', icon: <FiUsers /> },
     { id: 'reviews', label: 'Reviews', icon: <FiMessageSquare /> },
-    { id: 'coupons', label: 'Códigos Promocionales', icon: <FiTag /> },
+    { id: 'coupons', label: 'Cupones', icon: <FiTag /> },
     { id: 'orders', label: 'Pedidos', icon: <FiPackage /> },
   ];
 
@@ -841,6 +978,9 @@ const ModernAdminDashboard = () => {
   const renderContent = () => {
     switch (activeSection) {
       case 'analytics':
+        if (loading) {
+          return <Loader text="Cargando datos analíticos..." size="lg" />;
+        }
         return (
           <div className="w-full space-y-6">
             {/* Date Range Selector */}
@@ -1044,6 +1184,9 @@ const ModernAdminDashboard = () => {
           </div>
         );
       case 'products':
+        if (productsLoading) {
+          return <Loader text="Cargando productos..." size="lg" />;
+        }
         // Filter products based on search term
         const filteredProducts = productSearchTerm
           ? products.filter(product =>
@@ -1134,71 +1277,140 @@ const ModernAdminDashboard = () => {
           </div>
         );
       case 'users':
+        if (usersLoading) {
+          return <Loader text="Cargando usuarios..." size="lg" />;
+        }
+        // Filter users based on search term and role filter
+        const filteredUsers = users.filter(user => {
+          // Apply search filter
+          const matchesSearch = !userSearchTerm || 
+            (user.email && user.email.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
+            (user.role && user.role.toLowerCase().includes(userSearchTerm.toLowerCase()));
+          
+          // Apply role filter
+          const matchesRole = userRoleFilter === 'all' || 
+            (userRoleFilter === 'admin' && user.role === 'admin') ||
+            (userRoleFilter === 'user' && user.role === 'user');
+          
+          return matchesSearch && matchesRole;
+        });
+
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los usuarios</h2>
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Buscar usuarios..."
+                    value={userSearchTerm}
+                    onChange={(e) => setUserSearchTerm(e.target.value)}
+                    className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                  />
+                  <FiUsers className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  }`} />
+                </div>
+                <select
+                  value={userRoleFilter}
+                  onChange={(e) => setUserRoleFilter(e.target.value)}
+                  className={`px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
+                >
+                  <option value="all">Todos</option>
+                  <option value="admin">Administradores</option>
+                  <option value="user">Clientes</option>
+                </select>
+              </div>
             </div>
             <div className="w-full overflow-x-auto">
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
                 <thead>
                   <tr>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Email</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Rol</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {users.map((user) => (
+                  {filteredUsers.map((user) => (
                     <tr key={user.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{user.email}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.name || 'N/A'}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.email}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.role}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
                         <button 
                           onClick={() => updateUserRole(user.id, user.role === 'admin' ? 'user' : 'admin')} 
-                          className={`px-3 py-1 text-xs rounded-md ${
-                            user.role === 'admin' 
-                              ? (theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800') 
-                              : (theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800')
-                          } hover:opacity-80`}
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-900'
+                          }`}
                         >
-                          {user.role === 'admin' ? 'Usuario' : 'Admin'}
+                          <FiEdit />
                         </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {filteredUsers.length === 0 && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {userSearchTerm ? 'No se encontraron usuarios que coincidan con la búsqueda.' : 'No hay usuarios disponibles.'}
+                </div>
+              )}
             </div>
           </div>
         );
       case 'reviews':
+        if (reviewsLoading) {
+          return <Loader text="Cargando reseñas..." size="lg" />;
+        }
+        // Filter reviews based on search term
+        const filteredReviews = reviews.filter(review =>
+          (review.productName && review.productName.toLowerCase().includes(reviewSearchTerm.toLowerCase())) ||
+          (review.createdAt && formatDate(review.createdAt).toLowerCase().includes(reviewSearchTerm.toLowerCase()))
+        );
+
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todas las reseñas</h2>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar reseñas..."
+                  value={reviewSearchTerm}
+                  onChange={(e) => setReviewSearchTerm(e.target.value)}
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <FiMessageSquare className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
             </div>
             <div className="w-full overflow-x-auto">
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
                 <thead>
                   <tr>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Usuario</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Producto</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Calificación</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Comentario</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {reviews.map((review) => (
+                  {filteredReviews.map((review) => (
                     <tr key={review.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{review.userEmail || 'Usuario eliminado'}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.productName || 'Producto eliminado'}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.rating}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.comment}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(review.createdAt)}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
                         <button 
@@ -1222,94 +1434,67 @@ const ModernAdminDashboard = () => {
                   ))}
                 </tbody>
               </table>
+              {filteredReviews.length === 0 && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {reviewSearchTerm ? 'No se encontraron reseñas que coincidan con la búsqueda.' : 'No hay reseñas disponibles.'}
+                </div>
+              )}
             </div>
           </div>
         );
-      case 'orders':
+      case 'users':
+        if (usersLoading) {
+          return <Loader text="Cargando usuarios..." size="lg" />;
+        }
+        // Filter users based on search term
+        const filteredUsers = userSearchTerm
+          ? users.filter(user =>
+              (user.name && user.name.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
+              (user.email && user.email.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
+              (user.role && user.role.toLowerCase().includes(userSearchTerm.toLowerCase()))
+            )
+          : users;
+
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los pedidos</h2>
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los usuarios</h2>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar usuarios..."
+                  value={userSearchTerm}
+                  onChange={(e) => setUserSearchTerm(e.target.value)}
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <FiUser className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
             </div>
             <div className="w-full overflow-x-auto">
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
                 <thead>
                   <tr>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Email</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Role</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {orders.map((order) => (
-                    <tr key={order.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.id.substring(0, 8)}...</td>
-                      <td className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.userEmail || 'N/A'}</td>
-                      <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(order.createdAt)}</td>
-                      <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatCurrency(order.totalAmount || 0)}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap`}>
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending', theme)}`}>
-                          {getOrderStatusText(order.orderStatus || 'pending')}
-                        </span>
-                      </td>
+                  {filteredUsers.map((user) => (
+                    <tr key={user._id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{user.name}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.email}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.role}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
                         <button 
-                          onClick={() => openOrderDetails(order)} 
-                          className={`p-1 rounded hover:opacity-80 ${
-                            theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
-                          }`}
-                        >
-                          <FiShoppingCart />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        );
-      case 'coupons':
-        return (
-          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los códigos promocionales</h2>
-            </div>
-            <div className="w-full overflow-x-auto">
-              <CouponManager />
-            </div>
-          </div>
-        );
-      default:
-        return (
-          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
-            </div>
-            <div className="w-full overflow-x-auto">
-              <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
-                <thead>
-                  <tr>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Producto</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Calificación</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Comentario</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {reviews.map((review) => (
-                    <tr key={review.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{review.productName}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.userEmail}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>
-                        <StarRating rating={review.rating} />
-                      </td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.comment}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
-                        <button 
-                          onClick={() => openEditReviewModal(review)} 
+                          onClick={() => openEditUserModal(user)} 
                           className={`p-1 rounded hover:opacity-80 ${
                             theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
                           }`}
@@ -1317,7 +1502,7 @@ const ModernAdminDashboard = () => {
                           <FiEdit />
                         </button>
                         <button 
-                          onClick={() => deleteReviewHandler(review.id)} 
+                          onClick={() => deleteUserHandler(user._id)} 
                           className={`p-1 rounded hover:opacity-80 ${
                             theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
                           }`}
@@ -1329,82 +1514,228 @@ const ModernAdminDashboard = () => {
                   ))}
                 </tbody>
               </table>
+              {filteredUsers.length === 0 && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {userSearchTerm ? 'No se encontraron usuarios que coincidan con la búsqueda.' : 'No hay usuarios disponibles.'}
+                </div>
+              )}
             </div>
           </div>
         );
-      case 'orders':
+      case 'categories':
+        if (categoriesLoading) {
+          return <Loader text="Cargando categorías..." size="lg" />;
+        }
+        // Filter categories based on search term
+        const filteredCategories = categorySearchTerm
+          ? categories.filter(category =>
+              (category.name && category.name.toLowerCase().includes(categorySearchTerm.toLowerCase()))
+            )
+          : categories;
+
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los pedidos</h2>
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todas las categorías</h2>
+              <div className="flex flex-wrap gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Buscar categorías..."
+                    value={categorySearchTerm}
+                    onChange={(e) => setCategorySearchTerm(e.target.value)}
+                    className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                  />
+                  <FiList className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  }`} />
+                </div>
+                <button
+                  onClick={openAddCategoryModal}
+                  className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
+                    theme === 'dark' 
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }`}
+                >
+                  <FiPlus className="mr-2" />
+                  Añadir Categoría
+                </button>
+              </div>
             </div>
             <div className="w-full overflow-x-auto">
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
                 <thead>
                   <tr>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>ID</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Cliente</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Total</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Estado</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {orders.map((order) => (
-                    <tr key={order.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                      <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{order.id.substring(0, 8)}...</td>
-                      <td className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.userEmail || 'N/A'}</td>
-                      <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(order.createdAt)}</td>
-                      <td className={`px-6 py-4 text-sm whitespace-nowrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatCurrency(order.totalAmount || 0)}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap`}>
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.orderStatus || 'pending', theme)}`}>
-                          {getOrderStatusText(order.orderStatus || 'pending')}
-                        </span>
-                      </td>
+                  {filteredCategories.map((category) => (
+                    <tr key={category.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{category.name}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
                         <button 
-                          onClick={() => openOrderDetails(order)} 
+                          onClick={() => openEditCategoryModal(category)} 
                           className={`p-1 rounded hover:opacity-80 ${
                             theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
                           }`}
                         >
-                          <FiPackage />
+                          <FiEdit />
+                        </button>
+                        <button 
+                          onClick={() => deleteCategoryHandler(category.id)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                          }`}
+                        >
+                          <FiTrash2 />
                         </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {filteredCategories.length === 0 && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {categorySearchTerm ? 'No se encontraron categorías que coincidan con la búsqueda.' : 'No hay categorías disponibles.'}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      case 'users':
+        if (usersLoading) {
+          return <Loader text="Cargando usuarios..." size="lg" />;
+        }
+        // Filter users based on search term
+        const filteredUsers = userSearchTerm
+          ? users.filter(user =>
+              (user.name && user.name.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
+              (user.email && user.email.toLowerCase().includes(userSearchTerm.toLowerCase())) ||
+              (user.role && user.role.toLowerCase().includes(userSearchTerm.toLowerCase()))
+            )
+          : users;
+
+        return (
+          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los usuarios</h2>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar usuarios..."
+                  value={userSearchTerm}
+                  onChange={(e) => setUserSearchTerm(e.target.value)}
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <FiUser className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
+            </div>
+            <div className="w-full overflow-x-auto">
+              <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                <thead>
+                  <tr>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Nombre</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Email</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Role</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
+                  {filteredUsers.map((user) => (
+                    <tr key={user._id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{user.name}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.email}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{user.role}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
+                        <button 
+                          onClick={() => openEditUserModal(user)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-indigo-600 hover:text-indigo-900'
+                          }`}
+                        >
+                          <FiEdit />
+                        </button>
+                        <button 
+                          onClick={() => deleteUserHandler(user._id)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                          }`}
+                        >
+                          <FiTrash2 />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {filteredUsers.length === 0 && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {userSearchTerm ? 'No se encontraron usuarios que coincidan con la búsqueda.' : 'No hay usuarios disponibles.'}
+                </div>
+              )}
             </div>
           </div>
         );
       case 'reviews':
+        if (reviewsLoading) {
+          return <Loader text="Cargando reseñas..." size="lg" />;
+        }
+        // Filter reviews based on search term
+        const filteredReviews = reviewSearchTerm
+          ? reviews.filter(review =>
+              (review.productName && review.productName.toLowerCase().includes(reviewSearchTerm.toLowerCase())) ||
+              (review.comment && review.comment.toLowerCase().includes(reviewSearchTerm.toLowerCase()))
+            )
+          : reviews;
+
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todas las reseñas</h2>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar reseñas..."
+                  value={reviewSearchTerm}
+                  onChange={(e) => setReviewSearchTerm(e.target.value)}
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <FiMessageCircle className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
             </div>
             <div className="w-full overflow-x-auto">
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
                 <thead>
                   <tr>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Producto</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Usuario</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Calificación</th>
-                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Comentario</th>
+                    <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Fecha</th>
                     <th className={`px-6 py-3 text-xs font-medium tracking-wider text-left uppercase ${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {reviews.map((review) => (
-                    <tr key={review.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{review.productName}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.userEmail || 'N/A'}</td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>
-                        <StarRating rating={review.rating} />
-                      </td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.comment}</td>
+                  {filteredReviews.map((review) => (
+                    <tr key={review._id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{review.productName || 'Producto eliminado'}</td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{formatDate(review.createdAt)}</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-md font-medium flex space-x-2`}>
                         <button 
                           onClick={() => openEditReviewModal(review)} 
@@ -1427,14 +1758,47 @@ const ModernAdminDashboard = () => {
                   ))}
                 </tbody>
               </table>
+              {filteredReviews.length === 0 && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {reviewSearchTerm ? 'No se encontraron reseñas que coincidan con la búsqueda.' : 'No hay reseñas disponibles.'}
+                </div>
+              )}
             </div>
           </div>
         );
       case 'orders':
+        if (ordersLoading) {
+          return <Loader text="Cargando pedidos..." size="lg" />;
+        }
+        // Filter orders based on search term
+        const filteredOrders = orderSearchTerm
+          ? orders.filter(order =>
+              (order.id && order.id.toLowerCase().includes(orderSearchTerm.toLowerCase())) ||
+              (order.userEmail && order.userEmail.toLowerCase().includes(orderSearchTerm.toLowerCase())) ||
+              (order.orderStatus && order.orderStatus.toLowerCase().includes(orderSearchTerm.toLowerCase()))
+            )
+          : orders;
+
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los pedidos</h2>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar pedidos..."
+                  value={orderSearchTerm}
+                  onChange={(e) => setOrderSearchTerm(e.target.value)}
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <FiPackage className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
             </div>
             <div className="w-full overflow-x-auto">
               <table className={`min-w-full divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
@@ -1449,7 +1813,7 @@ const ModernAdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
-                  {orders.map((order) => (
+                  {filteredOrders.map((order) => (
                     <tr key={order.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.id.substring(0, 8)}...</td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{order.userEmail || 'N/A'}</td>
@@ -1492,30 +1856,36 @@ const ModernAdminDashboard = () => {
                         >
                           <FiShoppingBag />
                         </button>
+                        <button 
+                          onClick={() => deleteOrder(order.id)} 
+                          className={`p-1 rounded hover:opacity-80 ${
+                            theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                          }`}
+                        >
+                          <FiTrash2 />
+                        </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {filteredOrders.length === 0 && (
+                <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {orderSearchTerm ? 'No se encontraron pedidos que coincidan con la búsqueda.' : 'No hay pedidos disponibles.'}
+                </div>
+              )}
             </div>
           </div>
         );
       case 'coupons':
         return (
           <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
-            <h2 className={`mb-6 text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Gestión de Cupones</h2>
-const Dashboard = ({ theme, activeTab }) => {
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'coupons':
-        return (
-          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} w-full`}>
-  const renderContent = () => {
-    switch (currentTab) {
-      case 'coupons':
-        return (
-          <div className={`p-6 shadow-sm rounded-xl ${theme === 'dark' ? 'bg-gray-8800' : 'bg-white'} w-full`}>
-            <CouponManager theme={theme} />
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Todos los códigos promocionales</h2>
+            </div>
+            <div className="w-full overflow-x-auto">
+              <CouponManager theme={theme} />
+            </div>
           </div>
         );
       default:
@@ -1527,10 +1897,6 @@ const Dashboard = ({ theme, activeTab }) => {
         );
     }
   };
-  };
-  };
-
-  return (
     <div className={`min-h-screen flex w-full ${theme === 'dark' ? 'dark:bg-gray-900 bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
       {/* Success/Error Messages */}
       {successMessage && (
@@ -1652,6 +2018,20 @@ const Dashboard = ({ theme, activeTab }) => {
                       </p>
                     </div>
                     <button
+                      onClick={() => {
+                        navigate('/');
+                        closeProfileMenu();
+                      }}
+                      className={`flex items-center w-full px-4 py-2 text-sm text-left ${
+                        theme === 'dark' 
+                          ? 'text-gray-300 hover:bg-gray-700' 
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      <FiHome className="mr-2" />
+                      Ir a la página
+                    </button>
+                    <button
                       onClick={handleLogout}
                       className={`flex items-center w-full px-4 py-2 text-sm text-left ${
                         theme === 'dark' 
@@ -1698,7 +2078,7 @@ const Dashboard = ({ theme, activeTab }) => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div 
-              className="fixed inset-0 transition-opacity bg-black bg-opacity-50" 
+              className="fixed transition-opacity bg-opacity-50" 
               aria-hidden="true"
               onClick={() => setProductModalOpen(false)}
             ></div>
@@ -2065,7 +2445,7 @@ const Dashboard = ({ theme, activeTab }) => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div 
-              className="fixed inset-0 transition-opacity bg-black bg-opacity-50" 
+              className="fixed transition-opacity bg-opacity-50" 
               aria-hidden="true"
               onClick={() => setReviewModalOpen(false)}
             ></div>
@@ -2173,6 +2553,7 @@ const Dashboard = ({ theme, activeTab }) => {
           formatDate={formatDate}
           formatCurrency={formatCurrency}
           getOrderStatusText={getOrderStatusText}
+          getStatusBadgeClass={getStatusBadgeClass}
           getStatusBadgeClass={getStatusBadgeClass}
           theme={theme}
         />

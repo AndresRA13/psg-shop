@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 import { Link } from 'react-router-dom';
 import { getProducts } from '../../services/productService';
+import { getCategories } from '../../services/categoryService';
 import StarRating from '../../components/StarRating';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
@@ -10,6 +11,8 @@ import Swal from 'sweetalert2';
 
 const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { addToCart } = useCart();
@@ -37,8 +40,9 @@ const Home = () => {
   });
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch featured products
         setLoading(true);
         const productList = await getProducts();
         // Get top 8 products with highest ratings or randomly select if no ratings
@@ -46,15 +50,21 @@ const Home = () => {
           .sort((a, b) => (b.rating || 0) - (a.rating || 0))
           .slice(0, 8);
         setFeaturedProducts(sortedProducts);
+        
+        // Fetch categories
+        setCategoriesLoading(true);
+        const categoriesList = await getCategories();
+        setCategoryList(categoriesList);
       } catch (err) {
-        setError('Failed to load products');
-        console.error('Error fetching products:', err);
+        setError('Failed to load data');
+        console.error('Error fetching data:', err);
       } finally {
         setLoading(false);
+        setCategoriesLoading(false);
       }
     };
 
-    fetchFeaturedProducts();
+    fetchData();
   }, []);
 
   // Testimonials data
@@ -252,13 +262,7 @@ const Home = () => {
     }
   ];
 
-  // Categories data - Updated to use local images from public folder with correct base path
-  const categories = [
-    { id: 1, name: "Moños Clásicos", image: "/psg-shop/clasicos.jpg" },
-    { id: 2, name: "Moños Modernos", image: "/psg-shop/modernos.jpg" },
-    { id: 3, name: "Moños Infantiles", image: "/psg-shop/infantiles.jpg" },
-    { id: 4, name: "Moños para Damas", image: "/psg-shop/dama.jpg" }
-  ];
+
 
   // Handle touch events for mobile swipe
   const handleTouchStart = (e) => {
@@ -497,34 +501,52 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 gap-8 mt-10 sm:grid-cols-2 lg:grid-cols-4">
-            {categories.map((category) => (
-              <div key={category.id} className="relative overflow-hidden transition-all duration-300 transform shadow-lg group rounded-2xl hover:shadow-xl hover:-translate-y-1">
-                <div className="relative w-full h-80">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/500x500.png?text=' + encodeURIComponent(category.name);
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-70"></div>
+            {categoryList.length > 0 ? (
+              categoryList.slice(0, 8).map((category) => (
+                <div key={category.id} className="relative overflow-hidden transition-all duration-300 transform shadow-lg group rounded-2xl hover:shadow-xl hover:-translate-y-1">
+                  <div className="relative w-full h-80">
+                    <img
+                      src={category.imageUrl || '/psg-shop/clasicos.jpg'}
+                      alt={category.name}
+                      className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/500x500.png?text=' + encodeURIComponent(category.name);
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-70"></div>
+                  </div>
+                  <div className="absolute inset-0 flex flex-col justify-end p-6">
+                    <h3 className="mb-2 text-xl font-bold text-white">{category.name}</h3>
+                    <Link 
+                      to="/shop" 
+                      className="inline-flex items-center font-medium text-indigo-200 transition-colors duration-300 hover:text-white"
+                    >
+                      Explorar
+                      <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </Link>
+                  </div>
                 </div>
-                <div className="absolute inset-0 flex flex-col justify-end p-6">
-                  <h3 className="mb-2 text-xl font-bold text-white">{category.name}</h3>
-                  <Link 
-                    to="/shop" 
-                    className="inline-flex items-center font-medium text-indigo-200 transition-colors duration-300 hover:text-white"
-                  >
-                    Explorar
-                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                  </Link>
-                </div>
+              ))
+            ) : categoriesLoading ? (
+              <div className="flex items-center justify-center w-full h-64 col-span-4">
+                <div className="w-12 h-12 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
               </div>
-            ))}
+            ) : (
+              <div className="flex flex-col items-center justify-center w-full col-span-4 py-16">
+                <div className="mb-4 text-5xl">📁</div>
+                <h3 className="mb-2 text-xl font-semibold text-gray-900">No hay categorías creadas</h3>
+                <p className="mb-6 text-gray-600">Actualmente no hay categorías disponibles en la tienda.</p>
+                <Link 
+                  to="/shop" 
+                  className="inline-flex items-center px-6 py-3 text-base font-medium text-white transition-all duration-300 border border-transparent rounded-lg shadow-md bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800"
+                >
+                  Explorar productos
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -812,7 +834,7 @@ const Home = () => {
             <div className="overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl">
               <div className="h-48 overflow-hidden">
                 <img 
-                 src="/psg-shop/talento.jpg" 
+                 src="/psg-shop/calidad.jpg" 
                   alt="Nuestro Equipo" 
                   className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
                 />
