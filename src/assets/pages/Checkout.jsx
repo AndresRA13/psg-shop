@@ -58,11 +58,59 @@ const Checkout = () => {
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [shippingCost, setShippingCost] = useState(0);
+  
+  // Store origin location (PSG SHOP in Cajamarca, Tolima, Colombia)
+  const originLocation = {
+    city: 'Cajamarca',
+    state: 'Tolima',
+    country: 'Colombia'
+  };
   
   const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
   const discount = coupon ? subtotal - getTotalPrice() : 0;
-  const total = getTotalPrice();
   
+  // Calculate total including shipping
+  const total = getTotalPrice() + shippingCost;
+  
+  // Function to calculate shipping cost based on distance
+  const calculateShippingCost = (destination) => {
+    // If no destination selected, return 0
+    if (!destination) return 0;
+    
+    // If destination is the same city as origin, shipping is minimal
+    if (destination.city.toLowerCase() === originLocation.city.toLowerCase() && 
+        destination.state.toLowerCase() === originLocation.state.toLowerCase()) {
+      return 5000; // $5,000 COP for local shipping
+    }
+    
+    // If destination is in the same state, shipping is moderate
+    if (destination.state.toLowerCase() === originLocation.state.toLowerCase()) {
+      return 15000; // $15,000 COP for state shipping
+    }
+    
+    // If destination is in Colombia but different state, shipping is higher
+    if (destination.country.toLowerCase() === 'colombia') {
+      return 25000; // $25,000 COP for national shipping
+    }
+    
+    // International shipping
+    return 50000; // $50,000 COP for international shipping
+  };
+  
+  // Function to check if address is in Cajamarca
+  const isLocalDelivery = (address) => {
+    if (!address) return false;
+    return address.city.toLowerCase() === originLocation.city.toLowerCase() && 
+           address.state.toLowerCase() === originLocation.state.toLowerCase();
+  };
+  
+  // Update shipping cost when selected address changes
+  useEffect(() => {
+    const cost = calculateShippingCost(selectedAddress);
+    setShippingCost(cost);
+  }, [selectedAddress]);
+
   // Load user addresses
   useEffect(() => {
     const loadAddresses = async () => {
@@ -186,6 +234,7 @@ const Checkout = () => {
         items: items,
         subtotal: parseFloat(subtotal),
         discount: parseFloat(discount),
+        shippingCost: parseFloat(shippingCost),
         totalAmount: parseFloat(total),
         totalAmountUSD: parseFloat(totalInUSD.toFixed(2)), // Store USD amount for PayPal payments
         address: selectedAddress,
@@ -302,9 +351,9 @@ const Checkout = () => {
   if (cartLoading || loading) {
     return (
       <div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="w-12 h-12 border-b-2 border-gray-900 rounded-full animate-spin"></div>
           </div>
         </div>
       </div>
@@ -319,20 +368,20 @@ const Checkout = () => {
   
   return (
     <div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <h1 className="mb-8 text-3xl font-bold text-gray-900">Checkout</h1>
         
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
           {/* Left Column - Address Selection and Order Summary */}
           <div className="lg:col-span-8">
             {/* Shipping Address Section */}
-            <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
+            <div className="mb-8 overflow-hidden bg-white rounded-lg shadow">
               <div className="px-4 py-6 sm:px-6">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">Dirección de Envío</h2>
+                <h2 className="mb-4 text-lg font-medium text-gray-900">Dirección de Envío</h2>
                 
                 {addresses.length === 0 ? (
-                  <div className="text-center py-8">
-                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="py-8 text-center">
+                    <svg className="w-12 h-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
@@ -358,7 +407,7 @@ const Checkout = () => {
                               name="address"
                               checked={selectedAddress && selectedAddress.id === address.id}
                               onChange={() => setSelectedAddress(address)}
-                              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                              className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                             />
                           </div>
                           <div className="ml-3">
@@ -386,9 +435,9 @@ const Checkout = () => {
                   <button
                     type="button"
                     onClick={() => setShowNewAddressForm(!showNewAddressForm)}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
-                    <svg className="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <svg className="w-5 h-5 mr-2 -ml-1 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                     </svg>
                     {addresses.length === 0 ? 'Agregar Dirección' : 'Agregar Nueva Dirección'}
@@ -397,8 +446,8 @@ const Checkout = () => {
                 
                 {/* New Address Form */}
                 {showNewAddressForm && (
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <h3 className="text-md font-medium text-gray-900 mb-4">
+                  <div className="pt-6 mt-6 border-t border-gray-200">
+                    <h3 className="mb-4 font-medium text-gray-900 text-md">
                       {addresses.length === 0 ? 'Agregar Dirección' : 'Nueva Dirección'}
                     </h3>
                     <form onSubmit={handleAddNewAddress}>
@@ -414,7 +463,7 @@ const Checkout = () => {
                             value={newAddress.name}
                             onChange={handleAddressChange}
                             placeholder="Ej: Casa, Trabajo"
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                           />
                         </div>
                         
@@ -429,7 +478,7 @@ const Checkout = () => {
                             value={newAddress.street}
                             onChange={handleAddressChange}
                             placeholder="Ej: Av. Principal 123"
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                           />
                         </div>
                         
@@ -443,7 +492,7 @@ const Checkout = () => {
                             id="city"
                             value={newAddress.city}
                             onChange={handleAddressChange}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                           />
                         </div>
                         
@@ -457,7 +506,7 @@ const Checkout = () => {
                             id="state"
                             value={newAddress.state}
                             onChange={handleAddressChange}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                           />
                         </div>
                         
@@ -471,7 +520,7 @@ const Checkout = () => {
                             id="zipCode"
                             value={newAddress.zipCode}
                             onChange={handleAddressChange}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                           />
                         </div>
                         
@@ -485,22 +534,22 @@ const Checkout = () => {
                             id="country"
                             value={newAddress.country}
                             onChange={handleAddressChange}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                           />
                         </div>
                       </div>
                       
-                      <div className="mt-6 flex space-x-3">
+                      <div className="flex mt-6 space-x-3">
                         <button
                           type="submit"
-                          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                           Guardar Dirección
                         </button>
                         <button
                           type="button"
                           onClick={() => setShowNewAddressForm(false)}
-                          className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          className="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                           Cancelar
                         </button>
@@ -512,19 +561,19 @@ const Checkout = () => {
             </div>
             
             {/* Order Summary Section */}
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="overflow-hidden bg-white rounded-lg shadow">
               <div className="px-4 py-6 sm:px-6">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">Resumen del Pedido</h2>
+                <h2 className="mb-4 text-lg font-medium text-gray-900">Resumen del Pedido</h2>
                 
                 <div className="flow-root">
                   <ul className="-my-6 divide-y divide-gray-200">
                     {items.map((item) => (
-                      <li key={item.id} className="py-6 flex">
-                        <div className="flex-shrink-0 w-24 h-24 border border-gray-200 rounded-md overflow-hidden">
+                      <li key={item.id} className="flex py-6">
+                        <div className="flex-shrink-0 w-24 h-24 overflow-hidden border border-gray-200 rounded-md">
                           <img
                             src={getPrimaryImageUrl(item)}
                             alt={item.name}
-                            className="w-full h-full object-center object-cover"
+                            className="object-cover object-center w-full h-full"
                             onError={(e) => {
                               e.target.onerror = null;
                               e.target.src = 'https://via.placeholder.com/100x100.png?text=Moño';
@@ -532,7 +581,7 @@ const Checkout = () => {
                           />
                         </div>
 
-                        <div className="ml-4 flex-1 flex flex-col">
+                        <div className="flex flex-col flex-1 ml-4">
                           <div>
                             <div className="flex justify-between text-base font-medium text-gray-900">
                               <h3>{item.name}</h3>
@@ -540,7 +589,7 @@ const Checkout = () => {
                             </div>
                             <p className="mt-1 text-sm text-gray-500">{item.category}</p>
                           </div>
-                          <div className="flex-1 flex items-end justify-between text-sm">
+                          <div className="flex items-end justify-between flex-1 text-sm">
                             <p className="text-gray-500">Cantidad: {item.quantity}</p>
                           </div>
                         </div>
@@ -554,8 +603,8 @@ const Checkout = () => {
           
           {/* Right Column - Payment Summary */}
           <div className="mt-8 lg:mt-0 lg:col-span-4">
-            <div className="bg-gray-50 rounded-lg px-4 py-6 sm:p-6 lg:p-8">
-              <h2 className="text-lg font-medium text-gray-900 mb-6">Resumen del Pedido</h2>
+            <div className="px-4 py-6 rounded-lg bg-gray-50 sm:p-6 lg:p-8">
+              <h2 className="mb-6 text-lg font-medium text-gray-900">Resumen del Pedido</h2>
               
               <dl className="space-y-6">
                 <div className="flex items-center justify-between">
@@ -572,10 +621,10 @@ const Checkout = () => {
                 
                 <div className="flex items-center justify-between">
                   <dt className="text-sm text-gray-600">Envío</dt>
-                  <dd className="text-sm font-medium text-gray-900">$0</dd>
+                  <dd className="text-sm font-medium text-gray-900">${parseFloat(shippingCost).toLocaleString('es-CO')}</dd>
                 </div>
                 
-                <div className="flex items-center justify-between border-t border-gray-200 pt-6">
+                <div className="flex items-center justify-between pt-6 border-t border-gray-200">
                   <dt className="text-base font-medium text-gray-900">Total</dt>
                   <dd className="text-base font-medium text-gray-900">${parseFloat(total).toLocaleString('es-CO')}</dd>
                 </div>
@@ -583,8 +632,8 @@ const Checkout = () => {
               
               {/* Selected Address Preview */}
               {selectedAddress && (
-                <div className="mt-8 p-4 bg-white rounded-lg border border-gray-200">
-                  <h3 className="text-md font-medium text-gray-900 mb-2">Dirección de Envío</h3>
+                <div className="p-4 mt-8 bg-white border border-gray-200 rounded-lg">
+                  <h3 className="mb-2 font-medium text-gray-900 text-md">Dirección de Envío</h3>
                   <div className="text-sm text-gray-500">
                     <p className="font-medium">{selectedAddress.name}</p>
                     <p>{selectedAddress.street}</p>
@@ -596,7 +645,7 @@ const Checkout = () => {
               
               {/* Payment Methods */}
               <div className="mt-8">
-                <h3 className="text-md font-medium text-gray-900 mb-4">Método de Pago</h3>
+                <h3 className="mb-4 font-medium text-gray-900 text-md">Método de Pago</h3>
                 
                 <div className="space-y-4">
                   {/* PayPal Button */}
@@ -624,9 +673,9 @@ const Checkout = () => {
                     ) : (
                       <button
                         disabled
-                        className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white opacity-50 cursor-not-allowed"
+                        className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm opacity-50 cursor-not-allowed"
                       >
-                        <svg className="mr-2 h-5 w-5" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg className="w-5 h-5 mr-2" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg">
                           <path fill="#253b80" d="M35.71 15.39c.27-.4.4-.87.36-1.35-.04-.48-.24-.93-.57-1.28-.33-.35-.76-.55-1.22-.56-.46 0-.89.19-1.22.53-.33.34-.52.8-.54 1.28-.02.48.12.94.4 1.33.28.39.68.67 1.14.8.46.13.95.1 1.4-.08.45-.18.84-.49 1.12-.89z"/>
                           <path fill="#179bd7" d="M13.34 15.96c.34-.46.52-1.02.51-1.59-.01-.57-.22-1.12-.59-1.54-.28-.42-.72-.81-1.23-.96-.51-.15-1-.08-1.46.09-.46.17-.85.49-1.11.89-.27.4-.37.93-.32 1.44.03.51.21.99.51 1.4.3.41.74.72 1.23.88.49.16 1.01.17 1.51.06.5-.12.94-.4 1.26-.78z"/>
                           <path fill="#253b80" d="M22.72 16.11c.41-.36.67-.87.72-1.41.05-.54-.03-1.08-.31-1.55-.28-.42-.72-.81-1.23-.96-.51-.15-1-.08-1.46.09-.46.17-.85.49-1.11.89-.26.4-.37.88-.32 1.37.05.49.27.95.61 1.31.34.36.79.6 1.28.68.49.08 1-.01 1.44-.24z"/>
@@ -638,26 +687,36 @@ const Checkout = () => {
                     )}
                   </div>
                   
-                  {/* Cash on Delivery Button */}
-                  <button
-                    onClick={handleCashOnDelivery}
-                    disabled={processing || !selectedAddress}
-                    className={`w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                      processing || !selectedAddress ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {processing ? (
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                    ) : (
-                      <svg className="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    )}
-                    Pagar Contra Entrega
-                  </button>
+                  {/* Cash on Delivery Button - Only show for local delivery (Cajamarca) */}
+                  {isLocalDelivery(selectedAddress) && (
+                    <button
+                      onClick={handleCashOnDelivery}
+                      disabled={processing || !selectedAddress}
+                      className={`w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                        processing || !selectedAddress ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      {processing ? (
+                        <svg className="w-5 h-5 mr-3 -ml-1 text-gray-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )}
+                      Pagar Contra Entrega
+                    </button>
+                  )}
+                  
+                  {/* Message for non-local deliveries */}
+                  {!isLocalDelivery(selectedAddress) && selectedAddress && (
+                    <div className="py-3 text-sm text-center text-gray-600 border border-blue-100 rounded-md bg-blue-50">
+                      <p>El pago contra entrega solo está disponible para envíos dentro de Cajamarca.</p>
+                      <p className="mt-1">Por favor use PayPal para envíos a otras ubicaciones.</p>
+                    </div>
+                  )}
                 </div>
               </div>
               
