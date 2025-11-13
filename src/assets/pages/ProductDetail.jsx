@@ -302,8 +302,8 @@ const ProductDetail = () => {
     return (
       // Removed duplicate Navbar since it's already rendered in App.jsx
       <div>
-        <div className="flex items-center justify-center h-64">
-          <div className="w-12 h-12 border-b-2 border-gray-900 rounded-full animate-spin"></div>
+        <div className="flex items-center justify-center h-48 sm:h-64">
+          <div className="w-8 h-8 sm:w-12 sm:h-12 border-b-2 border-gray-900 rounded-full animate-spin"></div>
         </div>
       </div>
     );
@@ -313,8 +313,8 @@ const ProductDetail = () => {
     return (
       // Removed duplicate Navbar since it's already rendered in App.jsx
       <div>
-        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <div className="relative px-4 py-3 text-red-700 bg-red-100 border border-red-400 rounded" role="alert">
+        <div className="px-4 py-6 sm:py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="relative px-3 py-2 text-xs sm:text-sm sm:px-4 sm:py-3 text-red-700 bg-red-100 border border-red-400 rounded" role="alert">
             <strong className="font-bold">Error! </strong>
             <span className="block sm:inline">{error || 'Product not found'}</span>
           </div>
@@ -328,23 +328,23 @@ const ProductDetail = () => {
   return (
     // Removed duplicate Navbar since it's already rendered in App.jsx
     <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <nav className="flex mb-6" aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-2">
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 sm:px-6 lg:px-8">
+        <nav className="flex mb-4 sm:mb-6" aria-label="Breadcrumb">
+          <ol className="flex items-center space-x-1 sm:space-x-2">
             <li>
-              <Link to="/home" className="text-gray-500 hover:text-indigo-600 transition-colors duration-200">Home</Link>
+              <Link to="/home" className="text-xs sm:text-sm text-gray-500 hover:text-indigo-600 transition-colors duration-200">Home</Link>
             </li>
             <li>
-              <span className="text-gray-500">/</span>
+              <span className="text-xs sm:text-sm text-gray-500">/</span>
             </li>
             <li>
-              <Link to="/shop" className="text-gray-500 hover:text-indigo-600 transition-colors duration-200">Shop</Link>
+              <Link to="/shop" className="text-xs sm:text-sm text-gray-500 hover:text-indigo-600 transition-colors duration-200">Shop</Link>
             </li>
             <li>
-              <span className="text-gray-500">/</span>
+              <span className="text-xs sm:text-sm text-gray-500">/</span>
             </li>
             <li>
-              <span className="text-gray-900 font-medium">{product.name}</span>
+              <span className="text-xs sm:text-sm text-gray-900 font-medium truncate max-w-[100px] sm:max-w-none">{product.name}</span>
             </li>
           </ol>
         </nav>
@@ -355,11 +355,11 @@ const ProductDetail = () => {
             {/* Image selector */}
             {images.length > 1 && (
               <div className="w-full max-w-2xl mx-auto mt-6 lg:max-w-none">
-                <div className="grid grid-cols-4 gap-4" aria-orientation="horizontal">
+                <div className="grid grid-cols-4 gap-2 sm:gap-4" aria-orientation="horizontal">
                   {images.map((image, index) => (
                     <button
                       key={index}
-                      className={`relative h-20 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-medium uppercase text-gray-900 cursor-pointer hover:bg-gray-200 focus:outline-none transition-all duration-200 ${
+                      className={`relative h-16 sm:h-20 bg-gray-100 rounded-lg flex items-center justify-center text-xs sm:text-sm font-medium uppercase text-gray-900 cursor-pointer hover:bg-gray-200 focus:outline-none transition-all duration-200 ${
                         selectedImageIndex === index ? 'ring-2 ring-indigo-500' : 'border border-gray-200'
                       }`}
                       onClick={() => setSelectedImageIndex(index)}
@@ -400,44 +400,44 @@ const ProductDetail = () => {
           </div>
 
           {/* Product info */}
-          <div className="px-4 mt-10 sm:px-0 sm:mt-16 lg:mt-0">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">{product.name}</h1>
+          <div className="px-4 mt-8 sm:px-0 sm:mt-10 lg:mt-0">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">{product.name}</h1>
 
-            <div className="mt-4 flex items-center">
+            <div className="mt-3 sm:mt-4 flex flex-wrap items-center gap-2 sm:gap-4">
               {product.rating > 0 && (
                 <div className="flex items-center">
-                  <StarRating rating={product.rating} size="lg" />
-                  <span className="ml-2 text-sm text-gray-600">({product.rating})</span>
+                  <StarRating rating={product.rating} size="md" />
+                  <span className="ml-2 text-xs sm:text-sm text-gray-600">({product.rating})</span>
                 </div>
               )}
-              <span className="ml-4 text-sm text-gray-500">SKU: {product.id?.substring(0, 8)}</span>
+              <span className="text-xs sm:text-sm text-gray-500">SKU: {product.id?.substring(0, 8)}</span>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <h2 className="sr-only">Product information</h2>
-              <p className="text-3xl font-bold text-indigo-700">${parseFloat(product.price).toLocaleString('es-CO')}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-indigo-700">${parseFloat(product.price).toLocaleString('es-CO')}</p>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <h3 className="sr-only">Description</h3>
               <div className="prose prose-indigo text-gray-700">
-                <p className="text-base leading-relaxed">{product.description}</p>
+                <p className="text-sm sm:text-base leading-relaxed">{product.description}</p>
               </div>
             </div>
 
-            <div className="mt-8 border-t border-b border-gray-200 py-6">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="mt-6 sm:mt-8 border-t border-b border-gray-200 py-4 sm:py-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="flex items-center">
-                  <span className="text-gray-600 font-medium">Categoría:</span>
-                  <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800">
+                  <span className="text-xs sm:text-sm text-gray-600 font-medium">Categoría:</span>
+                  <span className="ml-2 inline-flex items-center px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800">
                     {product.category}
                   </span>
                 </div>
                 
                 {product.stock !== undefined && (
                   <div className="flex items-center">
-                    <span className="text-gray-600 font-medium">Disponibilidad:</span>
-                    <span className={`ml-2 font-medium ${product.stock > 5 ? 'text-green-600' : product.stock > 0 ? 'text-yellow-600' : 'text-red-600'}`}>
+                    <span className="text-xs sm:text-sm text-gray-600 font-medium">Disponibilidad:</span>
+                    <span className={`ml-2 text-xs sm:text-sm font-medium ${product.stock > 5 ? 'text-green-600' : product.stock > 0 ? 'text-yellow-600' : 'text-red-600'}`}>
                       {product.stock > 0 ? `${product.stock} en stock` : 'Agotado'}
                     </span>
                   </div>
@@ -445,40 +445,40 @@ const ProductDetail = () => {
                 
                 {product.material && (
                   <div className="flex items-center">
-                    <span className="text-gray-600 font-medium">Material:</span>
-                    <span className="ml-2 text-gray-900">{product.material}</span>
+                    <span className="text-xs sm:text-sm text-gray-600 font-medium">Material:</span>
+                    <span className="ml-2 text-xs sm:text-sm text-gray-900">{product.material}</span>
                   </div>
                 )}
                 
                 {product.color && (
                   <div className="flex items-center">
-                    <span className="text-gray-600 font-medium">Color:</span>
-                    <span className="ml-2 text-gray-900">{product.color}</span>
+                    <span className="text-xs sm:text-sm text-gray-600 font-medium">Color:</span>
+                    <span className="ml-2 text-xs sm:text-sm text-gray-900">{product.color}</span>
                   </div>
                 )}
                 
                 {product.size && (
                   <div className="flex items-center">
-                    <span className="text-gray-600 font-medium">Tamaño:</span>
-                    <span className="ml-2 text-gray-900">{product.size}</span>
+                    <span className="text-xs sm:text-sm text-gray-600 font-medium">Tamaño:</span>
+                    <span className="ml-2 text-xs sm:text-sm text-gray-900">{product.size}</span>
                   </div>
                 )}
                 
                 {product.style && (
                   <div className="flex items-center">
-                    <span className="text-gray-600 font-medium">Estilo:</span>
-                    <span className="ml-2 text-gray-900">{product.style}</span>
+                    <span className="text-xs sm:text-sm text-gray-600 font-medium">Estilo:</span>
+                    <span className="ml-2 text-xs sm:text-sm text-gray-900">{product.style}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <form className="mt-8">
-              <div className="flex flex-wrap gap-4">
+            <form className="mt-6 sm:mt-8">
+              <div className="flex flex-wrap gap-3 sm:gap-4">
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className="flex-1 min-w-[200px] px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+                  className="flex-1 min-w-[150px] sm:min-w-[200px] px-4 sm:px-6 py-2.5 sm:py-3 border border-transparent text-sm sm:text-base font-medium rounded-lg text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
                   disabled={product.stock === 0}
                 >
                   {product.stock === 0 ? 'Agotado' : 'Agregar al Carrito'}
@@ -487,9 +487,9 @@ const ProductDetail = () => {
                 <button
                   type="button"
                   onClick={handleAddToWishlist}
-                  className="flex items-center justify-center px-5 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300"
+                  className="flex items-center justify-center px-4 sm:px-5 py-2.5 sm:py-3 border border-gray-300 rounded-lg shadow-sm text-sm sm:text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300"
                 >
-                  <svg className="flex-shrink-0 w-5 h-5 text-gray-500 hover:text-red-500 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5 text-gray-500 hover:text-red-500 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                   <span className="sr-only">Agregar a favoritos</span>
@@ -500,42 +500,42 @@ const ProductDetail = () => {
         </div>
 
         {/* Reviews Section */}
-        <div className="mt-20">
-          <div className="border-t border-gray-200 pt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Reseñas de Clientes</h2>
+        <div className="mt-12 sm:mt-20">
+          <div className="border-t border-gray-200 pt-8 sm:pt-12">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8">Reseñas de Clientes</h2>
             
             {/* Reviews List - Only showing existing reviews, no form */}
             <div>
               {reviewLoading ? (
-                <div className="flex justify-center py-12">
-                  <div className="w-10 h-10 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
+                <div className="flex justify-center py-8 sm:py-12">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
                 </div>
               ) : reviews.length === 0 ? (
-                <div className="text-center py-12 bg-white rounded-2xl shadow-sm p-8">
-                  <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="text-center py-8 sm:py-12 bg-white rounded-2xl shadow-sm p-6 sm:p-8">
+                  <svg className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                   </svg>
-                  <h3 className="mt-2 text-lg font-medium text-gray-900">No hay reseñas aún</h3>
-                  <p className="mt-1 text-gray-500">
+                  <h3 className="mt-2 text-base sm:text-lg font-medium text-gray-900">No hay reseñas aún</h3>
+                  <p className="mt-1 text-sm text-gray-500">
                     Este producto aún no tiene reseñas.
                   </p>
                 </div>
               ) : (
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   {reviews.map((review) => (
-                    <div key={review.id} className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow duration-300">
-                      <div className="flex items-center justify-between">
+                    <div key={review.id} className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 border border-gray-100 hover:shadow-md transition-shadow duration-300">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
                         <div>
-                          <h4 className="text-lg font-semibold text-gray-900">{review.userName}</h4>
+                          <h4 className="text-base sm:text-lg font-semibold text-gray-900">{review.userName}</h4>
                           <div className="mt-1 flex items-center">
                             <StarRating rating={review.rating} size="sm" />
-                            <span className="ml-2 text-sm text-gray-500">{review.rating}/5</span>
+                            <span className="ml-2 text-xs sm:text-sm text-gray-500">{review.rating}/5</span>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-500">{formatDate(review.createdAt)}</p>
+                        <p className="text-xs sm:text-sm text-gray-500">{formatDate(review.createdAt)}</p>
                       </div>
-                      <div className="mt-4">
-                        <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                      <div className="mt-3 sm:mt-4">
+                        <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>
                       </div>
                     </div>
                   ))}
@@ -546,26 +546,26 @@ const ProductDetail = () => {
         </div>
 
         {/* Related Products Section */}
-        <div className="mt-20">
-          <div className="border-t border-gray-200 pt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Productos Relacionados</h2>
+        <div className="mt-12 sm:mt-20">
+          <div className="border-t border-gray-200 pt-8 sm:pt-12">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8">Productos Relacionados</h2>
             
             {relatedLoading ? (
-              <div className="flex items-center justify-center h-32">
-                <div className="w-8 h-8 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
+              <div className="flex items-center justify-center h-24 sm:h-32">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
               </div>
             ) : relatedProducts.length === 0 ? (
-              <div className="text-center py-8 bg-white rounded-2xl shadow-sm p-6">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="text-center py-6 sm:py-8 bg-white rounded-2xl shadow-sm p-4 sm:p-6">
+                <svg className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
-                <h3 className="mt-2 text-lg font-medium text-gray-900">No hay productos relacionados</h3>
-                <p className="mt-1 text-gray-500">
+                <h3 className="mt-2 text-base sm:text-lg font-medium text-gray-900">No hay productos relacionados</h3>
+                <p className="mt-1 text-sm text-gray-500">
                   No encontramos otros productos en la misma categoría.
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {relatedProducts.map((relatedProduct) => (
                   <div key={relatedProduct.id} className="overflow-hidden transition-all duration-300 bg-white border border-gray-100 rounded-lg shadow-md hover:shadow-lg">
                     <Link to={`/product/${relatedProduct.id}`}>
@@ -573,7 +573,7 @@ const ProductDetail = () => {
                         <img
                           src={getPrimaryImageUrl(relatedProduct)}
                           alt={relatedProduct.name}
-                          className="object-cover w-full h-48"
+                          className="object-cover w-full h-32 sm:h-48"
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src = 'https://via.placeholder.com/300x300.png?text=Moño';
@@ -581,8 +581,8 @@ const ProductDetail = () => {
                         />
                       </div>
                     </Link>
-                    <div className="p-4">
-                      <h3 className="text-lg font-medium text-gray-900 truncate">{relatedProduct.name}</h3>
+                    <div className="p-3 sm:p-4">
+                      <h3 className="text-base sm:text-lg font-medium text-gray-900 truncate">{relatedProduct.name}</h3>
                       
                       {relatedProduct.rating > 0 && (
                         <div className="mt-1">
@@ -591,11 +591,11 @@ const ProductDetail = () => {
                       )}
                       
                       <div className="mt-2">
-                        <span className="text-lg font-semibold text-indigo-700">${parseFloat(relatedProduct.price).toLocaleString('es-CO')}</span>
+                        <span className="text-base sm:text-lg font-semibold text-indigo-700">${parseFloat(relatedProduct.price).toLocaleString('es-CO')}</span>
                       </div>
                       
                       <button 
-                        className="w-full mt-4 px-4 py-2 text-sm font-medium text-white transition-all duration-300 border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="w-full mt-3 sm:mt-4 px-3 py-2 text-xs sm:text-sm font-medium text-white transition-all duration-300 border border-transparent rounded-md shadow-sm bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         onClick={(e) => {
                           e.preventDefault();
                           handleAddRelatedToCart(relatedProduct);
